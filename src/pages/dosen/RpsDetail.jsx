@@ -1,10 +1,14 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Breadcrumb from '../../components/Breadcrumb';
 import Header from '../../components/Header';
 import Sidebar from '../../components/Sidebar';
 import { useNavigate, useParams } from 'react-router-dom';
 import { getRpsMataKuliah } from '../../api/matakuliah';
 import { getUserRole } from '../../api/user';
+import { PrinterIcon } from '@heroicons/react/24/solid';
+import { useReactToPrint } from 'react-to-print';
+// import MyPdf from '../../utils/MyPdf';
+import MyPdf2 from '../../utils/MyPdf2';
 
 export default function RpsDetail() {
   const navigate = useNavigate();
@@ -14,6 +18,12 @@ export default function RpsDetail() {
   const [listAssessment, setListAssessment] = useState([]);
   const [dosenPengampu, setDosenPengampu] = useState([]);
   const params = useParams();
+  const pdfRef = useRef();
+
+  const handlePrint = useReactToPrint({
+    content: () => pdfRef.current,
+    documentTitle: `RPS ${rps.kode_mk}`,
+  });
 
   useEffect(() => {
     async function fetchUser() {
@@ -30,7 +40,6 @@ export default function RpsDetail() {
     async function fetchRps() {
       try {
         const res = await getRpsMataKuliah(params.mkId);
-        console.log(res);
         if (res) {
           setRps(res);
           setDosenPengampu(res.dosen_pengampu);
@@ -49,7 +58,7 @@ export default function RpsDetail() {
 
   const listNav = [
     { name: 'RPS', link: '/dosen/rps' },
-    { name: 'Detail', link: '/dosen/rps/detail' },
+    { name: `${rps.kode_mk} / Detail`, link: '/dosen/rps/detail' },
   ];
   return (
     <>
@@ -63,6 +72,25 @@ export default function RpsDetail() {
             <Breadcrumb listNav={listNav} />
           </div>
           <main className="p-7 text-wrap">
+            <div className="">
+              <div className="hidden">
+                <MyPdf2
+                  ref={pdfRef}
+                  rps={rps}
+                  listClo={listClo}
+                  listPlo={listPlo}
+                  dosenPengampu={dosenPengampu}
+                />
+              </div>
+              <button
+                type="button"
+                onClick={handlePrint}
+                className="flex justify-center items-center focus:outline-none text-white bg-lime-600 hover:bg-lime-700 focus:ring-4 focus:ring-lime-300 font-medium rounded-lg text-sm px-3 py-1.5 me-2 mb-2"
+              >
+                Cetak RPS
+                <PrinterIcon className="w-5 ml-1" />
+              </button>
+            </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="block bg-white border border-gray-200 rounded-lg shadow">
                 <div className="rounded-t-lg bg-slate-200 px-4 py-2">

@@ -19,7 +19,7 @@ export default function Sidebar({ typeUser, page }) {
           className="absolute cursor-pointer bg-indigo-500 z-40 border-t border-b border-r border-indigo-500 rounded-r-md -right-7 top-1.5 w-8 hover:bg-indigo-400 shadow-inner"
         />
         <div className="text-xl font-bold text-center">
-          <img src="../../../../../logo.png" alt="" />
+          <img src="/logo.png" alt="" />
           <h1 className={`${!open && 'hidden'} duration-200`}>
             Rekayasa Perangkat Lunak
           </h1>
