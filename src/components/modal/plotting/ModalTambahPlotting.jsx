@@ -5,6 +5,7 @@ import { getMataKuliahByObeId } from '../../../api/matakuliah';
 import { getDosen } from '../../../api/dosen';
 import { getKelas } from '../../../api/kelas';
 import { createPlotting } from '../../../api/plotting';
+import { alertFailed, alertSuccess } from '../../../utils/alert';
 
 export default function ModalTambahPlotting({ close, render, activeObe }) {
   const [listMk, setListMk] = useState([]);
@@ -71,11 +72,12 @@ export default function ModalTambahPlotting({ close, render, activeObe }) {
       try {
         const res = await createPlotting(dataInput);
         if (res) {
+          alertSuccess('Berhasil menambah data');
           render();
           close();
         }
       } catch (e) {
-        console.error(e);
+        alertFailed('Gagal menambah data');
       }
     }
   };

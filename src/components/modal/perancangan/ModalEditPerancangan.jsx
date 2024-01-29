@@ -6,6 +6,7 @@ import {
   getPerancanganById,
   updatePerancangan,
 } from '../../../api/perancanganObe';
+import { alertFailed, alertSuccess } from '../../../utils/alert';
 
 export default function ModalEditPerancangan({ close, render, id }) {
   const [data, setData] = useState({});
@@ -40,11 +41,12 @@ export default function ModalEditPerancangan({ close, render, id }) {
       try {
         const res = await updatePerancangan(dataInput, id);
         if (res) {
+          alertSuccess('Berhasil memperbarui data');
           render();
           close();
         }
       } catch (e) {
-        console.error(e);
+        alertFailed('Gagal memperbarui data');
       }
     }
   };

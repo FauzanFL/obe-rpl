@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { XMarkIcon } from '@heroicons/react/24/solid';
 import { updateAssessment } from '../../../api/lembarAssessment';
 import { getJenisAssessment } from '../../../api/jenisAssessment';
+import { alertFailed, alertSuccess } from '../../../utils/alert';
 
 export default function ModalEditAssessment({
   close,
@@ -80,11 +81,12 @@ export default function ModalEditAssessment({
       try {
         const res = await updateAssessment(dataInput, data.id);
         if (res) {
+          alertSuccess('Berhasil memperbarui data');
           render();
           close();
         }
       } catch (e) {
-        console.error(e);
+        alertFailed('Gagal memperbarui data');
       }
     }
   };

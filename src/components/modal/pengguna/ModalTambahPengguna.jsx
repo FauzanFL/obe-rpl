@@ -1,6 +1,7 @@
 /* eslint-disable react/prop-types */
 import { XMarkIcon } from '@heroicons/react/24/solid';
 import { addUser } from '../../../api/user';
+import { alertFailed, alertSuccess } from '../../../utils/alert';
 
 export default function ModalTambahPengguna({ close, render }) {
   const dataInput = {};
@@ -33,11 +34,12 @@ export default function ModalTambahPengguna({ close, render }) {
       try {
         const res = await addUser(dataInput);
         if (res) {
+          alertSuccess('Berhasil menambah data');
           render();
           close();
         }
       } catch (e) {
-        console.error(e);
+        alertFailed('Gagal menambah data');
       }
     }
   };

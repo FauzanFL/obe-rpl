@@ -3,6 +3,7 @@ import { XMarkIcon } from '@heroicons/react/24/solid';
 import { useEffect, useState } from 'react';
 import { getKurikulum } from '../../../api/kurikulum';
 import { createPerancangan } from '../../../api/perancanganObe';
+import { alertFailed, alertSuccess } from '../../../utils/alert';
 
 export default function ModalTambahPerancangan({ close, render }) {
   const [listKurikulum, setListKurikulum] = useState([]);
@@ -29,11 +30,12 @@ export default function ModalTambahPerancangan({ close, render }) {
       try {
         const res = await createPerancangan(dataInput);
         if (res) {
+          alertSuccess('Berhasil menambah data');
           render();
           close();
         }
       } catch (e) {
-        console.error(e);
+        alertFailed('Gagal menambah data');
       }
     }
   };

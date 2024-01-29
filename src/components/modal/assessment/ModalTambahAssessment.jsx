@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { XMarkIcon } from '@heroicons/react/24/solid';
 import { createAssessment } from '../../../api/lembarAssessment';
 import { getJenisAssessment } from '../../../api/jenisAssessment';
+import { alertFailed, alertSuccess } from '../../../utils/alert';
 
 export default function ModalTambahAssessment({
   close,
@@ -70,11 +71,12 @@ export default function ModalTambahAssessment({
       try {
         const res = await createAssessment(dataInput);
         if (res) {
+          alertSuccess('Berhasil menambah data');
           render();
           close();
         }
       } catch (e) {
-        console.error(e);
+        alertFailed('Gagal menambah data');
       }
     }
   };

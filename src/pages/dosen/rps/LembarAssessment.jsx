@@ -18,6 +18,7 @@ import {
 import { getUserRole } from '../../../api/user';
 import ModalTambahAssessment from '../../../components/modal/assessment/ModalTambahAssessment';
 import ModalEditAssessment from '../../../components/modal/assessment/ModalEditAssessment';
+import { alertDelete, alertFailed, alertSuccess } from '../../../utils/alert';
 
 export default function LembarAssessment() {
   const navigate = useNavigate();
@@ -175,10 +176,11 @@ export default function LembarAssessment() {
                         try {
                           const res = await deleteAssessment(item.id);
                           if (res) {
+                            alertSuccess('Berhasil menghapus data');
                             render();
                           }
                         } catch (e) {
-                          console.error(e);
+                          alertFailed('Gagal menghapus data');
                         }
                       };
                       return (
@@ -202,7 +204,7 @@ export default function LembarAssessment() {
                             </button>
                             <button
                               type="button"
-                              onClick={handleDelete}
+                              onClick={() => alertDelete(handleDelete)}
                               className="flex justify-center items-center focus:outline-none text-white bg-red-600 hover:bg-red-700 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-3 py-1.5 me-2 mb-2"
                             >
                               <TrashIcon className="w-5" />

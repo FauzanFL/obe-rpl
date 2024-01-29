@@ -1,6 +1,7 @@
 /* eslint-disable react/prop-types */
 import { XMarkIcon } from '@heroicons/react/24/solid';
 import { createMataKuliah } from '../../../api/matakuliah';
+import { alertFailed, alertSuccess } from '../../../utils/alert';
 
 export default function ModalTambahMk({ close, render, activeObe }) {
   const dataInput = { obe_id: activeObe.id };
@@ -40,11 +41,12 @@ export default function ModalTambahMk({ close, render, activeObe }) {
       try {
         const res = await createMataKuliah(dataInput);
         if (res) {
+          alertSuccess('Berhasil menambah data');
           render();
           close();
         }
       } catch (e) {
-        console.error(e);
+        alertFailed('Gagal menambah data');
       }
     }
   };

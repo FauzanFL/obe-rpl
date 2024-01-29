@@ -1,6 +1,7 @@
 /* eslint-disable react/prop-types */
 import { XMarkIcon } from '@heroicons/react/24/solid';
 import { updateMataKuliah } from '../../../api/matakuliah';
+import { alertFailed, alertSuccess } from '../../../utils/alert';
 
 export default function ModalEditMk({ close, render, activeObe, data }) {
   const dataInput = {
@@ -48,11 +49,12 @@ export default function ModalEditMk({ close, render, activeObe, data }) {
       try {
         const res = await updateMataKuliah(dataInput, data.id);
         if (res) {
+          alertSuccess('Berhasil memperbarui data');
           render();
           close();
         }
       } catch (e) {
-        console.error(e);
+        alertFailed('Gagal memperbarui data');
       }
     }
   };

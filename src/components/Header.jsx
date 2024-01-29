@@ -3,20 +3,21 @@ import { ArrowRightStartOnRectangleIcon } from '@heroicons/react/24/solid';
 import { logoutUser } from '../api/user';
 import RemoveCookie from '../hooks/RemoveCookie';
 import { useNavigate } from 'react-router-dom';
+import { alertFailed, alertSuccess } from '../utils/alert';
 
 export default function Header({ typeUser }) {
   const navigate = useNavigate();
   const handleLogout = async () => {
     try {
       const res = await logoutUser();
-      console.log(res);
       if (res) {
         RemoveCookie('usrin');
         RemoveCookie('Authorization');
         navigate('/');
       }
+      alertSuccess('Logout success');
     } catch (e) {
-      console.error(e.response.data);
+      alertFailed('Logout failed');
     }
   };
   return (

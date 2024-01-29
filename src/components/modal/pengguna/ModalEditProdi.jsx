@@ -1,6 +1,7 @@
 /* eslint-disable react/prop-types */
 import { XMarkIcon } from '@heroicons/react/24/solid';
 import { updateUser } from '../../../api/user';
+import { alertFailed, alertSuccess } from '../../../utils/alert';
 
 export default function ModalEditProdi({ close, render, data }) {
   const dataInput = {
@@ -22,11 +23,12 @@ export default function ModalEditProdi({ close, render, data }) {
       try {
         const res = await updateUser(dataInput, data.id);
         if (res) {
+          alertSuccess('Berhasil memperbarui data');
           render();
           close();
         }
       } catch (e) {
-        console.error(e);
+        alertFailed('Gagal memperbarui data');
       }
     }
   };

@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { getPloByObeId } from '../../../api/plo';
 import { XMarkIcon } from '@heroicons/react/24/solid';
 import { createClo } from '../../../api/clo';
+import { alertFailed, alertSuccess } from '../../../utils/alert';
 
 export default function ModalTambahClo({
   close,
@@ -71,11 +72,12 @@ export default function ModalTambahClo({
       try {
         const res = await createClo(dataInput);
         if (res) {
+          alertSuccess('Berhasil menambah data');
           render();
           close();
         }
       } catch (e) {
-        console.error(e);
+        alertFailed('Gagal menambah data');
       }
     }
   };

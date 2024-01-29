@@ -8,6 +8,7 @@ import RemoveCookie from '../hooks/RemoveCookie';
 import SetCookie from '../hooks/SetCookie';
 import { useNavigate } from 'react-router-dom';
 import GetCookie from '../hooks/GetCookie';
+import { alertFailed, alertSuccess } from '../utils/alert';
 
 export default function Home() {
   const navigate = useNavigate();
@@ -49,7 +50,7 @@ export default function Home() {
         if (res) {
           RemoveCookie('Authorization');
           SetCookie('Authorization', res.token);
-          alert('Login Success');
+          alertSuccess('Login Success');
           try {
             const res = await getUserRole();
             roleHandler(res.role);
@@ -58,7 +59,7 @@ export default function Home() {
           }
         }
       } catch (e) {
-        console.error(e.response.data);
+        alertFailed(e.response.data.error);
       }
     }
   };

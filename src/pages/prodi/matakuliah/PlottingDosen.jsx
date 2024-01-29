@@ -9,6 +9,7 @@ import { useNavigate } from 'react-router-dom';
 import { getUserRole } from '../../../api/user';
 import { getActivePerancangan } from '../../../api/perancanganObe';
 import ModalTambahPlotting from '../../../components/modal/plotting/ModalTambahPlotting';
+import { alertDelete, alertFailed, alertSuccess } from '../../../utils/alert';
 
 export default function PlottingDosen() {
   const navigate = useNavigate();
@@ -114,10 +115,11 @@ export default function PlottingDosen() {
                         try {
                           const res = await deletePlotting(item.id);
                           if (res) {
+                            alertSuccess('Berhasil menghapus data');
                             render();
                           }
                         } catch (e) {
-                          console.error(e);
+                          alertFailed('Gagal menghapus data');
                         }
                       };
                       return (
@@ -131,7 +133,7 @@ export default function PlottingDosen() {
                           <td className="flex px-6 py-4">
                             <button
                               type="button"
-                              onClick={handleDelete}
+                              onClick={() => alertDelete(handleDelete)}
                               className="flex justify-center items-center focus:outline-none text-white bg-red-600 hover:bg-red-700 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-3 py-1.5 me-2 mb-2"
                             >
                               <TrashIcon className="w-5" />

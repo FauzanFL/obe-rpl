@@ -14,6 +14,7 @@ import { getUserRole } from '../../../api/user';
 import { getActivePerancangan } from '../../../api/perancanganObe';
 import ModalTambahPlo from '../../../components/modal/plo/ModalTambahPlo';
 import ModalEditPlo from '../../../components/modal/plo/ModalEditPlo';
+import { alertDelete, alertFailed, alertSuccess } from '../../../utils/alert';
 
 export default function Plo() {
   const navigate = useNavigate();
@@ -112,10 +113,11 @@ export default function Plo() {
                         try {
                           const res = await deletePlo(item.id);
                           if (res) {
+                            alertSuccess('Berhasil menghapus data');
                             render();
                           }
                         } catch (e) {
-                          console.error(e);
+                          alertFailed('Gagal menghapus data');
                         }
                       };
                       return (
@@ -135,7 +137,7 @@ export default function Plo() {
                             </button>
                             <button
                               type="button"
-                              onClick={handleDelete}
+                              onClick={() => alertDelete(handleDelete)}
                               className="flex justify-center items-center focus:outline-none text-white bg-red-600 hover:bg-red-700 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-3 py-1.5 me-2 mb-2"
                             >
                               <TrashIcon className="w-5" />

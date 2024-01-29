@@ -1,6 +1,7 @@
 /* eslint-disable react/prop-types */
 import { XMarkIcon } from '@heroicons/react/24/solid';
 import { updatePlo } from '../../../api/plo';
+import { alertFailed, alertSuccess } from '../../../utils/alert';
 
 export default function ModalEditPlo({ close, render, data }) {
   const dataInput = {
@@ -31,11 +32,12 @@ export default function ModalEditPlo({ close, render, data }) {
       try {
         const res = await updatePlo(dataInput, data.id);
         if (res) {
+          alertSuccess('Berhasil memperbarui data');
           render();
           close();
         }
       } catch (e) {
-        console.error(e);
+        alertFailed('Gagal memperbarui data');
       }
     }
   };

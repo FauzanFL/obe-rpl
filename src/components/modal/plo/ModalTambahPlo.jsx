@@ -3,6 +3,7 @@ import { XMarkIcon } from '@heroicons/react/24/solid';
 import { useEffect, useState } from 'react';
 import { getActivePerancangan } from '../../../api/perancanganObe';
 import { createPlo } from '../../../api/plo';
+import { alertFailed, alertSuccess } from '../../../utils/alert';
 
 export default function ModalTambahPlo({ close, render }) {
   const [activeObe, setActiveObe] = useState({});
@@ -45,11 +46,12 @@ export default function ModalTambahPlo({ close, render }) {
       try {
         const res = await createPlo(dataInput);
         if (res) {
+          alertSuccess('Berhasil menambah data');
           render();
           close();
         }
       } catch (e) {
-        console.error(e);
+        alertFailed('Gagal menambah data');
       }
     }
   };

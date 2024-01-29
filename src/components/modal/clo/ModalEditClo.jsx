@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { getPloByObeId } from '../../../api/plo';
 import { XMarkIcon } from '@heroicons/react/24/solid';
 import { updateClo } from '../../../api/clo';
+import { alertFailed, alertSuccess } from '../../../utils/alert';
 
 export default function ModalEditClo({
   close,
@@ -80,11 +81,12 @@ export default function ModalEditClo({
       try {
         const res = await updateClo(dataInput, data.id);
         if (res) {
+          alertSuccess('Berhasil memperbarui data');
           render();
           close();
         }
       } catch (e) {
-        console.error(e);
+        alertFailed('Gagal memperbarui data');
       }
     }
   };
