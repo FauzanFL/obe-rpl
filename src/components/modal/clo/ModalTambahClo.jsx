@@ -13,9 +13,15 @@ export default function ModalTambahClo({
   activeObe,
 }) {
   const [listPlo, setListPlo] = useState([]);
-  const dataInput = {
+  const [errStatus, setErrStatus] = useState({});
+  const [errors, setErrors] = useState({});
+  const [dataInput, setDataInput] = useState({
     mk_id: mkId,
-  };
+    nama: '',
+    deskripsi: '',
+    bobot: 0,
+    plo_id: 0,
+  });
 
   useEffect(() => {
     async function fetchPlo() {
@@ -38,37 +44,71 @@ export default function ModalTambahClo({
   };
 
   const formatBobot = (bobot) => {
-    return parseInt(bobot) / 100;
+    return bobot / 100;
   };
 
   const handleChange = (target) => {
+    let helper = { ...dataInput };
     if (target.name === 'nama') {
-      dataInput.nama = target.value;
+      helper.nama = target.value;
+      setDataInput(helper);
     } else if (target.name === 'deskripsi') {
-      dataInput.deskripsi = target.value;
+      helper.deskripsi = target.value;
+      setDataInput(helper);
     } else if (target.name === 'bobot') {
-      dataInput.bobot = formatBobot(target.value);
+      helper.bobot = parseInt(target.value);
+      setDataInput(helper);
     } else if (target.name === 'plo') {
-      dataInput.plo_id = parseInt(target.value);
+      helper.plo_id = parseInt(target.value);
+      setDataInput(helper);
     }
+  };
+
+  const validation = () => {
+    const error = {};
+    const errStat = {};
+    let status = true;
+
+    if (dataInput.nama === '') {
+      error.nama = 'nama tidak boleh kosong';
+      errStat.nama = true;
+      status = false;
+    }
+
+    if (dataInput.deskripsi === '') {
+      error.deskripsi = 'deskripsi tidak boleh kosong';
+      errStat.deskripsi = true;
+      status = false;
+    }
+
+    if (dataInput.bobot === 0) {
+      error.bobot = 'bobot tidak boleh kosong';
+      errStat.bobot = true;
+      status = false;
+    } else if (dataInput.bobot > bobotMax()) {
+      error.bobot = `bobot tidak boleh lebih dari ${bobotMax()}`;
+      errStat.bobot = true;
+      status = false;
+    } else if (dataInput.bobot < 1) {
+      error.bobot = 'bobot tidak boleh kurang dari 1';
+      errStat.bobot = true;
+      status = false;
+    }
+
+    if (dataInput.plo_id === 0) {
+      error.plo_id = 'PLO tidak boleh kosong';
+      errStat.plo_id = true;
+      status = false;
+    }
+    setErrStatus(errStat);
+    setErrors(error);
+    return status;
   };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    if (dataInput.nama === undefined || dataInput.nama === '') {
-      console.log('Nama tidak boleh kosong');
-    } else if (
-      dataInput.deskripsi === undefined ||
-      dataInput.deskripsi === ''
-    ) {
-      console.log('Deskripsi tidak boleh kosong');
-    } else if (dataInput.bobot === undefined || dataInput.bobot === 0) {
-      console.log('Bobot tidak boleh kosong');
-    } else if (dataInput.plo_id === undefined || dataInput.plo_id === 0) {
-      console.log('PLO tidak boleh kosong');
-    } else if (dataInput.bobot > bobotMax()) {
-      console.log(`Bobot tidak boleh lebih dari ${bobotMax()}`);
-    } else {
+    if (validation()) {
+      dataInput.bobot = formatBobot(dataInput.bobot);
       try {
         const res = await createClo(dataInput);
         if (res) {
@@ -110,10 +150,15 @@ export default function ModalTambahClo({
               name="nama"
               id="nama"
               type="text"
-              className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5 focus:ring-blue-500 focus:border-blue-500"
+              className={`bg-gray-50 border ${
+                errStatus.nama ? 'border-red-500' : 'border-gray-300'
+              } text-gray-900 text-sm rounded-lg block w-full p-2.5`}
               placeholder="Masukkan nama clo"
               required
             />
+            {errStatus.nama && (
+              <span className="text-red-500 text-sm">{errors.nama}</span>
+            )}
           </div>
           <div className="mb-2">
             <label
@@ -128,10 +173,15 @@ export default function ModalTambahClo({
               onChange={({ target }) => handleChange(target)}
               cols="30"
               rows="10"
-              className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5 focus:ring-blue-500 focus:border-blue-500"
+              className={`bg-gray-50 border ${
+                errStatus.deskripsi ? 'border-red-500' : 'border-gray-300'
+              } text-gray-900 text-sm rounded-lg block w-full p-2.5`}
               placeholder="Masukkan deskripsi clo"
               required
             ></textarea>
+            {errStatus.deskripsi && (
+              <span className="text-red-500 text-sm">{errors.deskripsi}</span>
+            )}
           </div>
           <div className="mb-2">
             <label
@@ -146,13 +196,19 @@ export default function ModalTambahClo({
                 name="bobot"
                 id="bobot"
                 type="number"
-                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5 focus:ring-blue-500 focus:border-blue-500"
+                className={`bg-gray-50 border ${
+                  errStatus.bobot ? 'border-red-500' : 'border-gray-300'
+                } text-gray-900 text-sm rounded-lg block w-full p-2.5`}
                 placeholder="Masukkan bobot"
                 max={bobotMax()}
+                // min={1}
                 required
               />
               <div className="font-semibold text-xl mx-2">%</div>
             </div>
+            {errStatus.bobot && (
+              <span className="text-red-500 text-sm">{errors.bobot}</span>
+            )}
           </div>
           <div className="mb-2">
             <label
@@ -165,7 +221,9 @@ export default function ModalTambahClo({
               name="plo"
               id="plo"
               onChange={({ target }) => handleChange(target)}
-              className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+              className={`bg-gray-50 border ${
+                errStatus.plo_id ? 'border-red-500' : 'border-gray-300'
+              } text-gray-900 text-sm rounded-lg block w-full p-2.5`}
               defaultValue={''}
             >
               <option value="" disabled>
@@ -179,6 +237,9 @@ export default function ModalTambahClo({
                 );
               })}
             </select>
+            {errStatus.plo_id && (
+              <span className="text-red-500 text-sm">{errors.plo_id}</span>
+            )}
           </div>
           <div className="flex justify-center mt-3">
             <button

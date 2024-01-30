@@ -2,24 +2,40 @@
 import { XMarkIcon } from '@heroicons/react/24/solid';
 import { updateUser } from '../../../api/user';
 import { alertFailed, alertSuccess } from '../../../utils/alert';
+import { useState } from 'react';
 
 export default function ModalEditProdi({ close, render, data }) {
-  const dataInput = {
+  const [errStatus, setErrStatus] = useState({});
+  const [errors, setErrors] = useState({});
+  const [dataInput, setDataInput] = useState({
     email: data.email,
-  };
+    password: '',
+  });
 
   const validation = () => {
-    if (dataInput.email === undefined || dataInput.email === '') {
-      console.log('Email tidak boleh kosong');
-      return false;
+    const error = {};
+    const errStat = {};
+    let status = true;
+    const regex =
+      /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+
+    if (dataInput.email === '') {
+      error.email = 'email tidak boleh kosong';
+      errStat.email = true;
+      status = false;
+    } else if (!regex.test(dataInput.email)) {
+      error.email = 'email harus sesuai format';
+      errStat.email = true;
+      status = false;
     }
-    return true;
+
+    setErrStatus(errStat);
+    setErrors(error);
+    return status;
   };
   const handleSubmit = async (event) => {
     event.preventDefault();
-    if (!validation) {
-      return;
-    } else {
+    if (validation()) {
       try {
         const res = await updateUser(dataInput, data.id);
         if (res) {
@@ -33,15 +49,13 @@ export default function ModalEditProdi({ close, render, data }) {
     }
   };
   const handleChange = (target) => {
+    const helper = { ...dataInput };
     if (target.name === 'email') {
-      dataInput.email = target.value;
+      helper.email = target.value;
     } else if (target.name === 'password') {
-      dataInput.password = target.value;
-    } else if (target.name === 'kode_dosen') {
-      dataInput.kode_dosen = target.value.toUpperCase();
-    } else if (target.name === 'nama') {
-      dataInput.nama = target.value;
+      helper.password = target.value;
     }
+    setDataInput(helper);
   };
   return (
     <div className="flex justify-center items-center fixed top-0 bottom-0 left-0 right-0 bg-black/50">
@@ -68,11 +82,16 @@ export default function ModalEditProdi({ close, render, data }) {
               name="email"
               id="email"
               type="email"
-              className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5 focus:ring-blue-500 focus:border-blue-500"
+              className={`bg-gray-50 border ${
+                errStatus.email ? 'border-red-500' : 'border-gray-300'
+              } text-gray-900 text-sm rounded-lg block w-full p-2.5`}
               placeholder="Masukkan email"
               defaultValue={data.email}
               required
             />
+            {errStatus.email && (
+              <span className="text-red-500 text-sm">{errors.email}</span>
+            )}
           </div>
           <div className="mb-2">
             <label
@@ -86,10 +105,15 @@ export default function ModalEditProdi({ close, render, data }) {
               name="password"
               id="password"
               type="password"
-              className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5 focus:ring-blue-500 focus:border-blue-500"
+              className={`bg-gray-50 border ${
+                errStatus.password ? 'border-red-500' : 'border-gray-300'
+              } text-gray-900 text-sm rounded-lg block w-full p-2.5`}
               placeholder="Masukkan password"
               required
             />
+            {errStatus.password && (
+              <span className="text-red-500 text-sm">{errors.password}</span>
+            )}
           </div>
           <div className="flex justify-center mt-3">
             <button

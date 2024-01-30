@@ -2,35 +2,54 @@
 import { XMarkIcon } from '@heroicons/react/24/solid';
 import { updateUser } from '../../../api/user';
 import { alertFailed, alertSuccess } from '../../../utils/alert';
+import { useState } from 'react';
 
 export default function ModalEditPengguna({ close, render, data }) {
-  const dataInput = {
+  const [errStatus, setErrStatus] = useState({});
+  const [errors, setErrors] = useState({});
+  const [dataInput, setDataInput] = useState({
     nama: data.nama,
     kode_dosen: data.kode_dosen,
     email: data.email,
-  };
+    password: '',
+  });
 
   const validation = () => {
-    if (dataInput.nama === undefined || dataInput.nama === '') {
-      console.log('Nama tidak boleh kosong');
-      return false;
-    } else if (
-      dataInput.kode_dosen === undefined ||
-      dataInput.kode_dosen === ''
-    ) {
-      console.log('Kode dosen tidak boleh kosong');
-      return false;
-    } else if (dataInput.email === undefined || dataInput.email === '') {
-      console.log('Email tidak boleh kosong');
-      return false;
+    const error = {};
+    const errStat = {};
+    let status = true;
+    const regex =
+      /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+
+    if (dataInput.nama === '') {
+      error.nama = 'nama tidak boleh kosong';
+      errStat.nama = true;
+      status = false;
     }
-    return true;
+
+    if (dataInput.kode_dosen === '') {
+      error.kode_dosen = 'kode dosen tidak boleh kosong';
+      errStat.kode_dosen = true;
+      status = false;
+    }
+
+    if (dataInput.email === '') {
+      error.email = 'email tidak boleh kosong';
+      errStat.email = true;
+      status = false;
+    } else if (!regex.test(dataInput.email)) {
+      error.email = 'email harus sesuai format';
+      errStat.email = true;
+      status = false;
+    }
+
+    setErrStatus(errStat);
+    setErrors(error);
+    return status;
   };
   const handleSubmit = async (event) => {
     event.preventDefault();
-    if (!validation) {
-      return;
-    } else {
+    if (validation()) {
       try {
         const res = await updateUser(dataInput, data.id);
         if (res) {
@@ -44,15 +63,17 @@ export default function ModalEditPengguna({ close, render, data }) {
     }
   };
   const handleChange = (target) => {
+    const helper = { ...dataInput };
     if (target.name === 'email') {
-      dataInput.email = target.value;
+      helper.email = target.value;
     } else if (target.name === 'password') {
-      dataInput.password = target.value;
+      helper.password = target.value;
     } else if (target.name === 'kode_dosen') {
-      dataInput.kode_dosen = target.value.toUpperCase();
+      helper.kode_dosen = target.value.toUpperCase();
     } else if (target.name === 'nama') {
-      dataInput.nama = target.value;
+      helper.nama = target.value;
     }
+    setDataInput(helper);
   };
   return (
     <div className="flex justify-center items-center fixed top-0 bottom-0 left-0 right-0 bg-black/50">
@@ -79,11 +100,16 @@ export default function ModalEditPengguna({ close, render, data }) {
               name="nama"
               id="nama"
               type="text"
-              className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5 focus:ring-blue-500 focus:border-blue-500"
+              className={`bg-gray-50 border ${
+                errStatus.nama ? 'border-red-500' : 'border-gray-300'
+              } text-gray-900 text-sm rounded-lg block w-full p-2.5`}
               placeholder="Masukkan nama"
               defaultValue={data.nama}
               required
             />
+            {errStatus.nama && (
+              <span className="text-red-500 text-sm">{errors.nama}</span>
+            )}
           </div>
           <div className="mb-2">
             <label
@@ -97,11 +123,16 @@ export default function ModalEditPengguna({ close, render, data }) {
               name="kode_dosen"
               id="kode_dosen"
               type="text"
-              className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5 focus:ring-blue-500 focus:border-blue-500"
+              className={`bg-gray-50 border ${
+                errStatus.kode_dosen ? 'border-red-500' : 'border-gray-300'
+              } text-gray-900 text-sm rounded-lg block w-full p-2.5`}
               placeholder="Masukkan kode dosen"
               defaultValue={data.kode_dosen}
               required
             />
+            {errStatus.kode_dosen && (
+              <span className="text-red-500 text-sm">{errors.kode_dosen}</span>
+            )}
           </div>
           <div className="mb-2">
             <label
@@ -115,11 +146,16 @@ export default function ModalEditPengguna({ close, render, data }) {
               name="email"
               id="email"
               type="email"
-              className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5 focus:ring-blue-500 focus:border-blue-500"
+              className={`bg-gray-50 border ${
+                errStatus.email ? 'border-red-500' : 'border-gray-300'
+              } text-gray-900 text-sm rounded-lg block w-full p-2.5`}
               placeholder="Masukkan email"
               defaultValue={data.email}
               required
             />
+            {errStatus.email && (
+              <span className="text-red-500 text-sm">{errors.email}</span>
+            )}
           </div>
           <div className="mb-2">
             <label
@@ -133,9 +169,14 @@ export default function ModalEditPengguna({ close, render, data }) {
               name="password"
               id="password"
               type="password"
-              className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5 focus:ring-blue-500 focus:border-blue-500"
+              className={`bg-gray-50 border ${
+                errStatus.password ? 'border-red-500' : 'border-gray-300'
+              } text-gray-900 text-sm rounded-lg block w-full p-2.5`}
               placeholder="Masukkan password (boleh tidak diisi)"
             />
+            {errStatus.password && (
+              <span className="text-red-500 text-sm">{errors.password}</span>
+            )}
           </div>
           <div className="flex justify-center mt-3">
             <button

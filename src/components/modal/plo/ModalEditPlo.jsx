@@ -2,33 +2,53 @@
 import { XMarkIcon } from '@heroicons/react/24/solid';
 import { updatePlo } from '../../../api/plo';
 import { alertFailed, alertSuccess } from '../../../utils/alert';
+import { useState } from 'react';
 
 export default function ModalEditPlo({ close, render, data }) {
-  const dataInput = {
+  const [errStatus, setErrStatus] = useState({});
+  const [errors, setErrors] = useState({});
+  const [dataInput, setDataInput] = useState({
     nama: data.nama,
     deskripsi: data.deskripsi,
     obe_id: data.obe_id,
-  };
+  });
 
   const handleChange = (target) => {
+    const helper = { ...dataInput };
     if (target.name === 'nama') {
-      dataInput.nama = target.value;
+      helper.nama = target.value;
+      setDataInput(helper);
     } else if (target.name === 'deskripsi') {
-      dataInput.deskripsi = target.value;
+      helper.deskripsi = target.value;
+      setDataInput(helper);
     }
+  };
+
+  const validation = () => {
+    const error = {};
+    const errStat = {};
+    let status = true;
+
+    if (dataInput.nama === '') {
+      error.nama = 'nama tidak boleh kosong';
+      errStat.nama = true;
+      status = false;
+    }
+
+    if (dataInput.deskripsi === '') {
+      error.deskripsi = 'deskripsi tidak boleh kosong';
+      errStat.deskripsi = true;
+      status = false;
+    }
+
+    setErrStatus(errStat);
+    setErrors(error);
+    return status;
   };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    console.log(dataInput);
-    if (dataInput.nama === undefined || dataInput.nama === '') {
-      console.log('Nama tidak boleh kosong');
-    } else if (
-      dataInput.deskripsi === undefined ||
-      dataInput.deskripsi === ''
-    ) {
-      console.log('Deskripsi tidak boleh kosong');
-    } else {
+    if (validation()) {
       try {
         const res = await updatePlo(dataInput, data.id);
         if (res) {
@@ -66,11 +86,16 @@ export default function ModalEditPlo({ close, render, data }) {
               name="nama"
               id="nama"
               type="text"
-              className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5 focus:ring-blue-500 focus:border-blue-500"
+              className={`bg-gray-50 border ${
+                errStatus.nama ? 'border-red-500' : 'border-gray-300'
+              } text-gray-900 text-sm rounded-lg block w-full p-2.5`}
               placeholder="Masukkan nama perancangan"
               defaultValue={data.nama}
               required
             />
+            {errStatus.nama && (
+              <span className="text-red-500 text-sm">{errors.nama}</span>
+            )}
           </div>
           <div className="mb-2">
             <label
@@ -85,11 +110,16 @@ export default function ModalEditPlo({ close, render, data }) {
               onChange={({ target }) => handleChange(target)}
               cols="30"
               rows="10"
-              className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5 focus:ring-blue-500 focus:border-blue-500"
+              className={`bg-gray-50 border ${
+                errStatus.deskripsi ? 'border-red-500' : 'border-gray-300'
+              } text-gray-900 text-sm rounded-lg block w-full p-2.5`}
               placeholder="Masukkan deskripsi plo"
               defaultValue={data.deskripsi}
               required
             ></textarea>
+            {errStatus.deskripsi && (
+              <span className="text-red-500 text-sm">{errors.deskripsi}</span>
+            )}
           </div>
           <div className="flex justify-center mt-3">
             <button

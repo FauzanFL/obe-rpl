@@ -96,7 +96,7 @@ export default function Clo() {
   const handleTambahOpen = () => {
     const sum = listClo.reduce((acc, item) => acc + item.bobot, 0);
     const bobotMax = 100 - sum * 100;
-    if (bobotMax === 0) {
+    if (bobotMax <= 0) {
       console.log(
         'Tidak dapat menambah clo lagi karena bobot sudah 100 persen'
       );

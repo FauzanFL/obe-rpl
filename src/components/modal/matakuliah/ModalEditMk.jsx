@@ -2,9 +2,12 @@
 import { XMarkIcon } from '@heroicons/react/24/solid';
 import { updateMataKuliah } from '../../../api/matakuliah';
 import { alertFailed, alertSuccess } from '../../../utils/alert';
+import { useState } from 'react';
 
 export default function ModalEditMk({ close, render, activeObe, data }) {
-  const dataInput = {
+  const [errStatus, setErrStatus] = useState({});
+  const [errors, setErrors] = useState({});
+  const [dataInput, setDataInput] = useState({
     kode_mk: data.kode_mk,
     nama: data.nama,
     deskripsi: data.deskripsi,
@@ -12,40 +15,57 @@ export default function ModalEditMk({ close, render, activeObe, data }) {
     semester: data.semester,
     prasyarat: data.prasyarat,
     obe_id: activeObe.id,
-  };
+  });
+
   const validation = () => {
-    if (dataInput.kode_mk === undefined || dataInput.kode_mk === '') {
-      console.log('Kode tidak boleh kosong');
-      return false;
-    } else if (dataInput.nama === undefined || dataInput.nama === '') {
-      console.log('Nama tidak boleh kosong');
-      return false;
-    } else if (
-      dataInput.deskripsi === undefined ||
-      dataInput.deskripsi === ''
-    ) {
-      console.log('Deskripsi tidak boleh kosong');
-      return false;
-    } else if (dataInput.sks === undefined || dataInput.sks === 0) {
-      console.log('SKS tidak boleh kosong');
-      return false;
-    } else if (dataInput.semester === undefined || dataInput.semester === 0) {
-      console.log('Semester tidak boleh kosong');
-      return false;
-    } else if (
-      dataInput.prasyarat === undefined ||
-      dataInput.prasyarat === ''
-    ) {
-      console.log('Prasyarat tidak boleh kosong');
-      return false;
+    const error = {};
+    const errStat = {};
+    let status = true;
+
+    if (dataInput.nama === '') {
+      error.nama = 'nama tidak boleh kosong';
+      errStat.nama = true;
+      status = false;
     }
-    return true;
+
+    if (dataInput.kode_mk === '') {
+      error.kode_mk = 'kode mata kuliah tidak boleh kosong';
+      errStat.kode_mk = true;
+      status = false;
+    }
+
+    if (dataInput.deskripsi === '') {
+      error.deskripsi = 'deskripsi tidak boleh kosong';
+      errStat.deskripsi = true;
+      status = false;
+    }
+
+    if (dataInput.sks === 0) {
+      error.sks = 'sks tidak boleh kosong';
+      errStat.sks = true;
+      status = false;
+    }
+
+    if (dataInput.semester === 0) {
+      error.semester = 'semester tidak boleh kosong';
+      errStat.semester = true;
+      status = false;
+    }
+
+    if (dataInput.prasyarat === '') {
+      error.prasyarat = 'prasyarat tidak boleh kosong';
+      errStat.prasyarat = true;
+      status = false;
+    }
+
+    setErrStatus(errStat);
+    setErrors(error);
+    return status;
   };
+
   const handleSubmit = async (event) => {
     event.preventDefault();
-    if (!validation) {
-      return;
-    } else {
+    if (validation()) {
       try {
         const res = await updateMataKuliah(dataInput, data.id);
         if (res) {
@@ -59,19 +79,21 @@ export default function ModalEditMk({ close, render, activeObe, data }) {
     }
   };
   const handleChange = (target) => {
+    const helper = { ...dataInput };
     if (target.name === 'nama') {
-      dataInput.nama = target.value;
+      helper.nama = target.value.toUpperCase();
     } else if (target.name === 'kode_mk') {
-      dataInput.kode_mk = target.value.toUpperCase();
+      helper.kode_mk = target.value;
     } else if (target.name === 'deskripsi') {
-      dataInput.deskripsi = target.value;
+      helper.deskripsi = target.value;
     } else if (target.name === 'sks') {
-      dataInput.sks = parseInt(target.value);
+      helper.sks = parseInt(target.value);
     } else if (target.name === 'semester') {
-      dataInput.semester = parseInt(target.value);
+      helper.semester = parseInt(target.value);
     } else if (target.name === 'prasyarat') {
-      dataInput.prasyarat = target.value;
+      helper.prasyarat = target.value;
     }
+    setDataInput(helper);
   };
   return (
     <div className="flex justify-center items-center fixed top-0 bottom-0 left-0 right-0 bg-black/50">
@@ -102,11 +124,16 @@ export default function ModalEditMk({ close, render, activeObe, data }) {
               name="kode_mk"
               id="kode_mk"
               type="text"
-              className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5 focus:ring-blue-500 focus:border-blue-500"
+              className={`bg-gray-50 border ${
+                errStatus.kode_mk ? 'border-red-500' : 'border-gray-300'
+              } text-gray-900 text-sm rounded-lg block w-full p-2.5`}
               placeholder="Masukkan kode mata kuliah"
               defaultValue={data.kode_mk}
               required
             />
+            {errStatus.kode_mk && (
+              <span className="text-red-500 text-sm">{errors.kode_mk}</span>
+            )}
           </div>
           <div className="mb-2">
             <label
@@ -120,11 +147,16 @@ export default function ModalEditMk({ close, render, activeObe, data }) {
               name="nama"
               id="nama"
               type="text"
-              className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5 focus:ring-blue-500 focus:border-blue-500"
+              className={`bg-gray-50 border ${
+                errStatus.nama ? 'border-red-500' : 'border-gray-300'
+              } text-gray-900 text-sm rounded-lg block w-full p-2.5`}
               placeholder="Masukkan nama mata kuliah"
               defaultValue={data.nama}
               required
             />
+            {errStatus.nama && (
+              <span className="text-red-500 text-sm">{errors.nama}</span>
+            )}
           </div>
           <div className="mb-2">
             <label
@@ -139,11 +171,16 @@ export default function ModalEditMk({ close, render, activeObe, data }) {
               onChange={({ target }) => handleChange(target)}
               cols="30"
               rows="10"
-              className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5 focus:ring-blue-500 focus:border-blue-500"
+              className={`bg-gray-50 border ${
+                errStatus.deskripsi ? 'border-red-500' : 'border-gray-300'
+              } text-gray-900 text-sm rounded-lg block w-full p-2.5`}
               placeholder="Masukkan deskripsi mata kuliah"
               defaultValue={data.deskripsi}
               required
             ></textarea>
+            {errStatus.deskripsi && (
+              <span className="text-red-500 text-sm">{errors.deskripsi}</span>
+            )}
           </div>
           <div className="mb-2">
             <label
@@ -157,11 +194,16 @@ export default function ModalEditMk({ close, render, activeObe, data }) {
               name="sks"
               id="sks"
               type="number"
-              className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5 focus:ring-blue-500 focus:border-blue-500"
+              className={`bg-gray-50 border ${
+                errStatus.sks ? 'border-red-500' : 'border-gray-300'
+              } text-gray-900 text-sm rounded-lg block w-full p-2.5`}
               placeholder="Masukkan jumlah SKS"
               defaultValue={data.sks}
               required
             />
+            {errStatus.sks && (
+              <span className="text-red-500 text-sm">{errors.sks}</span>
+            )}
           </div>
           <div className="mb-2">
             <label
@@ -175,11 +217,16 @@ export default function ModalEditMk({ close, render, activeObe, data }) {
               name="semester"
               id="semester"
               type="number"
-              className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5 focus:ring-blue-500 focus:border-blue-500"
+              className={`bg-gray-50 border ${
+                errStatus.semester ? 'border-red-500' : 'border-gray-300'
+              } text-gray-900 text-sm rounded-lg block w-full p-2.5`}
               placeholder="Masukkan semester"
               defaultValue={data.semester}
               required
             />
+            {errStatus.semester && (
+              <span className="text-red-500 text-sm">{errors.semester}</span>
+            )}
           </div>
           <div className="mb-2">
             <label
@@ -194,11 +241,16 @@ export default function ModalEditMk({ close, render, activeObe, data }) {
               onChange={({ target }) => handleChange(target)}
               cols="30"
               rows="10"
-              className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5 focus:ring-blue-500 focus:border-blue-500"
+              className={`bg-gray-50 border ${
+                errStatus.prasyarat ? 'border-red-500' : 'border-gray-300'
+              } text-gray-900 text-sm rounded-lg block w-full p-2.5`}
               placeholder="Masukkan prasyarat, isikan (-) jika tidak ada"
               defaultValue={data.prasyarat}
               required
             ></textarea>
+            {errStatus.prasyarat && (
+              <span className="text-red-500 text-sm">{errors.prasyarat}</span>
+            )}
           </div>
           <div className="flex justify-center mt-3">
             <button

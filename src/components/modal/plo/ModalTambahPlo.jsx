@@ -7,7 +7,13 @@ import { alertFailed, alertSuccess } from '../../../utils/alert';
 
 export default function ModalTambahPlo({ close, render }) {
   const [activeObe, setActiveObe] = useState({});
-  const dataInput = {};
+  const [errStatus, setErrStatus] = useState({});
+  const [errors, setErrors] = useState({});
+  const [dataInput, setDataInput] = useState({
+    obe_id: activeObe.id,
+    nama: '',
+    deskripsi: '',
+  });
 
   useEffect(() => {
     async function fetchActiveObe() {
@@ -25,24 +31,42 @@ export default function ModalTambahPlo({ close, render }) {
   }, []);
 
   const handleChange = (target) => {
+    const helper = { ...dataInput };
     if (target.name === 'nama') {
-      dataInput.nama = target.value;
+      helper.nama = target.value;
+      setDataInput(helper);
     } else if (target.name === 'deskripsi') {
-      dataInput.deskripsi = target.value;
+      helper.deskripsi = target.value;
+      setDataInput(helper);
     }
+  };
+
+  const validation = () => {
+    const error = {};
+    const errStat = {};
+    let status = true;
+
+    if (dataInput.nama === '') {
+      error.nama = 'nama tidak boleh kosong';
+      errStat.nama = true;
+      status = false;
+    }
+
+    if (dataInput.deskripsi === '') {
+      error.deskripsi = 'deskripsi tidak boleh kosong';
+      errStat.deskripsi = true;
+      status = false;
+    }
+
+    setErrStatus(errStat);
+    setErrors(error);
+    return status;
   };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    dataInput.obe_id = activeObe.id;
-    if (dataInput.nama === undefined || dataInput.nama === '') {
-      console.log('Nama tidak boleh kosong');
-    } else if (
-      dataInput.deskripsi === undefined ||
-      dataInput.deskripsi === ''
-    ) {
-      console.log('Deskripsi tidak boleh kosong');
-    } else {
+    if (validation()) {
+      dataInput.obe_id = activeObe.id;
       try {
         const res = await createPlo(dataInput);
         if (res) {
@@ -80,10 +104,15 @@ export default function ModalTambahPlo({ close, render }) {
               name="nama"
               id="nama"
               type="text"
-              className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5 focus:ring-blue-500 focus:border-blue-500"
+              className={`bg-gray-50 border ${
+                errStatus.nama ? 'border-red-500' : 'border-gray-300'
+              } text-gray-900 text-sm rounded-lg block w-full p-2.5`}
               placeholder="Masukkan nama plo"
               required
             />
+            {errStatus.nama && (
+              <span className="text-red-500 text-sm">{errors.nama}</span>
+            )}
           </div>
           <div className="mb-2">
             <label
@@ -98,10 +127,15 @@ export default function ModalTambahPlo({ close, render }) {
               onChange={({ target }) => handleChange(target)}
               cols="30"
               rows="10"
-              className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5 focus:ring-blue-500 focus:border-blue-500"
+              className={`bg-gray-50 border ${
+                errStatus.deskripsi ? 'border-red-500' : 'border-gray-300'
+              } text-gray-900 text-sm rounded-lg block w-full p-2.5`}
               placeholder="Masukkan deskripsi plo"
               required
             ></textarea>
+            {errStatus.deskripsi && (
+              <span className="text-red-500 text-sm">{errors.deskripsi}</span>
+            )}
           </div>
           <div className="flex justify-center mt-3">
             <button

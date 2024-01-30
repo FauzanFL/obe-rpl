@@ -7,7 +7,12 @@ import { alertFailed, alertSuccess } from '../../../utils/alert';
 
 export default function ModalTambahPerancangan({ close, render }) {
   const [listKurikulum, setListKurikulum] = useState([]);
-  const dataInput = {};
+  const [errStatus, setErrStatus] = useState({});
+  const [errors, setErrors] = useState({});
+  const [dataInput, setDataInput] = useState({
+    nama: '',
+    kurikulum_id: 0,
+  });
 
   useEffect(() => {
     async function fetchKurikulum() {
@@ -17,16 +22,32 @@ export default function ModalTambahPerancangan({ close, render }) {
 
     fetchKurikulum();
   }, []);
+
+  const validation = () => {
+    const error = {};
+    const errStat = {};
+    let status = true;
+
+    if (dataInput.nama === '') {
+      error.nama = 'nama tidak boleh kosong';
+      errStat.nama = true;
+      status = false;
+    }
+
+    if (dataInput.kurikulum_id === 0) {
+      error.kurikulum_id = 'kurikulum tidak boleh kosong';
+      errStat.kurikulum_id = true;
+      status = false;
+    }
+
+    setErrStatus(errStat);
+    setErrors(error);
+    return status;
+  };
+
   const handleSubmit = async (event) => {
     event.preventDefault();
-    if (dataInput.nama === undefined || dataInput.nama === '') {
-      console.log('Nama tidak boleh kosong');
-    } else if (
-      dataInput.kurikulum_id === undefined ||
-      dataInput.kurikulum_id === 0
-    ) {
-      console.log('Kurikulum tidak boleh kosong');
-    } else {
+    if (validation()) {
       try {
         const res = await createPerancangan(dataInput);
         if (res) {
@@ -40,10 +61,13 @@ export default function ModalTambahPerancangan({ close, render }) {
     }
   };
   const handleChange = (target) => {
+    const helper = { ...dataInput };
     if (target.name === 'nama') {
-      dataInput.nama = target.value;
+      helper.nama = target.value;
+      setDataInput(helper);
     } else if (target.name === 'kurikulum') {
-      dataInput.kurikulum_id = parseInt(target.value);
+      helper.kurikulum_id = parseInt(target.value);
+      setDataInput(helper);
     }
   };
   return (
@@ -71,10 +95,15 @@ export default function ModalTambahPerancangan({ close, render }) {
               name="nama"
               id="nama"
               type="text"
-              className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5 focus:ring-blue-500 focus:border-blue-500"
+              className={`bg-gray-50 border ${
+                errStatus.nama ? 'border-red-500' : 'border-gray-300'
+              } text-gray-900 text-sm rounded-lg block w-full p-2.5`}
               placeholder="Masukkan nama perancangan"
               required
             />
+            {errStatus.nama && (
+              <span className="text-red-500 text-sm">{errors.nama}</span>
+            )}
           </div>
           <div className="mb-2">
             <label
@@ -87,7 +116,9 @@ export default function ModalTambahPerancangan({ close, render }) {
               name="kurikulum"
               id="kurikulum"
               onChange={({ target }) => handleChange(target)}
-              className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+              className={`bg-gray-50 border ${
+                errStatus.kurikulum_id ? 'border-red-500' : 'border-gray-300'
+              } text-gray-900 text-sm rounded-lg block w-full p-2.5`}
               defaultValue={''}
             >
               <option value="" disabled>
@@ -101,6 +132,11 @@ export default function ModalTambahPerancangan({ close, render }) {
                 );
               })}
             </select>
+            {errStatus.kurikulum_id && (
+              <span className="text-red-500 text-sm">
+                {errors.kurikulum_id}
+              </span>
+            )}
           </div>
           <div className="flex justify-center mt-3">
             <button

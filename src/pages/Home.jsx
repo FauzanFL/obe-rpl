@@ -14,6 +14,8 @@ export default function Home() {
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [errStatus, setErrStatus] = useState({});
+  const [errors, setErrors] = useState({});
 
   const roleHandler = useCallback((role) => {
     if (role == 'prodi') {
@@ -37,11 +39,38 @@ export default function Home() {
     }
   }, [roleHandler]);
 
+  const validation = () => {
+    const error = {};
+    const errStat = {};
+    let status = true;
+    const regex =
+      /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+
+    if (email === '') {
+      error.email = 'email harus diisi';
+      errStat.email = true;
+      status = false;
+    } else if (!regex.test(email)) {
+      error.email = 'email harus sesuai format';
+      errStat.email = true;
+      status = false;
+    }
+
+    if (password === '') {
+      error.password = 'password harus diisi';
+      errStat.password = true;
+      status = false;
+    }
+
+    setErrStatus(errStat);
+    setErrors(error);
+    return status;
+  };
+
   const handleSubmit = async (event) => {
     event.preventDefault();
-    if (email == '' || password == '') {
-      console.log('email dan password harus diisi');
-    } else {
+    const valid = validation();
+    if (valid) {
       try {
         const res = await loginUser({
           email,
@@ -62,6 +91,18 @@ export default function Home() {
         alertFailed(e.response.data.error);
       }
     }
+  };
+
+  const handleChange = (e) => {
+    const errStat = {};
+    if (e.target.name === 'email') {
+      errStat.email = false;
+      setEmail(e.target.value);
+    } else if (e.target.name === 'password') {
+      errStat.password = false;
+      setPassword(e.target.value);
+    }
+    setErrStatus(errStat);
   };
 
   return (
@@ -92,12 +133,18 @@ export default function Home() {
                         Email
                       </label>
                       <input
-                        onChange={({ target }) => setEmail(target.value)}
+                        onChange={(e) => handleChange(e)}
                         name="email"
                         type="email"
-                        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5"
-                        required
+                        className={`bg-gray-50 border ${
+                          errStatus.email ? 'border-red-500' : 'border-gray-300'
+                        } text-gray-900 text-sm rounded-lg block w-full p-2.5`}
                       />
+                      {errStatus.email && (
+                        <span className="text-red-500 text-sm">
+                          {errors.email}
+                        </span>
+                      )}
                     </div>
                     <div className="mb-2">
                       <label
@@ -107,12 +154,21 @@ export default function Home() {
                         Password
                       </label>
                       <input
-                        onChange={({ target }) => setPassword(target.value)}
+                        onChange={(e) => handleChange(e)}
                         name="password"
                         type="password"
-                        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5"
+                        className={`bg-gray-50 border ${
+                          errStatus.password
+                            ? 'border-red-500'
+                            : 'border-gray-300'
+                        } text-gray-900 text-sm rounded-lg block w-full p-2.5`}
                         required
                       />
+                      {errStatus.password && (
+                        <span className="text-red-500 text-sm">
+                          {errors.password}
+                        </span>
+                      )}
                     </div>
                     <div className="flex justify-center mt-3">
                       <button

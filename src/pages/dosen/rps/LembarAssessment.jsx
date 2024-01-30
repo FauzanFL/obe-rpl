@@ -88,7 +88,7 @@ export default function LembarAssessment() {
   const handleTambahOpen = () => {
     const sum = listAssessment.reduce((acc, item) => acc + item.bobot, 0);
     const bobotMax = (clo.bobot - sum) * 100;
-    if (bobotMax === 0) {
+    if (bobotMax <= 0) {
       console.log(
         `Tidak dapat menambah lembar assessment lagi karena bobot sudah ${
           clo.bobot * 100
