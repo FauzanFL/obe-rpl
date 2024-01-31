@@ -14,7 +14,7 @@ import {
   deletePerancangan,
   getPerancangan,
 } from '../../api/perancanganObe';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { getUserRole } from '../../api/user';
 import ModalTambahPerancangan from '../../components/modal/perancangan/ModalTambahPerancangan';
 import ModalEditPerancangan from '../../components/modal/perancangan/ModalEditPerancangan';
@@ -22,11 +22,26 @@ import { alertDelete, alertFailed, alertSuccess } from '../../utils/alert';
 
 export default function Kurikulum() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [isTambahOpen, setIsTambahOpen] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [selectedId, setSelectedId] = useState(0);
   const [listPerancangan, setListPerancangan] = useState([]);
   const listNav = [{ name: 'Kurikulum', link: '/prodi/kurikulum' }];
+
+  const itemsPerPage = 5;
+  const [currentPage, setCurrentPage] = useState(1);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const totalPages =
+    listPerancangan != null
+      ? Math.ceil(listPerancangan.length / itemsPerPage)
+      : 1;
+
+  let displayedItems;
+  if (listPerancangan != null) {
+    displayedItems = listPerancangan.slice(startIndex, endIndex);
+  }
 
   useEffect(() => {
     async function fetchUser() {
@@ -51,9 +66,24 @@ export default function Kurikulum() {
       }
     }
 
+    function fetchPage() {
+      const urlParams = new URLSearchParams(location.search);
+      const page = urlParams.get('page');
+      if (page === null) {
+        setCurrentPage(1);
+      } else {
+        try {
+          setCurrentPage(parseInt(page));
+        } catch (e) {
+          console.error(e);
+        }
+      }
+    }
+
     fetchUser();
+    fetchPage();
     fetchList();
-  }, [navigate]);
+  }, [navigate, location]);
 
   const render = async () => {
     try {
@@ -64,6 +94,42 @@ export default function Kurikulum() {
     } catch (e) {
       console.error(e);
     }
+  };
+
+  const handlePageChange = (pageNumber) => {
+    const urlParams = new URLSearchParams(location.search);
+    urlParams.set('page', pageNumber);
+    navigate(`?${urlParams.toString()}`);
+  };
+
+  const handlePrev = () => {
+    if (currentPage != 1) {
+      const current = currentPage - 1;
+      const urlParams = new URLSearchParams(location.search);
+      urlParams.set('page', current);
+      navigate(`?${urlParams.toString()}`);
+    }
+  };
+
+  const handleNext = () => {
+    if (currentPage != totalPages) {
+      const current = currentPage + 1;
+      const urlParams = new URLSearchParams(location.search);
+      urlParams.set('page', current);
+      navigate(`?${urlParams.toString()}`);
+    }
+  };
+
+  const handleFirst = () => {
+    const urlParams = new URLSearchParams(location.search);
+    urlParams.set('page', 1);
+    navigate(`?${urlParams.toString()}`);
+  };
+
+  const handleLast = () => {
+    const urlParams = new URLSearchParams(location.search);
+    urlParams.set('page', totalPages);
+    navigate(`?${urlParams.toString()}`);
   };
 
   const ActiveSign = () => {
@@ -132,7 +198,7 @@ export default function Kurikulum() {
                     </tr>
                   </thead>
                   <tbody>
-                    {listPerancangan.map((item, i) => {
+                    {displayedItems.map((item, i) => {
                       const handleEdit = () => {
                         setSelectedId(item.id);
                         setIsEditOpen(true);
@@ -201,7 +267,17 @@ export default function Kurikulum() {
                     })}
                   </tbody>
                 </table>
-                <Pagination />
+                <Pagination
+                  totalPages={totalPages}
+                  currentPage={currentPage}
+                  onPageChange={handlePageChange}
+                  onNext={handleNext}
+                  onPrev={handlePrev}
+                  onFirst={handleFirst}
+                  onLast={handleLast}
+                  totalData={listPerancangan.length}
+                  pageSize={itemsPerPage}
+                />
               </div>
             </div>
           </main>

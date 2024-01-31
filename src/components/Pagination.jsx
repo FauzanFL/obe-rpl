@@ -1,4 +1,29 @@
-export default function Pagination() {
+/* eslint-disable react/prop-types */
+export default function Pagination({
+  currentPage,
+  totalPages,
+  onPageChange,
+  onPrev,
+  onNext,
+  onFirst,
+  onLast,
+  totalData,
+  pageSize,
+}) {
+  const nearbyPages = 2;
+  const pageNumbers = [];
+
+  for (let i = 1; i <= totalPages; i++) {
+    pageNumbers.push(i);
+  }
+
+  const startPage = Math.max(1, currentPage - nearbyPages);
+  const endPage = Math.min(totalPages, currentPage + nearbyPages);
+
+  const showingFrom = (currentPage - 1) * pageSize + 1;
+  const showingTo = Math.min(currentPage * pageSize, totalData);
+
+  const pagesToShow = pageNumbers.slice(startPage - 1, endPage);
   return (
     <>
       <nav
@@ -8,69 +33,81 @@ export default function Pagination() {
         <span className="text-sm font-normal text-gray-500 dark:text-gray-400 mb-4 md:mb-0 block w-full md:inline md:w-auto">
           Showing{' '}
           <span className="font-semibold text-gray-900 dark:text-white">
-            1-10
-          </span>{' '}
+            {showingFrom}-{showingTo + ' '}
+          </span>
           of{' '}
           <span className="font-semibold text-gray-900 dark:text-white">
-            1000
+            {totalData}
           </span>
         </span>
         <ul className="inline-flex -space-x-px rtl:space-x-reverse text-sm h-8">
           <li>
             <a
               href="#"
-              className="flex items-center justify-center px-3 h-8 ms-0 leading-tight text-gray-500 bg-white border border-gray-300 rounded-s-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
+              onClick={onFirst}
+              className={`flex items-center justify-center px-3 h-8 ms-0 leading-tight  bg-white border border-gray-300 rounded-s-lg ${
+                currentPage === 1
+                  ? 'text-gray-400 pointer-events-none cursor-default'
+                  : 'text-gray-500 hover:bg-gray-100 hover:text-gray-700'
+              }`}
+            >
+              First
+            </a>
+          </li>
+          <li>
+            <a
+              href="#"
+              onClick={onPrev}
+              className={`flex items-center justify-center px-3 h-8 ms-0 leading-tight  bg-white border border-gray-300 ${
+                currentPage === 1
+                  ? 'text-gray-400 pointer-events-none cursor-default'
+                  : 'text-gray-500 hover:bg-gray-100 hover:text-gray-700'
+              }`}
             >
               Previous
             </a>
           </li>
+          {pagesToShow.map((number) => {
+            return (
+              <li key={number}>
+                <a
+                  href="#"
+                  onClick={() => onPageChange(number)}
+                  className={`flex items-center justify-center px-3 h-8 leading-tight ${
+                    currentPage === number
+                      ? 'text-gray-700 bg-gray-100'
+                      : 'text-gray-500 bg-white'
+                  } border border-gray-300 hover:bg-gray-100 hover:text-gray-700 `}
+                >
+                  {number}
+                </a>
+              </li>
+            );
+          })}
           <li>
             <a
               href="#"
-              className="flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
-            >
-              1
-            </a>
-          </li>
-          <li>
-            <a
-              href="#"
-              className="flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
-            >
-              2
-            </a>
-          </li>
-          <li>
-            <a
-              href="#"
-              aria-current="page"
-              className="flex items-center justify-center px-3 h-8 text-blue-600 border border-gray-300 bg-blue-50 hover:bg-blue-100 hover:text-blue-700 dark:border-gray-700 dark:bg-gray-700 dark:text-white"
-            >
-              3
-            </a>
-          </li>
-          <li>
-            <a
-              href="#"
-              className="flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
-            >
-              4
-            </a>
-          </li>
-          <li>
-            <a
-              href="#"
-              className="flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
-            >
-              5
-            </a>
-          </li>
-          <li>
-            <a
-              href="#"
-              className="flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-white border border-gray-300 rounded-e-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
+              onClick={onNext}
+              className={`flex items-center justify-center px-3 h-8 ms-0 leading-tight  bg-white border border-gray-300 ${
+                currentPage === totalPages
+                  ? 'text-gray-400 pointer-events-none cursor-default'
+                  : 'text-gray-500 hover:bg-gray-100 hover:text-gray-700'
+              }`}
             >
               Next
+            </a>
+          </li>
+          <li>
+            <a
+              href="#"
+              onClick={onLast}
+              className={`flex items-center justify-center px-3 h-8 ms-0 leading-tight  bg-white border border-gray-300 rounded-e-lg ${
+                currentPage === totalPages
+                  ? 'text-gray-400 pointer-events-none cursor-default'
+                  : 'text-gray-500 hover:bg-gray-100 hover:text-gray-700'
+              }`}
+            >
+              Last
             </a>
           </li>
         </ul>

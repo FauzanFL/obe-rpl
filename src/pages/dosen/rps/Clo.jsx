@@ -10,7 +10,7 @@ import Pagination from '../../../components/Pagination';
 import Sidebar from '../../../components/Sidebar';
 import { useEffect, useState } from 'react';
 import { getMataKuliahById } from '../../../api/matakuliah';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { useLocation, Link, useNavigate, useParams } from 'react-router-dom';
 import { deleteClo, getMkClo } from '../../../api/clo';
 import { getUserRole } from '../../../api/user';
 import ModalTambahClo from '../../../components/modal/clo/ModalTambahClo';
@@ -20,6 +20,7 @@ import { alertDelete, alertFailed, alertSuccess } from '../../../utils/alert';
 
 export default function Clo() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [mk, setMk] = useState({});
   const [listClo, setListClo] = useState([]);
   const [activeObe, setActiveObe] = useState({});
@@ -27,6 +28,18 @@ export default function Clo() {
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [selectedClo, setSelectedClo] = useState({});
   const params = useParams();
+
+  const itemsPerPage = 5;
+  const [currentPage, setCurrentPage] = useState(1);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const totalPages =
+    listClo != null ? Math.ceil(listClo.length / itemsPerPage) : 1;
+
+  let displayedItems;
+  if (listClo != null) {
+    displayedItems = listClo.slice(startIndex, endIndex);
+  }
 
   useEffect(() => {
     async function fetchUser() {
@@ -72,11 +85,26 @@ export default function Clo() {
       }
     }
 
+    function fetchPage() {
+      const urlParams = new URLSearchParams(location.search);
+      const page = urlParams.get('page');
+      if (page === null) {
+        setCurrentPage(1);
+      } else {
+        try {
+          setCurrentPage(parseInt(page));
+        } catch (e) {
+          console.error(e);
+        }
+      }
+    }
+
     fetchUser();
     fetchMk();
     fetchActiveObe();
+    fetchPage();
     fetchClo();
-  }, [params, navigate]);
+  }, [params, navigate, location]);
 
   const formatBobot = (bobot) => {
     return bobot * 100 + '%';
@@ -109,6 +137,42 @@ export default function Clo() {
     { name: 'RPS', link: '/dosen/rps' },
     { name: `CLO / ${mk.kode_mk}`, link: `/dosen/rps/${mk.id}/clo` },
   ];
+
+  const handlePageChange = (pageNumber) => {
+    const urlParams = new URLSearchParams(location.search);
+    urlParams.set('page', pageNumber);
+    navigate(`?${urlParams.toString()}`);
+  };
+
+  const handlePrev = () => {
+    if (currentPage != 1) {
+      const current = currentPage - 1;
+      const urlParams = new URLSearchParams(location.search);
+      urlParams.set('page', current);
+      navigate(`?${urlParams.toString()}`);
+    }
+  };
+
+  const handleNext = () => {
+    if (currentPage != totalPages) {
+      const current = currentPage + 1;
+      const urlParams = new URLSearchParams(location.search);
+      urlParams.set('page', current);
+      navigate(`?${urlParams.toString()}`);
+    }
+  };
+
+  const handleFirst = () => {
+    const urlParams = new URLSearchParams(location.search);
+    urlParams.set('page', 1);
+    navigate(`?${urlParams.toString()}`);
+  };
+
+  const handleLast = () => {
+    const urlParams = new URLSearchParams(location.search);
+    urlParams.set('page', totalPages);
+    navigate(`?${urlParams.toString()}`);
+  };
   return (
     <>
       <div className="flex">
@@ -153,7 +217,7 @@ export default function Clo() {
                     </tr>
                   </thead>
                   <tbody>
-                    {listClo.map((item, i) => {
+                    {displayedItems.map((item, i) => {
                       const handleEdit = () => {
                         setSelectedClo(item);
                         setIsEditOpen(true);
@@ -209,7 +273,17 @@ export default function Clo() {
                     })}
                   </tbody>
                 </table>
-                <Pagination />
+                <Pagination
+                  totalPages={totalPages}
+                  currentPage={currentPage}
+                  onPageChange={handlePageChange}
+                  onNext={handleNext}
+                  onPrev={handlePrev}
+                  onFirst={handleFirst}
+                  onLast={handleLast}
+                  totalData={listClo.length}
+                  pageSize={itemsPerPage}
+                />
               </div>
             </div>
           </main>
