@@ -97,7 +97,7 @@ export default function ModalTambahMk({ close, render, activeObe }) {
     setDataInput(helper);
   };
   return (
-    <div className="flex justify-center items-center fixed top-0 bottom-0 left-0 right-0 bg-black/50">
+    <div className="flex justify-center items-center z-50 fixed top-0 bottom-0 left-0 right-0 bg-black/50">
       <div className="relative block w-1/3 max-h-full rounded-lg bg-white p-6 shadow-[0_2px_15px_-3px_rgba(0,0,0,0.07),0_10px_20px_-2px_rgba(0,0,0,0.04)]">
         <div
           onClick={close}

@@ -9,6 +9,7 @@ import SetCookie from '../hooks/SetCookie';
 import { useNavigate } from 'react-router-dom';
 import GetCookie from '../hooks/GetCookie';
 import { alertFailed, alertSuccess } from '../utils/alert';
+import Loader from '../components/Loader';
 
 export default function Home() {
   const navigate = useNavigate();
@@ -185,6 +186,7 @@ export default function Home() {
           </main>
         </div>
       </div>
+      <Loader />
     </>
   );
 }
