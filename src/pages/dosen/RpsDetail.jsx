@@ -9,6 +9,7 @@ import { PrinterIcon } from '@heroicons/react/24/solid';
 import { useReactToPrint } from 'react-to-print';
 // import MyPdf from '../../utils/MyPdf';
 import MyPdf2 from '../../utils/MyPdf2';
+import Loader from '../../components/Loader';
 
 export default function RpsDetail() {
   const navigate = useNavigate();
@@ -17,6 +18,7 @@ export default function RpsDetail() {
   const [listPlo, setListPlo] = useState([]);
   const [listAssessment, setListAssessment] = useState([]);
   const [dosenPengampu, setDosenPengampu] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
   const params = useParams();
   const pdfRef = useRef();
 
@@ -52,8 +54,10 @@ export default function RpsDetail() {
       }
     }
 
+    setIsLoading(true);
     fetchUser();
     fetchRps();
+    setIsLoading(false);
   }, [params, navigate]);
 
   const listNav = [
@@ -214,6 +218,7 @@ export default function RpsDetail() {
           </main>
         </div>
       </div>
+      {isLoading && <Loader />}
     </>
   );
 }

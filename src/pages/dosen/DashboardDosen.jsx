@@ -2,10 +2,12 @@ import { useNavigate } from 'react-router-dom';
 import Breadcrumb from '../../components/Breadcrumb';
 import Header from '../../components/Header';
 import Sidebar from '../../components/Sidebar';
-import { useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { getUserRole } from '../../api/user';
+import Loader from '../../components/Loader';
 
 export default function DashboardDosen() {
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -20,7 +22,9 @@ export default function DashboardDosen() {
       }
     }
 
+    setIsLoading(true);
     fetchUser();
+    setIsLoading(false);
   }, [navigate]);
   const listNav = [{ name: 'Dashboard', link: '/dosen/dashboard' }];
   return (
@@ -39,6 +43,7 @@ export default function DashboardDosen() {
           </main>
         </div>
       </div>
+      {isLoading && <Loader />}
     </>
   );
 }

@@ -10,9 +10,11 @@ import { useLocation, Link, useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { getDosenMataKuliah } from '../../api/dosen';
 import { getUserRole } from '../../api/user';
+import Loader from '../../components/Loader';
 
 export default function Rps() {
   const [listMk, setListMk] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
   const listNav = [{ name: 'RPS', link: '/dosen/rps' }];
@@ -65,9 +67,11 @@ export default function Rps() {
       }
     }
 
+    setIsLoading(true);
     fetchUser();
     fetchPage();
     fetch();
+    setIsLoading(false);
   }, [navigate, location]);
 
   const handlePageChange = (pageNumber) => {
@@ -180,6 +184,7 @@ export default function Rps() {
           </main>
         </div>
       </div>
+      {isLoading && <Loader />}
     </>
   );
 }

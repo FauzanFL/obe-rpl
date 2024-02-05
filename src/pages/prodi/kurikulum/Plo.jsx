@@ -15,6 +15,7 @@ import { getActivePerancangan } from '../../../api/perancanganObe';
 import ModalTambahPlo from '../../../components/modal/plo/ModalTambahPlo';
 import ModalEditPlo from '../../../components/modal/plo/ModalEditPlo';
 import { alertDelete, alertFailed, alertSuccess } from '../../../utils/alert';
+import Loader from '../../../components/Loader';
 
 export default function Plo() {
   const navigate = useNavigate();
@@ -23,6 +24,7 @@ export default function Plo() {
   const [isTambahOpen, setIsTambahOpen] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [selectedPlo, setSelectedPlo] = useState({});
+  const [isLoading, setIsLoading] = useState(false);
   const listNav = [{ name: 'PLO', link: '/prodi/plo' }];
 
   const itemsPerPage = 5;
@@ -75,9 +77,11 @@ export default function Plo() {
       }
     }
 
+    setIsLoading(true);
     fetchUser();
     fetchPage();
     fetch();
+    setIsLoading(false);
   }, [navigate, location]);
 
   const render = async () => {
@@ -238,6 +242,7 @@ export default function Plo() {
           data={selectedPlo}
         />
       )}
+      {isLoading && <Loader />}
     </>
   );
 }

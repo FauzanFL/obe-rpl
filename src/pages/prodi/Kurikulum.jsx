@@ -19,6 +19,7 @@ import { getUserRole } from '../../api/user';
 import ModalTambahPerancangan from '../../components/modal/perancangan/ModalTambahPerancangan';
 import ModalEditPerancangan from '../../components/modal/perancangan/ModalEditPerancangan';
 import { alertDelete, alertFailed, alertSuccess } from '../../utils/alert';
+import Loader from '../../components/Loader';
 
 export default function Kurikulum() {
   const navigate = useNavigate();
@@ -27,6 +28,7 @@ export default function Kurikulum() {
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [selectedId, setSelectedId] = useState(0);
   const [listPerancangan, setListPerancangan] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
   const listNav = [{ name: 'Kurikulum', link: '/prodi/kurikulum' }];
 
   const itemsPerPage = 5;
@@ -80,9 +82,11 @@ export default function Kurikulum() {
       }
     }
 
+    setIsLoading(true);
     fetchUser();
     fetchPage();
     fetchList();
+    setIsLoading(false);
   }, [navigate, location]);
 
   const render = async () => {
@@ -295,6 +299,7 @@ export default function Kurikulum() {
             id={selectedId}
           />
         )}
+        {isLoading && <Loader />}
       </div>
     </>
   );

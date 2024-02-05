@@ -10,6 +10,7 @@ import { getUserRole } from '../../../api/user';
 import { getActivePerancangan } from '../../../api/perancanganObe';
 import ModalTambahPlotting from '../../../components/modal/plotting/ModalTambahPlotting';
 import { alertDelete, alertFailed, alertSuccess } from '../../../utils/alert';
+import Loader from '../../../components/Loader';
 
 export default function PlottingDosen() {
   const navigate = useNavigate();
@@ -17,6 +18,7 @@ export default function PlottingDosen() {
   const [listPlotting, setListPlotting] = useState([]);
   const [activeObe, setActiveObe] = useState({});
   const [isTambahOpen, setIsTambahOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const listNav = [{ name: 'Plotting Dosen', link: '/prodi/plotting' }];
 
   const itemsPerPage = 5;
@@ -78,10 +80,12 @@ export default function PlottingDosen() {
       }
     }
 
+    setIsLoading(true)
     fetchUser();
     fetchPage();
     fetch();
     fetchActiveObe();
+    setIsLoading(false)
   }, [navigate, location]);
 
   const render = async () => {
@@ -231,6 +235,7 @@ export default function PlottingDosen() {
           activeObe={activeObe}
         />
       )}
+      {isLoading && (<Loader/>)}
     </>
   );
 }

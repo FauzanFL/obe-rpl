@@ -14,6 +14,7 @@ import ModalTambahPengguna from '../../components/modal/pengguna/ModalTambahPeng
 import ModalEditPengguna from '../../components/modal/pengguna/ModalEditPengguna';
 import ModalEditProdi from '../../components/modal/pengguna/ModalEditProdi';
 import { alertDelete, alertFailed, alertSuccess } from '../../utils/alert';
+import Loader from '../../components/Loader';
 
 export default function Pengguna() {
   const navigate = useNavigate();
@@ -23,6 +24,7 @@ export default function Pengguna() {
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [isEditProdiOpen, setIsEditProdiOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState({});
+  const [isLoading, setIsLoading] = useState(false);
   const listNav = [{ name: 'Pengguna', link: '/prodi/pengguna' }];
 
   const itemsPerPage = 5;
@@ -74,9 +76,11 @@ export default function Pengguna() {
       }
     }
 
+    setIsLoading(true);
     fetchUser();
     fetchPage();
     fetch();
+    setIsLoading(false);
   }, [navigate, location]);
 
   const render = async () => {
@@ -255,6 +259,7 @@ export default function Pengguna() {
           data={selectedUser}
         />
       )}
+      {isLoading && <Loader />}
     </>
   );
 }

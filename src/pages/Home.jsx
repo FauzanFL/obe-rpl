@@ -17,6 +17,7 @@ export default function Home() {
   const [password, setPassword] = useState('');
   const [errStatus, setErrStatus] = useState({});
   const [errors, setErrors] = useState({});
+  const [isLoading, setIsLoading] = useState(false);
 
   const roleHandler = useCallback((role) => {
     if (role == 'prodi') {
@@ -29,6 +30,7 @@ export default function Home() {
   });
 
   useEffect(() => {
+    setIsLoading(true);
     async function fetchUser() {
       const res = await getUserRole();
       roleHandler(res.role);
@@ -38,6 +40,7 @@ export default function Home() {
     if (auth) {
       fetchUser();
     }
+    setIsLoading(false);
   }, [roleHandler]);
 
   const validation = () => {
@@ -186,7 +189,7 @@ export default function Home() {
           </main>
         </div>
       </div>
-      <Loader />
+      {isLoading && <Loader />}
     </>
   );
 }

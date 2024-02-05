@@ -15,6 +15,7 @@ import { getActivePerancangan } from '../../api/perancanganObe';
 import ModalTambahMk from '../../components/modal/matakuliah/ModalTambahMk';
 import ModalEditMk from '../../components/modal/matakuliah/ModalEditMk';
 import { alertDelete, alertFailed, alertSuccess } from '../../utils/alert';
+import Loader from '../../components/Loader';
 
 export default function MataKuliah() {
   const navigate = useNavigate();
@@ -24,6 +25,7 @@ export default function MataKuliah() {
   const [isTambahOpen, setIsTambahOpen] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [selectedMk, setSelectedMk] = useState({});
+  const [isLoading, setIsLoading] = useState(false);
   const listNav = [{ name: 'Mata Kuliah', link: '/prodi/matakuliah' }];
 
   const itemsPerPage = 5;
@@ -85,10 +87,12 @@ export default function MataKuliah() {
       }
     }
 
+    setIsLoading(true);
     fetchUser();
     fetchActiveObe();
     fetchPage();
     fetch();
+    setIsLoading(false);
   }, [navigate, location]);
 
   const render = async () => {
@@ -271,6 +275,7 @@ export default function MataKuliah() {
           data={selectedMk}
         />
       )}
+      {isLoading && <Loader />}
     </>
   );
 }

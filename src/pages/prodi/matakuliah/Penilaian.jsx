@@ -8,11 +8,13 @@ import { getMataKuliahByObeId } from '../../../api/matakuliah';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { getUserRole } from '../../../api/user';
 import { getActivePerancangan } from '../../../api/perancanganObe';
+import Loader from '../../../components/Loader';
 
 export default function Penilaian() {
   const navigate = useNavigate();
   const location = useLocation();
   const [listMk, setListMk] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
   const listNav = [{ name: 'Penilaian', link: '/prodi/penilaian' }];
 
   const itemsPerPage = 5;
@@ -65,9 +67,11 @@ export default function Penilaian() {
       }
     }
 
+    setIsLoading(true);
     fetchUser();
     fetchPage();
     fetch();
+    setIsLoading(false);
   }, [navigate, location]);
 
   const handlePageChange = (pageNumber) => {
@@ -182,6 +186,7 @@ export default function Penilaian() {
           </main>
         </div>
       </div>
+      {isLoading && <Loader />}
     </>
   );
 }

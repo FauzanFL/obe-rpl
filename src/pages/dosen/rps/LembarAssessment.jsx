@@ -19,6 +19,7 @@ import { getUserRole } from '../../../api/user';
 import ModalTambahAssessment from '../../../components/modal/assessment/ModalTambahAssessment';
 import ModalEditAssessment from '../../../components/modal/assessment/ModalEditAssessment';
 import { alertDelete, alertFailed, alertSuccess } from '../../../utils/alert';
+import Loader from '../../../components/Loader';
 
 export default function LembarAssessment() {
   const navigate = useNavigate();
@@ -29,6 +30,7 @@ export default function LembarAssessment() {
   const [isTambahOpen, setIsTambahOpen] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [selectedAssessment, setSelectedAssessment] = useState({});
+  const [isLoading, setIsLoading] = useState(false);
   const params = useParams();
 
   const itemsPerPage = 5;
@@ -104,11 +106,13 @@ export default function LembarAssessment() {
       }
     }
 
+    setIsLoading(true);
     fetchUser();
     fetchMk();
     fetchClo();
     fetchPage();
     fetchAssessment();
+    setIsLoading(false);
   }, [params, navigate, location]);
 
   const formatBobot = (bobot) => {
@@ -314,6 +318,7 @@ export default function LembarAssessment() {
           listAssessment={listAssessment}
         />
       )}
+      {isLoading && <Loader />}
     </>
   );
 }

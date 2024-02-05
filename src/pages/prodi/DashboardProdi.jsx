@@ -2,10 +2,12 @@ import { useNavigate } from 'react-router-dom';
 import Breadcrumb from '../../components/Breadcrumb';
 import Header from '../../components/Header';
 import Sidebar from '../../components/Sidebar';
-import { useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { getUserRole } from '../../api/user';
+import Loader from '../../components/Loader';
 
 export default function DashboardProdi() {
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   useEffect(() => {
     async function fetchUser() {
@@ -19,7 +21,9 @@ export default function DashboardProdi() {
       }
     }
 
+    setIsLoading(true);
     fetchUser();
+    setIsLoading(false);
   }, [navigate]);
   const listNav = [{ name: 'Dashboard', link: '/prodi/dashboard' }];
   return (
@@ -38,6 +42,7 @@ export default function DashboardProdi() {
           </main>
         </div>
       </div>
+      {isLoading && <Loader />}
     </>
   );
 }

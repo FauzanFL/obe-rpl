@@ -1,11 +1,13 @@
-import { useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import Breadcrumb from '../../../components/Breadcrumb';
 import Header from '../../../components/Header';
 import Sidebar from '../../../components/Sidebar';
 import { useNavigate } from 'react-router-dom';
 import { getUserRole } from '../../../api/user';
+import Loader from '../../../components/Loader';
 
 export default function PenilaianDosen() {
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   useEffect(() => {
     async function fetchUser() {
@@ -18,7 +20,9 @@ export default function PenilaianDosen() {
         navigate('/');
       }
     }
+    setIsLoading(true);
     fetchUser();
+    setIsLoading(false);
   }, [navigate]);
   const listNav = [
     { name: 'Mata Kuliah', link: '/dosen/matakuliah' },
@@ -40,6 +44,7 @@ export default function PenilaianDosen() {
           </main>
         </div>
       </div>
+      {isLoading && <Loader />}
     </>
   );
 }

@@ -7,9 +7,11 @@ import { useEffect, useState } from 'react';
 import { getDosenMataKuliah } from '../../api/dosen';
 import { ClipboardDocumentCheckIcon } from '@heroicons/react/24/solid';
 import { getUserRole } from '../../api/user';
+import Loader from '../../components/Loader';
 
 export default function MataKuliahDosen() {
   const [listMk, setListMk] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
   const listNav = [{ name: 'Mata Kuliah', link: '/dosen/matakuliah' }];
@@ -63,9 +65,11 @@ export default function MataKuliahDosen() {
       }
     }
 
+    setIsLoading(true);
     fetchUser();
     fetchPage();
     fetch();
+    setIsLoading(false);
   }, [navigate, location]);
 
   const handlePageChange = (pageNumber) => {
@@ -180,6 +184,7 @@ export default function MataKuliahDosen() {
           </main>
         </div>
       </div>
+      {isLoading && <Loader />}
     </>
   );
 }

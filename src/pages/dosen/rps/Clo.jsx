@@ -17,6 +17,7 @@ import ModalTambahClo from '../../../components/modal/clo/ModalTambahClo';
 import { getActivePerancangan } from '../../../api/perancanganObe';
 import ModalEditClo from '../../../components/modal/clo/ModalEditClo';
 import { alertDelete, alertFailed, alertSuccess } from '../../../utils/alert';
+import Loader from '../../../components/Loader';
 
 export default function Clo() {
   const navigate = useNavigate();
@@ -27,6 +28,7 @@ export default function Clo() {
   const [isTambahOpen, setIsTambahOpen] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [selectedClo, setSelectedClo] = useState({});
+  const [isLoading, setIsLoading] = useState(false);
   const params = useParams();
 
   const itemsPerPage = 5;
@@ -99,11 +101,13 @@ export default function Clo() {
       }
     }
 
+    setIsLoading(true);
     fetchUser();
     fetchMk();
     fetchActiveObe();
     fetchPage();
     fetchClo();
+    setIsLoading(false);
   }, [params, navigate, location]);
 
   const formatBobot = (bobot) => {
@@ -307,6 +311,7 @@ export default function Clo() {
           data={selectedClo}
         />
       )}
+      {isLoading && <Loader />}
     </>
   );
 }
