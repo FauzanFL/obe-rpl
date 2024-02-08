@@ -59,3 +59,19 @@ export const alertDelete = (next) => {
     }
   });
 };
+
+export const alertActivate = (next) => {
+  Swal.fire({
+    title: 'Apakah Anda yakin?',
+    text: 'Ini akan mempengaruhi keseluruhan OBE',
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#16a34a',
+    cancelButtonColor: '#b8b6b0',
+    confirmButtonText: 'Ya, aktifkan!',
+  }).then((res) => {
+    if (res.isConfirmed) {
+      next();
+    }
+  });
+};

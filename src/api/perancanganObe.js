@@ -10,6 +10,16 @@ export const getPerancangan = async () => {
   return result.data;
 };
 
+export const searchPerancangan = async (key) => {
+  const result = await axios.get(
+    `${import.meta.env.VITE_API_URL}/perancangan_obe/search?keyword=${key}`,
+    {
+      withCredentials: true,
+    }
+  );
+  return result.data;
+};
+
 export const getActivePerancangan = async () => {
   const result = await axios.get(
     `${import.meta.env.VITE_API_URL}/perancangan_obe/active`,

@@ -16,3 +16,13 @@ export const getDosenMataKuliah = async () => {
   );
   return result.data;
 };
+
+export const searchDosenMataKuliah = async (key) => {
+  const result = await axios.get(
+    `${import.meta.env.VITE_API_URL}/dosen/mata_kuliah/search?keyword=${key}`,
+    {
+      withCredentials: true,
+    }
+  );
+  return result.data;
+};

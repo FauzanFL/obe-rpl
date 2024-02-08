@@ -8,7 +8,7 @@ import Header from '../../../components/Header';
 import Pagination from '../../../components/Pagination';
 import Sidebar from '../../../components/Sidebar';
 import { useEffect, useState } from 'react';
-import { deletePlo, getPloByObeId } from '../../../api/plo';
+import { deletePlo, getPloByObeId, searchPloByObeId } from '../../../api/plo';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { getUserRole } from '../../../api/user';
 import { getActivePerancangan } from '../../../api/perancanganObe';
@@ -40,6 +40,7 @@ export default function Plo() {
   }
 
   useEffect(() => {
+    setIsLoading(true);
     async function fetchUser() {
       try {
         const res = await getUserRole();
@@ -57,6 +58,7 @@ export default function Plo() {
         const res = await getPloByObeId(obeActive.id);
         if (res) {
           setListPlo(res);
+          setIsLoading(false);
         }
       } catch (e) {
         console.error(e);
@@ -77,11 +79,9 @@ export default function Plo() {
       }
     }
 
-    setIsLoading(true);
     fetchUser();
     fetchPage();
     fetch();
-    setIsLoading(false);
   }, [navigate, location]);
 
   const render = async () => {
@@ -93,6 +93,30 @@ export default function Plo() {
       }
     } catch (e) {
       console.error(e);
+    }
+  };
+
+  const handleSearch = async (key) => {
+    if (key.length > 1) {
+      try {
+        const obeActive = await getActivePerancangan();
+        const res = await searchPloByObeId(obeActive.id, key);
+        if (res) {
+          setListPlo(res);
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    } else if (key.length === 0) {
+      try {
+        const obeActive = await getActivePerancangan();
+        const res = await getPloByObeId(obeActive.id);
+        if (res) {
+          setListPlo(res);
+        }
+      } catch (e) {
+        console.error(e);
+      }
     }
   };
 
@@ -146,7 +170,39 @@ export default function Plo() {
             <h2 className="text-semibold text-3xl">PLO</h2>
             <div className="block mt-3 p-5 bg-white border border-gray-200 rounded-lg shadow">
               <h3 className="text-semibold text-2xl">Daftar PLO</h3>
-              <div className="flex justify-end">
+              <div className="flex justify-between items-center">
+                <div className="py-2">
+                  <label htmlFor="simple-search" className="sr-only">
+                    Search
+                  </label>
+                  <div className="relative w-full">
+                    <div className="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
+                      <svg
+                        className="w-4 h-4 text-gray-500 dark:text-gray-400"
+                        aria-hidden="true"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 18 20"
+                      >
+                        <path
+                          stroke="currentColor"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          d="M3 5v10M3 5a2 2 0 1 0 0-4 2 2 0 0 0 0 4Zm0 10a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm12 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm0 0V6a3 3 0 0 0-3-3H9m1.5-2-2 2 2 2"
+                        />
+                      </svg>
+                    </div>
+                    <input
+                      type="text"
+                      id="simple-search"
+                      onChange={({ target }) => handleSearch(target.value)}
+                      className="bg-gray-50 w-72 max-w-96 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block ps-10 p-2.5  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                      placeholder="Search..."
+                      required
+                    />
+                  </div>
+                </div>
                 <button
                   type="button"
                   onClick={() => setIsTambahOpen(true)}

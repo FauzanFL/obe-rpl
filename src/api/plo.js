@@ -24,6 +24,16 @@ export const getPloByObeId = async (obeId) => {
   return result.data;
 };
 
+export const searchPloByObeId = async (obeId, key) => {
+  const result = await axios.get(
+    `${import.meta.env.VITE_API_URL}/plo/obe/${obeId}/search?keyword=${key}`,
+    {
+      withCredentials: true,
+    }
+  );
+  return result.data;
+};
+
 export const createPlo = async (data) => {
   const result = await axios.post(
     `${import.meta.env.VITE_API_URL}/plo/`,

@@ -15,6 +15,7 @@ import LembarAssessment from '../pages/dosen/rps/LembarAssessment';
 import PenilaianDosen from '../pages/dosen/matakuliah/PenilaianDosen';
 import Rps from '../pages/dosen/Rps';
 import RpsDetail from '../pages/dosen/RpsDetail';
+import PenilaianKelasDosen from '../pages/dosen/matakuliah/PenilaianKelasDosen';
 
 const router = createBrowserRouter([
   {
@@ -66,8 +67,12 @@ const router = createBrowserRouter([
     element: <LembarAssessment />,
   },
   {
-    path: '/dosen/matakuliah/penilaian',
+    path: '/dosen/matakuliah/:mkId/penilaian',
     element: <PenilaianDosen />,
+  },
+  {
+    path: '/dosen/matakuliah/:mkId/penilaian/kelas',
+    element: <PenilaianKelasDosen />,
   },
   {
     path: '/dosen/rps',

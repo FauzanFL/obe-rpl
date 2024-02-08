@@ -13,12 +13,18 @@ import {
   activatePerancangan,
   deletePerancangan,
   getPerancangan,
+  searchPerancangan,
 } from '../../api/perancanganObe';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { getUserRole } from '../../api/user';
 import ModalTambahPerancangan from '../../components/modal/perancangan/ModalTambahPerancangan';
 import ModalEditPerancangan from '../../components/modal/perancangan/ModalEditPerancangan';
-import { alertDelete, alertFailed, alertSuccess } from '../../utils/alert';
+import {
+  alertActivate,
+  alertDelete,
+  alertFailed,
+  alertSuccess,
+} from '../../utils/alert';
 import Loader from '../../components/Loader';
 
 export default function Kurikulum() {
@@ -46,6 +52,7 @@ export default function Kurikulum() {
   }
 
   useEffect(() => {
+    setIsLoading(true);
     async function fetchUser() {
       try {
         const res = await getUserRole();
@@ -62,6 +69,7 @@ export default function Kurikulum() {
         const res = await getPerancangan();
         if (res) {
           setListPerancangan(res);
+          setIsLoading(false);
         }
       } catch (e) {
         console.error(e);
@@ -82,11 +90,9 @@ export default function Kurikulum() {
       }
     }
 
-    setIsLoading(true);
     fetchUser();
     fetchPage();
     fetchList();
-    setIsLoading(false);
   }, [navigate, location]);
 
   const render = async () => {
@@ -97,6 +103,28 @@ export default function Kurikulum() {
       }
     } catch (e) {
       console.error(e);
+    }
+  };
+
+  const handleSearch = async (key) => {
+    if (key.length > 1) {
+      try {
+        const res = await searchPerancangan(key);
+        if (res) {
+          setListPerancangan(res);
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    } else if (key.length === 0) {
+      try {
+        const res = await getPerancangan();
+        if (res) {
+          setListPerancangan(res);
+        }
+      } catch (e) {
+        console.error(e);
+      }
     }
   };
 
@@ -173,7 +201,39 @@ export default function Kurikulum() {
             <h2 className="text-semibold text-3xl">Kurikulum</h2>
             <div className="block mt-3 p-5 bg-white border border-gray-200 rounded-lg shadow">
               <h3 className="text-semibold text-2xl">Daftar Perancangan OBE</h3>
-              <div className="flex justify-end">
+              <div className="flex justify-between items-center">
+                <div className="py-2">
+                  <label htmlFor="simple-search" className="sr-only">
+                    Search
+                  </label>
+                  <div className="relative w-full">
+                    <div className="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
+                      <svg
+                        className="w-4 h-4 text-gray-500 dark:text-gray-400"
+                        aria-hidden="true"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 18 20"
+                      >
+                        <path
+                          stroke="currentColor"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          d="M3 5v10M3 5a2 2 0 1 0 0-4 2 2 0 0 0 0 4Zm0 10a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm12 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm0 0V6a3 3 0 0 0-3-3H9m1.5-2-2 2 2 2"
+                        />
+                      </svg>
+                    </div>
+                    <input
+                      type="text"
+                      id="simple-search"
+                      onChange={({ target }) => handleSearch(target.value)}
+                      className="bg-gray-50 w-72 max-w-96 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block ps-10 p-2.5  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                      placeholder="Search..."
+                      required
+                    />
+                  </div>
+                </div>
                 <button
                   onClick={() => setIsTambahOpen(true)}
                   type="button"
@@ -221,11 +281,11 @@ export default function Kurikulum() {
                         try {
                           const res = await activatePerancangan(item.id);
                           if (res) {
-                            alertSuccess('Berhasil menghapus data');
+                            alertSuccess('Berhasil mengaktifkan');
                             render();
                           }
                         } catch (e) {
-                          alertFailed('Gagal menghapus data');
+                          alertFailed('Gagal mengaktifkan');
                         }
                       };
                       return (
@@ -259,7 +319,7 @@ export default function Kurikulum() {
                             </button>
                             <button
                               type="button"
-                              onClick={handleActivate}
+                              onClick={() => alertActivate(handleActivate)}
                               className="flex justify-center items-center focus:outline-none text-white bg-green-500 hover:bg-green-600 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-3 py-1.5 me-2 mb-2"
                             >
                               <CursorArrowRippleIcon className="w-5 mr-1" />

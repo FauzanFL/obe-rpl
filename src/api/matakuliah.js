@@ -30,6 +30,18 @@ export const getMataKuliahByObeId = async (obeId) => {
   return result.data;
 };
 
+export const searchMataKuliahByObeId = async (obeId, key) => {
+  const result = await axios.get(
+    `${
+      import.meta.env.VITE_API_URL
+    }/mata_kuliah/obe/${obeId}/search?keyword=${key}`,
+    {
+      withCredentials: true,
+    }
+  );
+  return result.data;
+};
+
 export const getRpsMataKuliah = async (id) => {
   const result = await axios.get(
     `${import.meta.env.VITE_API_URL}/mata_kuliah/rps/${id}`,

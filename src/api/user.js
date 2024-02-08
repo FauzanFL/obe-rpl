@@ -42,6 +42,16 @@ export const getUserDosen = async () => {
   return result.data;
 };
 
+export const searchUserDosen = async (key) => {
+  const result = await axios.get(
+    `${import.meta.env.VITE_API_URL}/users/dosen/search?keyword=${key}`,
+    {
+      withCredentials: true,
+    }
+  );
+  return result.data;
+};
+
 export const addUser = async (data) => {
   const result = await axios.post(
     `${import.meta.env.VITE_API_URL}/users/`,

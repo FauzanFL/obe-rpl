@@ -2,13 +2,18 @@ import { useState, useEffect } from 'react';
 import Breadcrumb from '../../../components/Breadcrumb';
 import Header from '../../../components/Header';
 import Sidebar from '../../../components/Sidebar';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { getUserRole } from '../../../api/user';
 import Loader from '../../../components/Loader';
+import { ClipboardDocumentIcon } from '@heroicons/react/24/solid';
+import { getMataKuliahById } from '../../../api/matakuliah';
 
 export default function PenilaianDosen() {
   const [isLoading, setIsLoading] = useState(false);
+  const [mk, setMk] = useState({});
+  const [listKelas, setListKelas] = useState([]);
   const navigate = useNavigate();
+  const params = useParams();
   useEffect(() => {
     async function fetchUser() {
       try {
@@ -20,13 +25,25 @@ export default function PenilaianDosen() {
         navigate('/');
       }
     }
+    async function fetchMk() {
+      try {
+        const res = await getMataKuliahById(params.mkId);
+        if (res) {
+          setMk(res);
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    }
     setIsLoading(true);
     fetchUser();
+    fetchMk();
     setIsLoading(false);
-  }, [navigate]);
+  }, [navigate, params]);
+
   const listNav = [
     { name: 'Mata Kuliah', link: '/dosen/matakuliah' },
-    { name: 'Penilaian', link: '/dosen/matakuliah/penilaian' },
+    { name: 'Penilaian', link: `/dosen/matakuliah/${mk.id}/penilaian` },
   ];
   return (
     <>
@@ -40,7 +57,38 @@ export default function PenilaianDosen() {
             <Breadcrumb listNav={listNav} />
           </div>
           <main className="p-7 text-wrap">
-            <h2 className="text-semibold text-3xl">Penilaian</h2>
+            <h2 className="text-semibold text-3xl">Penilaian {mk.nama}</h2>
+            <div className="block mt-3 p-5 bg-white border border-gray-200 rounded-lg shadow">
+              <h3 className="text-semibold text-2xl">Daftar Kelas</h3>
+              <div className="relative overflow-x-auto shadow-sm sm:rounded-lg">
+                <table className="w-full text-left rtl:text-right">
+                  <thead className="text-xs text-gray-700 uppercase bg-gray-50">
+                    <tr>
+                      <th scope="col" className="px-6 py-3">
+                        Nama
+                      </th>
+                      <th scope="col" className="px-6 py-3">
+                        Aksi
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr className="odd:bg-white even:bg-gray-50 border-b">
+                      <td className="px-6 py-4">SE04A</td>
+                      <td className="px-6 py-4">
+                        <Link
+                          to={`/dosen/matakuliah/penilaian/kelas`}
+                          className="flex justify-center items-center focus:outline-none text-white bg-indigo-500 hover:bg-indigo-600 focus:ring-4 focus:ring-indigo-300 font-medium rounded-lg text-sm px-3 py-1.5 me-2 mb-2"
+                        >
+                          <ClipboardDocumentIcon className="w-5 mr-1" />
+                          Nilai
+                        </Link>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
           </main>
         </div>
       </div>

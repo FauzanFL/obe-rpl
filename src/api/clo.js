@@ -24,6 +24,16 @@ export const getMkClo = async (mkId) => {
   return result.data;
 };
 
+export const searchMkClo = async (mkId, key) => {
+  const result = await axios.get(
+    `${import.meta.env.VITE_API_URL}/clo/mk/${mkId}/search?keyword=${key}`,
+    {
+      withCredentials: true,
+    }
+  );
+  return result.data;
+};
+
 export const createClo = async (data) => {
   const result = await axios.post(
     `${import.meta.env.VITE_API_URL}/clo/`,

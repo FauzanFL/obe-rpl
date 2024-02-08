@@ -10,6 +10,16 @@ export const getPlotting = async () => {
   return result.data;
 };
 
+export const searchPlotting = async (key) => {
+  const result = await axios.get(
+    `${import.meta.env.VITE_API_URL}/plotting_dosen_mk/search?keyword=${key}`,
+    {
+      withCredentials: true,
+    }
+  );
+  return result.data;
+};
+
 export const createPlotting = async (data) => {
   const result = await axios.post(
     `${import.meta.env.VITE_API_URL}/plotting_dosen_mk/`,
