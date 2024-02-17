@@ -2,24 +2,29 @@ import { useState, useEffect } from 'react';
 import Breadcrumb from '../../../components/Breadcrumb';
 import Header from '../../../components/Header';
 import Sidebar from '../../../components/Sidebar';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { getUserRole } from '../../../api/user';
 import Loader from '../../../components/Loader';
 import Spreadsheet from 'react-spreadsheet';
+import { getMataKuliahById } from '../../../api/matakuliah';
+import { getKelasById } from '../../../api/kelas';
+import { getDataPenilaian } from '../../../api/penilaian';
 
 export default function PenilaianKelasDosen() {
+  const [dataPenilaian, setDataPenilaian] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [kelas, setKelas] = useState('');
+  const [mk, setMk] = useState({});
+  const [kelas, setKelas] = useState({});
   const firstData = [
     [{ value: 'Vanilla' }, { value: 'Chocolate' }, { value: '' }],
     [{ value: 'Strawberry' }, { value: 'Cookies' }, { value: '' }],
   ];
   const [data, setData] = useState(firstData);
+  const params = useParams();
 
-  const colLabel = ['Kolom 1', 'Kolom 2'];
-  const rowLabel = ['Baris 1', 'Baris 2'];
   const navigate = useNavigate();
   useEffect(() => {
+    setIsLoading(true);
     async function fetchUser() {
       try {
         const res = await getUserRole();
@@ -30,16 +35,76 @@ export default function PenilaianKelasDosen() {
         navigate('/');
       }
     }
-    setIsLoading(true);
+    async function fetchMk() {
+      try {
+        const res = await getMataKuliahById(params.mkId);
+        if (res) {
+          setMk(res);
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    }
+    async function fetchKelas() {
+      try {
+        const res = await getKelasById(params.kelasId);
+        if (res) {
+          setKelas(res);
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    async function fetch() {
+      try {
+        const resData = await getDataPenilaian(params.mkId, params.kelasId);
+        console.log(resData);
+        if (resData) {
+          setDataPenilaian(resData);
+          setIsLoading(false);
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
     fetchUser();
-    setKelas('SE04A');
-    setIsLoading(false);
-  }, [navigate]);
+    fetchMk();
+    fetchKelas();
+    fetch();
+  }, [navigate, params]);
+
+  const mahasiswaNilai = dataPenilaian.mahasiswa_nilai;
+  const cloAssessment = dataPenilaian.clo_assessment;
+  let colLabel = [];
+  let rowLabel = [];
+  if (mahasiswaNilai !== undefined && mahasiswaNilai.length !== 0) {
+    rowLabel = mahasiswaNilai.map((item) => item.nama);
+  }
+  if (cloAssessment !== undefined && cloAssessment.length !== 0) {
+    cloAssessment.forEach((item) => {
+      let assessments = [];
+      const assessment = item.assessment;
+      if (assessment !== undefined && assessment.length !== 0) {
+        assessments = assessment.map((item) => item.nama);
+      }
+      if (assessments.length !== 0) {
+        colLabel.push(assessments);
+      }
+    });
+  }
 
   const listNav = [
     { name: 'Mata Kuliah', link: '/dosen/matakuliah' },
-    { name: 'Penilaian', link: '/dosen/matakuliah/penilaian' },
-    { name: 'Kelas', link: '/dosen/matakuliah/penilaian/kelas' },
+    {
+      name: `Penilaian ${mk.kode_mk}`,
+      link: `/dosen/matakuliah/${mk.id}/penilaian`,
+    },
+    {
+      name: `${kelas.kode_kelas}`,
+      link: `/dosen/matakuliah/${mk.id}/penilaian/kelas/${kelas.id}`,
+    },
   ];
   return (
     <>

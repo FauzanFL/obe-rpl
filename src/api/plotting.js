@@ -10,6 +10,30 @@ export const getPlotting = async () => {
   return result.data;
 };
 
+export const getKelasDosenByMkId = async (mkId) => {
+  const result = await axios.get(
+    `${
+      import.meta.env.VITE_API_URL
+    }/plotting_dosen_mk/matakuliah/${mkId}/kelas/dosen`,
+    {
+      withCredentials: true,
+    }
+  );
+  return result.data;
+};
+
+export const getKelasByMkId = async (mkId) => {
+  const result = await axios.get(
+    `${
+      import.meta.env.VITE_API_URL
+    }/plotting_dosen_mk/matakuliah/${mkId}/kelas`,
+    {
+      withCredentials: true,
+    }
+  );
+  return result.data;
+};
+
 export const searchPlotting = async (key) => {
   const result = await axios.get(
     `${import.meta.env.VITE_API_URL}/plotting_dosen_mk/search?keyword=${key}`,

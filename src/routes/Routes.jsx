@@ -16,6 +16,7 @@ import PenilaianDosen from '../pages/dosen/matakuliah/PenilaianDosen';
 import Rps from '../pages/dosen/Rps';
 import RpsDetail from '../pages/dosen/RpsDetail';
 import PenilaianKelasDosen from '../pages/dosen/matakuliah/PenilaianKelasDosen';
+import PenilaianKelas from '../pages/prodi/matakuliah/PenilaianKelas';
 
 const router = createBrowserRouter([
   {
@@ -47,6 +48,10 @@ const router = createBrowserRouter([
     element: <Penilaian />,
   },
   {
+    path: '/prodi/penilaian/matakuliah/:mkId',
+    element: <PenilaianKelas />,
+  },
+  {
     path: '/prodi/plotting',
     element: <PlottingDosen />,
   },
@@ -71,7 +76,7 @@ const router = createBrowserRouter([
     element: <PenilaianDosen />,
   },
   {
-    path: '/dosen/matakuliah/:mkId/penilaian/kelas',
+    path: '/dosen/matakuliah/:mkId/penilaian/kelas/:kelasId',
     element: <PenilaianKelasDosen />,
   },
   {

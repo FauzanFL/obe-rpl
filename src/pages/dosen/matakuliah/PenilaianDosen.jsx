@@ -7,6 +7,7 @@ import { getUserRole } from '../../../api/user';
 import Loader from '../../../components/Loader';
 import { ClipboardDocumentIcon } from '@heroicons/react/24/solid';
 import { getMataKuliahById } from '../../../api/matakuliah';
+import { getKelasDosenByMkId } from '../../../api/plotting';
 
 export default function PenilaianDosen() {
   const [isLoading, setIsLoading] = useState(false);
@@ -35,15 +36,29 @@ export default function PenilaianDosen() {
         console.error(e);
       }
     }
+    async function fetchKelas() {
+      try {
+        const res = await getKelasDosenByMkId(params.mkId);
+        if (res) {
+          setListKelas(res);
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    }
     setIsLoading(true);
     fetchUser();
     fetchMk();
+    fetchKelas();
     setIsLoading(false);
   }, [navigate, params]);
 
   const listNav = [
     { name: 'Mata Kuliah', link: '/dosen/matakuliah' },
-    { name: 'Penilaian', link: `/dosen/matakuliah/${mk.id}/penilaian` },
+    {
+      name: `Penilaian ${mk.kode_mk}`,
+      link: `/dosen/matakuliah/${mk.id}/penilaian`,
+    },
   ];
   return (
     <>
@@ -60,7 +75,7 @@ export default function PenilaianDosen() {
             <h2 className="text-semibold text-3xl">Penilaian {mk.nama}</h2>
             <div className="block mt-3 p-5 bg-white border border-gray-200 rounded-lg shadow">
               <h3 className="text-semibold text-2xl">Daftar Kelas</h3>
-              <div className="relative overflow-x-auto shadow-sm sm:rounded-lg">
+              <div className="relative mt-2 overflow-x-auto shadow-sm sm:rounded-lg">
                 <table className="w-full text-left rtl:text-right">
                   <thead className="text-xs text-gray-700 uppercase bg-gray-50">
                     <tr>
@@ -73,18 +88,25 @@ export default function PenilaianDosen() {
                     </tr>
                   </thead>
                   <tbody>
-                    <tr className="odd:bg-white even:bg-gray-50 border-b">
-                      <td className="px-6 py-4">SE04A</td>
-                      <td className="px-6 py-4">
-                        <Link
-                          to={`/dosen/matakuliah/penilaian/kelas`}
-                          className="flex justify-center items-center focus:outline-none text-white bg-indigo-500 hover:bg-indigo-600 focus:ring-4 focus:ring-indigo-300 font-medium rounded-lg text-sm px-3 py-1.5 me-2 mb-2"
+                    {listKelas.map((item, i) => {
+                      return (
+                        <tr
+                          key={i}
+                          className="odd:bg-white even:bg-gray-50 border-b"
                         >
-                          <ClipboardDocumentIcon className="w-5 mr-1" />
-                          Nilai
-                        </Link>
-                      </td>
-                    </tr>
+                          <td className="px-6 py-4">{item.kode_kelas}</td>
+                          <td className="px-6 py-4">
+                            <Link
+                              to={`/dosen/matakuliah/${mk.id}/penilaian/kelas/${item.id}`}
+                              className="flex justify-center items-center focus:outline-none max-w-60 text-white bg-indigo-500 hover:bg-indigo-600 focus:ring-4 focus:ring-indigo-300 font-medium rounded-lg text-sm px-3 py-1.5 me-2 mb-2"
+                            >
+                              <ClipboardDocumentIcon className="w-5 mr-1" />
+                              Nilai
+                            </Link>
+                          </td>
+                        </tr>
+                      );
+                    })}
                   </tbody>
                 </table>
               </div>

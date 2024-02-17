@@ -8,7 +8,7 @@ import {
   getMataKuliahByObeId,
   searchMataKuliahByObeId,
 } from '../../../api/matakuliah';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { getUserRole } from '../../../api/user';
 import { getActivePerancangan } from '../../../api/perancanganObe';
 import Loader from '../../../components/Loader';
@@ -217,12 +217,12 @@ export default function Penilaian() {
                           <td className="px-6 py-4">{item.semester}</td>
                           <td className="px-6 py-4">{item.sks}</td>
                           <td className="flex px-6 py-4">
-                            <button
-                              type="button"
+                            <Link
+                              to={`/prodi/penilaian/matakuliah/${item.id}`}
                               className="flex justify-center items-center focus:outline-none text-white bg-purple-600 hover:bg-purple-700 focus:ring-4 focus:ring-purple-300 font-medium rounded-lg text-sm px-3 py-1.5 me-2 mb-2"
                             >
                               <EyeIcon className="w-5" />
-                            </button>
+                            </Link>
                           </td>
                         </tr>
                       );
