@@ -4,8 +4,30 @@ import 'animate.css';
 export const alertSuccess = (msg) => {
   Swal.fire({
     title: msg,
-    timer: 2000,
+    timer: 1000,
     icon: 'success',
+    showClass: {
+      popup: `
+          animate__animated
+          animate__zoomIn
+          animate__faster
+        `,
+    },
+    hideClass: {
+      popup: `
+          animate__animated
+          animate__zoomOut
+          animate__faster
+        `,
+    },
+  });
+};
+
+export const alertInfo = (msg) => {
+  Swal.fire({
+    title: msg,
+    timer: 1500,
+    icon: 'info',
     showClass: {
       popup: `
           animate__animated

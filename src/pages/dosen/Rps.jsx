@@ -32,6 +32,7 @@ export default function Rps() {
   }
 
   useEffect(() => {
+    setIsLoading(true);
     async function fetchUser() {
       try {
         const res = await getUserRole();
@@ -49,6 +50,7 @@ export default function Rps() {
         if (res) {
           setListMk(res);
         }
+        setIsLoading(false);
       } catch (e) {
         console.error(e);
       }

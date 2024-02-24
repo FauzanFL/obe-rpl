@@ -72,8 +72,8 @@ export default function MataKuliah() {
         const res = await getMataKuliahByObeId(obe.id);
         if (res) {
           setListMk(res);
-          setIsLoading(false);
         }
+        setIsLoading(false);
       } catch (e) {
         console.error(e);
       }

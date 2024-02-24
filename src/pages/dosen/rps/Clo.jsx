@@ -82,8 +82,8 @@ export default function Clo() {
         const res = await getMkClo(params.mkId);
         if (res) {
           setListClo(res);
-          setIsLoading(false);
         }
+        setIsLoading(false);
       } catch (e) {
         console.error(e);
       }

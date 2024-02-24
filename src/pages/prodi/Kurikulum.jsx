@@ -69,8 +69,8 @@ export default function Kurikulum() {
         const res = await getPerancangan();
         if (res) {
           setListPerancangan(res);
-          setIsLoading(false);
         }
+        setIsLoading(false);
       } catch (e) {
         console.error(e);
       }

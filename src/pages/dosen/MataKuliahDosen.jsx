@@ -46,8 +46,8 @@ export default function MataKuliahDosen() {
         const res = await getDosenMataKuliah();
         if (res) {
           setListMk(res);
-          setIsLoading(false);
         }
+        setIsLoading(false);
       } catch (e) {
         console.error(e);
       }

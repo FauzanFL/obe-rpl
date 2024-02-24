@@ -58,8 +58,8 @@ export default function Plo() {
         const res = await getPloByObeId(obeActive.id);
         if (res) {
           setListPlo(res);
-          setIsLoading(false);
         }
+        setIsLoading(false);
       } catch (e) {
         console.error(e);
       }

@@ -65,8 +65,8 @@ export default function PlottingDosen() {
         const res = await getPlotting();
         if (res) {
           setListPlotting(res);
-          setIsLoading(false);
         }
+        setIsLoading(false);
       } catch (e) {
         console.error(e);
       }

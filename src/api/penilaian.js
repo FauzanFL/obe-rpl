@@ -32,7 +32,7 @@ export const createPenilaian = async (data) => {
 
 export const updatePenilaian = async (data, id) => {
   const result = await axios.put(
-    `${import.meta.env.VITE_API_URL}/penilaian/${id}`,
+    `${import.meta.env.VITE_API_URL}/penilaian/update/${id}`,
     data,
     {
       withCredentials: true,
@@ -43,7 +43,7 @@ export const updatePenilaian = async (data, id) => {
 
 export const deletePenilaian = async (id) => {
   const result = await axios.delete(
-    `${import.meta.env.VITE_API_URL}/penilaian/${id}`,
+    `${import.meta.env.VITE_API_URL}/penilaian/delete/${id}`,
     {
       withCredentials: true,
     }

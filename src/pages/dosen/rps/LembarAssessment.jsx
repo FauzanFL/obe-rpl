@@ -88,8 +88,8 @@ export default function LembarAssessment() {
         const res = await getAssessmentByCloId(params.cloId);
         if (res) {
           setListAssessment(res);
-          setIsLoading(false);
         }
+        setIsLoading(false);
       } catch (e) {
         console.error(e);
       }

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import Spreadsheet from 'react-spreadsheet';
 import Sidebar from '../../../components/Sidebar';
 import Header from '../../../components/Header';
@@ -11,7 +11,6 @@ import { getKelasByMkId } from '../../../api/plotting';
 import { getDataPenilaian } from '../../../api/penilaian';
 
 export default function PenilaianKelas() {
-  let firstData = useRef([]);
   const [dataPenilaian, setDataPenilaian] = useState([]);
   const [listKelas, setListKelas] = useState([]);
   const [kelas, setKelas] = useState('SE04A');
@@ -24,27 +23,49 @@ export default function PenilaianKelas() {
   const settingData = useCallback((dataToSet) => {
     const mahasiswaNilai = dataToSet.mahasiswa_nilai;
     const cloAssessment = dataToSet.clo_assessment;
-    let assessments = [];
+    let listAssessments = [];
     if (cloAssessment !== undefined && cloAssessment.length !== 0) {
       cloAssessment.forEach((item) => {
+        let assessments = [];
         const assessment = item.assessment;
+        if (assessment !== undefined && assessment.length !== 0) {
+          assessments = assessment.map((item) => item);
+        }
         if (assessments.length !== 0) {
-          assessments.push(assessment);
+          listAssessments.push(...assessments);
         }
       });
     }
     let listNilai = [];
     if (mahasiswaNilai !== undefined && mahasiswaNilai.length !== 0) {
-      assessments.forEach((item) => {
-        const nilai = mahasiswaNilai.assessment.map((item2) => {
-          if (item.id === item2.assessment_id) {
-            return item.nilai;
+      mahasiswaNilai.forEach((item1) => {
+        const nilai = item1.penilaian.map((item2) => {
+          const obj = listAssessments.map((assessment) => {
+            if (assessment.id === item2.assessment_id) {
+              return {
+                id: item2.id,
+                value: item2.nilai,
+                readOnly: true,
+                mhsId: item1.id,
+                assessId: assessment.id,
+              };
+            } else {
+              return {
+                value: '',
+                readOnly: true,
+                mhsId: item1.id,
+                assessId: assessment.id,
+              };
+            }
+          });
+          if (obj) {
+            return obj;
           }
         });
-        listNilai.push(nilai);
+        listNilai.push(...nilai);
       });
     }
-    firstData.current = listNilai;
+    setData(listNilai);
   }, []);
 
   useEffect(() => {
@@ -148,6 +169,7 @@ export default function PenilaianKelas() {
                       );
                       if (resData) {
                         setDataPenilaian(resData);
+                        settingData(resData);
                         setIsLoading(false);
                       }
                     } catch (e) {
@@ -170,6 +192,7 @@ export default function PenilaianKelas() {
                 })}
               </div>
               <Spreadsheet
+                className="font-semibold"
                 data={data}
                 onChange={setData}
                 columnLabels={colLabel}

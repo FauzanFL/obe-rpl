@@ -5,7 +5,7 @@ import Sidebar from '../../../components/Sidebar';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { getUserRole } from '../../../api/user';
 import Loader from '../../../components/Loader';
-import { ClipboardDocumentIcon } from '@heroicons/react/24/solid';
+import { ClipboardDocumentIcon, DocumentIcon } from '@heroicons/react/24/solid';
 import { getMataKuliahById } from '../../../api/matakuliah';
 import { getKelasDosenByMkId } from '../../../api/plotting';
 
@@ -102,6 +102,13 @@ export default function PenilaianDosen() {
                             >
                               <ClipboardDocumentIcon className="w-5 mr-1" />
                               Nilai
+                            </Link>
+                            <Link
+                              to={``}
+                              className="flex justify-center items-center focus:outline-none max-w-60 text-white bg-fuchsia-500 hover:bg-fuchsia-600 focus:ring-4 focus:ring-fuchsia-300 font-medium rounded-lg text-sm px-3 py-1.5 me-2 mb-2"
+                            >
+                              <DocumentIcon className="w-5 mr-1" />
+                              File Assessment
                             </Link>
                           </td>
                         </tr>

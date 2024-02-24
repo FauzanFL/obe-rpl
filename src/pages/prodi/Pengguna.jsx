@@ -62,8 +62,8 @@ export default function Pengguna() {
         const res = await getUserDosen();
         if (res) {
           setListPengguna(res);
-          setIsLoading(false);
         }
+        setIsLoading(false);
       } catch (e) {
         console.error(e.response.data);
       }
