@@ -188,6 +188,7 @@ export default function ModalTambahAssessment({
               className="block mb-1 text-sm font-medium text-gray-900"
             >
               Bobot
+              <span className="ml-1 text-xs text-gray-500">{`(maks ${bobotMax()})`}</span>
             </label>
             <div className="flex items-center">
               <input
