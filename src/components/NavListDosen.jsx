@@ -17,7 +17,7 @@ export default function NavListDosen({ open, page }) {
         <Link to={'/dosen/dashboard'} className="flex items-center gap-x-4">
           <PresentationChartLineIcon className="w-7" />
           <span className={`${!open && 'hidden'} origin-left duration-200`}>
-            Bashboard
+            Dashboard
           </span>
         </Link>
       </li>
