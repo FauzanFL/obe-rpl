@@ -19,7 +19,12 @@ import {
 import { getUserRole } from '../../../api/user';
 import ModalTambahAssessment from '../../../components/modal/assessment/ModalTambahAssessment';
 import ModalEditAssessment from '../../../components/modal/assessment/ModalEditAssessment';
-import { alertDelete, alertFailed, alertSuccess } from '../../../utils/alert';
+import {
+  alertDelete,
+  alertFailed,
+  alertInfo,
+  alertSuccess,
+} from '../../../utils/alert';
 import Loader from '../../../components/Loader';
 
 export default function LembarAssessment() {
@@ -124,10 +129,10 @@ export default function LembarAssessment() {
     const sum = listAssessment.reduce((acc, item) => acc + item.bobot, 0);
     const bobotMax = (clo.bobot - sum) * 100;
     if (bobotMax <= 0) {
-      console.log(
-        `Tidak dapat menambah lembar assessment lagi karena bobot sudah ${
+      alertInfo(
+        `Tidak dapat menambah lagi karena bobot sudah mencapai max (${
           clo.bobot * 100
-        } persen`
+        }%)`
       );
     } else {
       setIsTambahOpen(true);

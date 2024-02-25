@@ -16,7 +16,12 @@ import { getUserRole } from '../../../api/user';
 import ModalTambahClo from '../../../components/modal/clo/ModalTambahClo';
 import { getActivePerancangan } from '../../../api/perancanganObe';
 import ModalEditClo from '../../../components/modal/clo/ModalEditClo';
-import { alertDelete, alertFailed, alertSuccess } from '../../../utils/alert';
+import {
+  alertDelete,
+  alertFailed,
+  alertInfo,
+  alertSuccess,
+} from '../../../utils/alert';
 import Loader from '../../../components/Loader';
 
 export default function Clo() {
@@ -144,8 +149,8 @@ export default function Clo() {
     const sum = listClo.reduce((acc, item) => acc + item.bobot, 0);
     const bobotMax = 100 - sum * 100;
     if (bobotMax <= 0) {
-      console.log(
-        'Tidak dapat menambah clo lagi karena bobot sudah 100 persen'
+      alertInfo(
+        'Tidak dapat menambah lagi karena bobot sudah mencapai max (100%)'
       );
     } else {
       setIsTambahOpen(true);
