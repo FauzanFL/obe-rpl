@@ -125,10 +125,14 @@ export default function LembarAssessment() {
     return bobot * 100 + '%';
   };
 
-  const handleTambahOpen = () => {
+  const maxBobot = () => {
     const sum = listAssessment.reduce((acc, item) => acc + item.bobot, 0);
     const bobotMax = (clo.bobot - sum) * 100;
-    if (bobotMax <= 0) {
+    return bobotMax;
+  };
+
+  const handleTambahOpen = () => {
+    if (maxBobot() <= 0) {
       alertInfo(
         `Tidak dapat menambah lagi karena bobot sudah mencapai max (${
           clo.bobot * 100
@@ -268,6 +272,27 @@ export default function LembarAssessment() {
                   <PlusCircleIcon className="w-6 ml-1" />
                 </button>
               </div>
+              {maxBobot() > 0 && (
+                <div
+                  id="alert-3"
+                  className="flex items-center p-3 mb-2 text-yellow-800 rounded-lg bg-yellow-50 dark:bg-gray-800 dark:text-yellow-400"
+                  role="alert"
+                >
+                  <svg
+                    className="flex-shrink-0 w-4 h-4"
+                    aria-hidden="true"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                  >
+                    <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z" />
+                  </svg>
+                  <span className="sr-only">Info</span>
+                  <div className="ms-3 text-sm font-medium">
+                    {`Perlu penambahan assessment karena bobot masih belum maksimal. Sisa bobot (${maxBobot()}%)`}
+                  </div>
+                </div>
+              )}
               <div className="relative overflow-x-auto shadow-sm sm:rounded-lg">
                 <table className="w-full text-left rtl:text-right">
                   <thead className="text-xs text-gray-700 uppercase bg-gray-50">

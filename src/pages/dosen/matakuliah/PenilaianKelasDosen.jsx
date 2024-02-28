@@ -390,7 +390,7 @@ export default function PenilaianKelasDosen() {
                   rowLabels={rowLabel}
                 />
               </div>
-              <div className="">
+              <div className="mt-2">
                 <button
                   type="button"
                   onClick={handleSave}
