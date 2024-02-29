@@ -5,11 +5,15 @@ import Sidebar from '../../components/Sidebar';
 import { useState, useEffect } from 'react';
 import { getUserRole } from '../../api/user';
 import Loader from '../../components/Loader';
+import { Bar, BarChart, Legend, Tooltip, XAxis, YAxis } from 'recharts';
+import { getDataPenilaianPlo } from '../../api/penilaian';
 
 export default function DashboardProdi() {
   const [isLoading, setIsLoading] = useState(false);
+  const [data, setData] = useState([]);
   const navigate = useNavigate();
   useEffect(() => {
+    setIsLoading(true);
     async function fetchUser() {
       try {
         const res = await getUserRole();
@@ -21,10 +25,34 @@ export default function DashboardProdi() {
       }
     }
 
-    setIsLoading(true);
+    async function fetch() {
+      try {
+        const res = await getDataPenilaianPlo();
+        if (res) {
+          setData(res);
+        }
+        setIsLoading(false);
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
     fetchUser();
-    setIsLoading(false);
+    fetch();
   }, [navigate]);
+
+  const renderCustomBarLabel = ({ x, y, width, value }) => {
+    return (
+      <text
+        x={x + width / 2}
+        y={y}
+        fill="#666"
+        textAnchor="middle"
+        dy={-6}
+      >{`${value}`}</text>
+    );
+  };
+
   const listNav = [{ name: 'Dashboard', link: '/prodi/dashboard' }];
   return (
     <>
@@ -39,6 +67,25 @@ export default function DashboardProdi() {
           </div>
           <main className="p-7 text-wrap">
             <h2 className="text-semibold text-3xl">Dashboard</h2>
+            <div className="block mt-3 p-5 bg-white border border-gray-200 rounded-lg shadow overflow-auto">
+              <h3 className="font-semibold text-center text-xl">
+                Total Capaian PLO
+              </h3>
+              <BarChart width={800} height={300} data={data}>
+                <XAxis dataKey={'nama'} />
+                <YAxis />
+                <Tooltip
+                  wrapperStyle={{ width: 100, backgroundColor: '#ccc' }}
+                />
+                <Bar
+                  dataKey={'nilai'}
+                  barSize={40}
+                  label={renderCustomBarLabel}
+                  fill="#337cf2"
+                />
+                <Legend />
+              </BarChart>
+            </div>
           </main>
         </div>
       </div>
