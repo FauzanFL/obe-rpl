@@ -7,11 +7,11 @@ export const getPenilaian = async () => {
   return result.data;
 };
 
-export const getDataPenilaian = async (mkId, kelasId) => {
+export const getDataPenilaian = async (mkId, kelasId, tahunId) => {
   const result = await axios.get(
     `${
       import.meta.env.VITE_API_URL
-    }/penilaian/data/matakuliah/${mkId}/kelas/${kelasId}`,
+    }/penilaian/data/matakuliah/${mkId}/kelas/${kelasId}/tahun/${tahunId}`,
     {
       withCredentials: true,
     }
@@ -19,9 +19,11 @@ export const getDataPenilaian = async (mkId, kelasId) => {
   return result.data;
 };
 
-export const getDataPenilaianCloPloByMk = async (mkId) => {
+export const getDataPenilaianCloPloByMk = async (mkId, tahunId) => {
   const result = await axios.get(
-    `${import.meta.env.VITE_API_URL}/penilaian/data/clo_plo/matakuliah/${mkId}`,
+    `${
+      import.meta.env.VITE_API_URL
+    }/penilaian/data/clo_plo/matakuliah/${mkId}/tahun/${tahunId}`,
     {
       withCredentials: true,
     }
@@ -29,9 +31,9 @@ export const getDataPenilaianCloPloByMk = async (mkId) => {
   return result.data;
 };
 
-export const getDataPenilaianPlo = async () => {
+export const getDataPenilaianPlo = async (tahunId) => {
   const result = await axios.get(
-    `${import.meta.env.VITE_API_URL}/penilaian/data/plo`,
+    `${import.meta.env.VITE_API_URL}/penilaian/data/plo/tahun/${tahunId}`,
     {
       withCredentials: true,
     }

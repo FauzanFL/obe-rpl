@@ -15,9 +15,11 @@ import {
   updatePenilaian,
 } from '../../../api/penilaian';
 import { alertFailed, alertInfo, alertSuccess } from '../../../utils/alert';
+import { getTahunAjaranNow } from '../../../api/tahunAjaran';
 
 export default function PenilaianKelasDosen() {
   const [dataPenilaian, setDataPenilaian] = useState([]);
+  const [tahunAjaran, setTahunAjaran] = useState({});
   const [isLoading, setIsLoading] = useState(false);
   const [isAlert, setIsAlert] = useState(false);
   const [mk, setMk] = useState({});
@@ -169,13 +171,23 @@ export default function PenilaianKelasDosen() {
 
     async function fetch() {
       try {
-        const resData = await getDataPenilaian(params.mkId, params.kelasId);
-        if (resData) {
-          setDataPenilaian(resData);
-          const listNilai = settingData(resData);
-          firstData.current = listNilai;
-          setData(listNilai);
-          setIsLoading(false);
+        const data = await getTahunAjaranNow();
+        setTahunAjaran(data);
+        try {
+          const resData = await getDataPenilaian(
+            params.mkId,
+            params.kelasId,
+            data.id
+          );
+          if (resData) {
+            setDataPenilaian(resData);
+            const listNilai = settingData(resData);
+            firstData.current = listNilai;
+            setData(listNilai);
+            setIsLoading(false);
+          }
+        } catch (e) {
+          console.error(e);
         }
       } catch (e) {
         console.error(e);
@@ -259,7 +271,7 @@ export default function PenilaianKelasDosen() {
               nilai: nilaiFloat,
               assessment_id: nilai.assessment_id,
               mhs_id: nilai.mhs_id,
-              tahun_ajaran_id: 1,
+              tahun_ajaran_id: tahunAjaran.id,
             };
             isError = await addData(dataAdd);
             if (isError) {

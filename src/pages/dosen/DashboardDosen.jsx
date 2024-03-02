@@ -2,18 +2,21 @@ import { useNavigate } from 'react-router-dom';
 import Breadcrumb from '../../components/Breadcrumb';
 import Header from '../../components/Header';
 import Sidebar from '../../components/Sidebar';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { getUserRole } from '../../api/user';
 import Loader from '../../components/Loader';
 import { getDataPenilaianCloPloByMk } from '../../api/penilaian';
 import { getDosenMataKuliah } from '../../api/dosen';
 import { Bar, BarChart, Legend, XAxis, YAxis, Tooltip } from 'recharts';
+import { getTahunAjaranNow } from '../../api/tahunAjaran';
 
 export default function DashboardDosen() {
   const [isLoading, setIsLoading] = useState(false);
+  const [tahunAjar, setTahunAjar] = useState({});
   const [listMk, setListMk] = useState([]);
   const [listClo, setListClo] = useState([]);
   const [listPlo, setListPlo] = useState([]);
+  const mkFirst = useRef({});
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -34,11 +37,21 @@ export default function DashboardDosen() {
         const res = await getDosenMataKuliah();
         if (res) {
           setListMk(res);
+          mkFirst.current = res[0];
           try {
-            const resData = await getDataPenilaianCloPloByMk(res[0].id);
-            if (resData) {
-              setListClo(resData.clo);
-              setListPlo(resData.plo);
+            const data = await getTahunAjaranNow();
+            setTahunAjar(data);
+            try {
+              const resData = await getDataPenilaianCloPloByMk(
+                res[0].id,
+                data.id
+              );
+              if (resData) {
+                setListClo(resData.clo);
+                setListPlo(resData.plo);
+              }
+            } catch (e) {
+              console.error(e);
             }
           } catch (e) {
             console.error(e);
@@ -57,7 +70,7 @@ export default function DashboardDosen() {
   const handleChooseMk = async (mkId) => {
     setIsLoading(true);
     try {
-      const resData = await getDataPenilaianCloPloByMk(mkId);
+      const resData = await getDataPenilaianCloPloByMk(mkId, tahunAjar.id);
       if (resData) {
         setListClo(resData.clo);
         setListPlo(resData.plo);
@@ -93,13 +106,12 @@ export default function DashboardDosen() {
           </div>
           <main className="p-7 text-wrap">
             <h2 className="text-semibold text-3xl mb-3">Dashboard</h2>
-
             <select
               name="mk"
               id="mk"
               className="bg-gray-50 border border-gray-300 mb-1
                text-gray-900 text-sm rounded-lg block w-96 p-2.5"
-              defaultValue={listMk[0].id}
+              defaultValue={mkFirst.current.id}
               onChange={({ target }) => handleChooseMk(target.value)}
             >
               {listMk.map((item, i) => {
