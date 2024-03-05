@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import Spreadsheet from 'react-spreadsheet';
 import Sidebar from '../../../components/Sidebar';
 import Header from '../../../components/Header';
@@ -9,6 +9,7 @@ import { getMataKuliahById } from '../../../api/matakuliah';
 import Loader from '../../../components/Loader';
 import { getKelasByMkId } from '../../../api/plotting';
 import { getDataPenilaian } from '../../../api/penilaian';
+import { getTahunAjaranNow } from '../../../api/tahunAjaran';
 
 export default function PenilaianKelas() {
   const [dataPenilaian, setDataPenilaian] = useState([]);
@@ -19,6 +20,11 @@ export default function PenilaianKelas() {
   const [data, setData] = useState([]);
   const navigate = useNavigate();
   const params = useParams();
+  const tahunAjar = useRef({});
+
+  function isFloat(num) {
+    return num % 1 !== 0 && num % 1 > 0;
+  }
 
   const settingData = useCallback((dataToSet) => {
     const mahasiswaNilai = dataToSet.mahasiswa_nilai;
@@ -39,33 +45,74 @@ export default function PenilaianKelas() {
     let listNilai = [];
     if (mahasiswaNilai !== undefined && mahasiswaNilai.length !== 0) {
       mahasiswaNilai.forEach((item1) => {
-        const nilai = item1.penilaian.map((item2) => {
-          const obj = listAssessments.map((assessment) => {
-            if (assessment.id === item2.assessment_id) {
-              return {
-                id: item2.id,
-                value: item2.nilai,
+        let nilai = [];
+        listAssessments.forEach((assessment) => {
+          if (item1.penilaian.length !== 0) {
+            const n = item1.penilaian.find(
+              (item2) => assessment.id === item2.assessment_id
+            );
+            if (n) {
+              nilai.push({
+                id: n.id,
+                value: n.nilai,
+                mhs_id: item1.id,
+                assessment_id: assessment.id,
+                clo_id: assessment.clo_id,
+                bobot: assessment.bobot,
+                tahun_ajaran_id: n.tahun_ajaran_id,
                 readOnly: true,
-                mhsId: item1.id,
-                assessId: assessment.id,
-              };
+              });
             } else {
-              return {
+              nilai.push({
                 value: '',
-                readOnly: true,
-                mhsId: item1.id,
-                assessId: assessment.id,
-              };
+                mhs_id: item1.id,
+                assessment_id: assessment.id,
+                clo_id: assessment.clo_id,
+                bobot: assessment.bobot,
+              });
             }
-          });
-          if (obj) {
-            return obj;
+          } else {
+            nilai.push({
+              value: '',
+              mhs_id: item1.id,
+              bobot: assessment.bobot,
+              clo_id: assessment.clo_id,
+              assessment_id: assessment.id,
+            });
           }
         });
-        listNilai.push(...nilai);
+        const clo = cloAssessment.map((value) => {
+          let cloNilai = 0;
+          nilai.forEach((n) => {
+            if (n.clo_id == value.id) {
+              const nilaiFloat = n.value * n.bobot;
+              cloNilai += nilaiFloat;
+            }
+          });
+          if (isFloat(cloNilai)) {
+            cloNilai = cloNilai.toFixed(2);
+          }
+          return {
+            value: cloNilai,
+            mhs_id: item1.id,
+            bobot: value.bobot,
+            clo_id: value.id,
+            readOnly: true,
+          };
+        });
+        const na = clo.reduce((acc, current) => {
+          return acc + parseFloat(current.value);
+        }, 0);
+        nilai.push(...clo);
+        nilai.push({
+          value: na,
+          mhs_id: item1.id,
+          readOnly: true,
+        });
+        listNilai.push(nilai);
       });
     }
-    setData(listNilai);
+    return listNilai;
   }, []);
 
   useEffect(() => {
@@ -97,11 +144,22 @@ export default function PenilaianKelas() {
           setListKelas(res);
           setKelas(res[0].kode_kelas);
           try {
-            const resData = await getDataPenilaian(params.mkId, res[0].id);
-            if (resData) {
-              setDataPenilaian(resData);
-              settingData(resData);
-              setIsLoading(false);
+            const tahun = await getTahunAjaranNow();
+            tahunAjar.current = tahun;
+            try {
+              const resData = await getDataPenilaian(
+                params.mkId,
+                res[0].id,
+                tahun.id
+              );
+              if (resData) {
+                setDataPenilaian(resData);
+                const listNilai = settingData(resData);
+                setData(listNilai);
+                setIsLoading(false);
+              }
+            } catch (e) {
+              console.error(e);
             }
           } catch (e) {
             console.error(e);
@@ -125,17 +183,24 @@ export default function PenilaianKelas() {
     rowLabel = mahasiswaNilai.map((item) => item.nama);
   }
   if (cloAssessment !== undefined && cloAssessment.length !== 0) {
+    let clo = [];
     cloAssessment.forEach((item) => {
       let assessments = [];
       const assessment = item.assessment;
       if (assessment !== undefined && assessment.length !== 0) {
-        assessments = assessment.map((item) => item.nama);
+        assessments = assessment.map(
+          (item) => `${item.nama}\n(${item.bobot * 100 + '%'})`
+        );
       }
       if (assessments.length !== 0) {
-        colLabel.push(assessments);
+        colLabel.push(...assessments);
       }
+      clo.push(`${item.nama}\n(${item.bobot * 100 + '%'})`);
     });
+    colLabel.push(...clo);
+    colLabel.push('NA');
   }
+
   const listNav = [
     { name: 'Penilaian', link: '/prodi/penilaian' },
     {
@@ -147,7 +212,7 @@ export default function PenilaianKelas() {
     <>
       <div className="flex">
         <div className="">
-          <Sidebar typeUser={'dosen'} page={'matakuliah'} />
+          <Sidebar typeUser={'prodi'} page={'penilaian'} />
         </div>
         <div className="flex-1 h-screen overflow-auto">
           <Header typeUser={'dosen'} />
@@ -165,11 +230,13 @@ export default function PenilaianKelas() {
                     try {
                       const resData = await getDataPenilaian(
                         params.mkId,
-                        item.id
+                        item.id,
+                        tahunAjar.current.id
                       );
                       if (resData) {
                         setDataPenilaian(resData);
-                        settingData(resData);
+                        const listNilai = settingData(resData);
+                        setData(listNilai);
                         setIsLoading(false);
                       }
                     } catch (e) {
@@ -191,13 +258,14 @@ export default function PenilaianKelas() {
                   );
                 })}
               </div>
-              <Spreadsheet
-                className="font-semibold"
-                data={data}
-                onChange={setData}
-                columnLabels={colLabel}
-                rowLabels={rowLabel}
-              />
+              <div className="overflow-auto">
+                <Spreadsheet
+                  className="font-semibold"
+                  data={data}
+                  columnLabels={colLabel}
+                  rowLabels={rowLabel}
+                />
+              </div>
             </div>
           </main>
         </div>

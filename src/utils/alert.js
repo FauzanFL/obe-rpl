@@ -97,3 +97,19 @@ export const alertActivate = (next) => {
     }
   });
 };
+
+export const alertFinalization = (next) => {
+  Swal.fire({
+    title: 'Apakah Anda yakin?',
+    text: 'Data yang telah difinalisasi tidak dapat diubah',
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#1a5dc9',
+    cancelButtonColor: '#b8b6b0',
+    confirmButtonText: 'Ya, finalisasi!',
+  }).then((res) => {
+    if (res.isConfirmed) {
+      next();
+    }
+  });
+};

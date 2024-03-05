@@ -14,20 +14,30 @@ import {
   getDataPenilaian,
   updatePenilaian,
 } from '../../../api/penilaian';
-import { alertFailed, alertInfo, alertSuccess } from '../../../utils/alert';
+import {
+  alertFailed,
+  alertFinalization,
+  alertInfo,
+  alertSuccess,
+} from '../../../utils/alert';
 import { getTahunAjaranNow } from '../../../api/tahunAjaran';
+import { createBeritaAcaraBatch } from '../../../api/beritaAcara';
+import { CheckCircleIcon } from '@heroicons/react/24/solid';
 
 export default function PenilaianKelasDosen() {
   const [dataPenilaian, setDataPenilaian] = useState([]);
   const [tahunAjaran, setTahunAjaran] = useState({});
   const [isLoading, setIsLoading] = useState(false);
-  const [isAlert, setIsAlert] = useState(false);
+  const [isAlertWarning, setIsAlertWarning] = useState(false);
+  const [isAlertDanger, setIsAlertDanger] = useState(false);
   const [mk, setMk] = useState({});
   const [kelas, setKelas] = useState({});
   const [data, setData] = useState([]);
+  const [isFinal, setIsFinal] = useState(false);
   const params = useParams();
   const navigate = useNavigate();
   let firstData = useRef([]);
+  let sumDataNilai = useRef(0);
 
   function isFloat(num) {
     return num % 1 !== 0 && num % 1 > 0;
@@ -36,6 +46,7 @@ export default function PenilaianKelasDosen() {
   const settingData = useCallback((dataToSet) => {
     const mahasiswaNilai = dataToSet.mahasiswa_nilai;
     const cloAssessment = dataToSet.clo_assessment;
+    let sumNilai = 0;
     let listAssessments = [];
     if (cloAssessment !== undefined && cloAssessment.length !== 0) {
       cloAssessment.forEach((item) => {
@@ -59,7 +70,7 @@ export default function PenilaianKelasDosen() {
               (item2) => assessment.id === item2.assessment_id
             );
             if (n) {
-              nilai.push({
+              const dataNilai = {
                 id: n.id,
                 value: n.nilai,
                 mhs_id: item1.id,
@@ -67,7 +78,13 @@ export default function PenilaianKelasDosen() {
                 clo_id: assessment.clo_id,
                 bobot: assessment.bobot,
                 tahun_ajaran_id: n.tahun_ajaran_id,
-              });
+              };
+              if (n.status === 'final') {
+                setIsFinal(true);
+                dataNilai.readOnly = true;
+              }
+              sumNilai += 1;
+              nilai.push(dataNilai);
             } else {
               nilai.push({
                 value: '',
@@ -98,6 +115,7 @@ export default function PenilaianKelasDosen() {
           if (isFloat(cloNilai)) {
             cloNilai = cloNilai.toFixed(2);
           }
+          sumNilai += 1;
           return {
             value: cloNilai,
             mhs_id: item1.id,
@@ -110,6 +128,7 @@ export default function PenilaianKelasDosen() {
           return acc + parseFloat(current.value);
         }, 0);
         nilai.push(...clo);
+        sumNilai += 1;
         nilai.push({
           value: na,
           mhs_id: item1.id,
@@ -118,23 +137,9 @@ export default function PenilaianKelasDosen() {
         listNilai.push(nilai);
       });
     }
+    sumDataNilai.current = sumNilai;
     return listNilai;
   }, []);
-
-  // const render = useCallback(async () => {
-  //   try {
-  //     const resData = await getDataPenilaian(params.mkId, params.kelasId);
-  //     if (resData) {
-  //       setDataPenilaian(resData);
-  //       const listNilai = settingData(resData);
-  //       firstData.current = listNilai;
-  //       setData(listNilai);
-  //       setIsLoading(false);
-  //     }
-  //   } catch (e) {
-  //     console.error(e);
-  //   }
-  // }, [params, settingData]);
 
   useEffect(() => {
     setIsLoading(true);
@@ -304,7 +309,7 @@ export default function PenilaianKelasDosen() {
     if (!isError) {
       if (isChange) {
         firstData.current = data;
-        setIsAlert(true);
+        setIsAlertWarning(true);
         alertSuccess('Berhasil menyimpan data');
       } else {
         alertInfo('Tidak ada data yang berubah');
@@ -313,6 +318,37 @@ export default function PenilaianKelasDosen() {
     } else {
       setIsLoading(false);
       alertFailed('Error saat menyimpan data');
+    }
+  };
+
+  const handleFinal = () => {
+    const finalData = [];
+    data.forEach((item) => {
+      const nilai = [];
+      item.forEach((val) => {
+        if (val.id === undefined) {
+          return;
+        } else {
+          val.nilai = val.value;
+          nilai.push(val);
+        }
+      });
+      finalData.push(...nilai);
+    });
+
+    if (colLabel.length * rowLabel.length !== sumDataNilai.current) {
+      setIsAlertDanger(true);
+      alertInfo('Data belum lengkap');
+    } else {
+      alertFinalization(() => {
+        try {
+          setIsFinal(true);
+          setIsAlertWarning(true);
+          createBeritaAcaraBatch(finalData);
+        } catch (e) {
+          console.error(e);
+        }
+      });
     }
   };
 
@@ -341,7 +377,7 @@ export default function PenilaianKelasDosen() {
           <main className="p-7 text-wrap">
             <h2 className="text-semibold text-3xl">Penilaian</h2>
             <div className="block mt-3 p-5 bg-white border border-gray-200 rounded-lg shadow">
-              {isAlert && (
+              {isAlertWarning && (
                 <div
                   id="alert-3"
                   className="flex items-center p-3 mb-2 text-yellow-800 rounded-lg bg-yellow-50 dark:bg-gray-800 dark:text-yellow-400"
@@ -369,8 +405,60 @@ export default function PenilaianKelasDosen() {
                   </div>
                   <button
                     type="button"
-                    onClick={() => setIsAlert(false)}
+                    onClick={() => setIsAlertWarning(false)}
                     className="ms-auto -mx-1.5 -my-1.5 bg-yellow-50 text-yellow-500 rounded-lg focus:ring-2 focus:ring-yellow-400 p-1.5 hover:bg-yellow-200 inline-flex items-center justify-center h-8 w-8 dark:bg-gray-800 dark:text-yellow-400 dark:hover:bg-gray-700"
+                    data-dismiss-target="#alert-3"
+                    aria-label="Close"
+                  >
+                    <span className="sr-only">Close</span>
+                    <svg
+                      className="w-3 h-3"
+                      aria-hidden="true"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 14 14"
+                    >
+                      <path
+                        stroke="currentColor"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"
+                      />
+                    </svg>
+                  </button>
+                </div>
+              )}
+              {isAlertDanger && (
+                <div
+                  id="alert-3"
+                  className="flex items-center p-3 mb-2 text-red-800 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400"
+                  role="alert"
+                >
+                  <svg
+                    className="flex-shrink-0 w-4 h-4"
+                    aria-hidden="true"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                  >
+                    <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z" />
+                  </svg>
+                  <span className="sr-only">Info</span>
+                  <div className="ms-3 text-sm font-medium">
+                    Data tidak lengkap / data belum terbaca dengan baik silakan{' '}
+                    <span
+                      className="underline text-blue-500 cursor-pointer"
+                      onClick={() => location.reload()}
+                    >
+                      refresh
+                    </span>{' '}
+                    halaman terlebih dahulu
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setIsAlertDanger(false)}
+                    className="ms-auto -mx-1.5 -my-1.5 bg-red-50 text-red-500 rounded-lg focus:ring-2 focus:ring-red-400 p-1.5 hover:bg-red-200 inline-flex items-center justify-center h-8 w-8 dark:bg-gray-800 dark:text-red-400 dark:hover:bg-gray-700"
                     data-dismiss-target="#alert-3"
                     aria-label="Close"
                   >
@@ -402,14 +490,37 @@ export default function PenilaianKelasDosen() {
                   rowLabels={rowLabel}
                 />
               </div>
-              <div className="mt-2">
+              <div className="mt-2 flex justify-between">
                 <button
                   type="button"
                   onClick={handleSave}
-                  className="flex justify-center items-center focus:outline-none text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-3 py-1.5 me-2 mb-2"
+                  className="flex justify-center items-center focus:outline-none h-fit text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-3 py-1.5 me-2 mb-2"
                 >
                   Simpan
                 </button>
+                <div className="flex flex-col justify-center items-center">
+                  <button
+                    type="button"
+                    onClick={handleFinal}
+                    className={`flex justify-center items-center ${
+                      colLabel.length * rowLabel.length !== sumDataNilai.current
+                        ? 'bg-slate-600 pointer-events-none'
+                        : isFinal
+                        ? 'bg-green-600 pointer-events-none'
+                        : 'bg-fuchsia-600 hover:bg-fuchsia-700  focus:ring-fuchsia-300 focus:ring-4'
+                    } focus:outline-none h-fit text-white  font-medium rounded-lg text-sm px-3 py-1.5 me-2 mb-2`}
+                  >
+                    Finalisasi
+                  </button>
+                  {isFinal && (
+                    <div className="flex text-green-500">
+                      <CheckCircleIcon className="h-5 w-5" />
+                      <span className="text-sm font-semibold">
+                        Terfinalisasi
+                      </span>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           </main>
