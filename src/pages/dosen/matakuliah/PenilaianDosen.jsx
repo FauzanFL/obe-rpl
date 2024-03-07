@@ -8,10 +8,13 @@ import Loader from '../../../components/Loader';
 import { ClipboardDocumentIcon, DocumentIcon } from '@heroicons/react/24/solid';
 import { getMataKuliahById } from '../../../api/matakuliah';
 import { getKelasDosenByMkId } from '../../../api/plotting';
+import ModalUpload from '../../../components/modal/ModalUpload';
 
 export default function PenilaianDosen() {
   const [isLoading, setIsLoading] = useState(false);
+  const [isUploadOpen, setIsUploadOpen] = useState(false);
   const [mk, setMk] = useState({});
+  const [selectedKelas, setSelectedKelas] = useState({});
   const [listKelas, setListKelas] = useState([]);
   const navigate = useNavigate();
   const params = useParams();
@@ -89,6 +92,10 @@ export default function PenilaianDosen() {
                   </thead>
                   <tbody>
                     {listKelas.map((item, i) => {
+                      const handleClick = () => {
+                        setSelectedKelas(item);
+                        setIsUploadOpen(true);
+                      };
                       return (
                         <tr
                           key={i}
@@ -103,13 +110,13 @@ export default function PenilaianDosen() {
                               <ClipboardDocumentIcon className="w-5 mr-1" />
                               Nilai
                             </Link>
-                            <Link
-                              to={``}
-                              className="flex justify-center items-center focus:outline-none max-w-60 text-white bg-fuchsia-500 hover:bg-fuchsia-600 focus:ring-4 focus:ring-fuchsia-300 font-medium rounded-lg text-sm px-3 py-1.5 me-2 mb-2"
+                            <button
+                              onClick={handleClick}
+                              className="flex justify-center items-center focus:outline-none max-w-60 text-white bg-orange-500 hover:bg-orange-600 focus:ring-4 focus:ring-orange-300 font-medium rounded-lg text-sm px-5 py-1.5 me-2 mb-2"
                             >
                               <DocumentIcon className="w-5 mr-1" />
-                              File Assessment
-                            </Link>
+                              Upload File Assessment
+                            </button>
                           </td>
                         </tr>
                       );
@@ -122,6 +129,15 @@ export default function PenilaianDosen() {
         </div>
       </div>
       {isLoading && <Loader />}
+      {isUploadOpen && (
+        <ModalUpload
+          close={() => setIsUploadOpen(false)}
+          kelas={selectedKelas}
+          matakuliah={mk}
+          loadingOpen={() => setIsLoading(true)}
+          loadingClose={() => setIsLoading(false)}
+        />
+      )}
     </>
   );
 }

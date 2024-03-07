@@ -30,6 +30,16 @@ export const getAssessmentByCloId = async (cloId) => {
   return result.data;
 };
 
+export const getAssessmentByMkId = async (mkId) => {
+  const result = await axios.get(
+    `${import.meta.env.VITE_API_URL}/lembar_assessment/matakuliah/${mkId}`,
+    {
+      withCredentials: true,
+    }
+  );
+  return result.data;
+};
+
 export const searchAssessment = async (cloId, key) => {
   const result = await axios.get(
     `${

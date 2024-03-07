@@ -72,3 +72,19 @@ export const deletePenilaian = async (id) => {
   );
   return result.data;
 };
+
+export const uploadEvidnce = async (file) => {
+  const formData = new FormData();
+  formData.append('file', file);
+  const result = await axios.post(
+    `${import.meta.env.VITE_API_URL}/penilaian/upload`,
+    formData,
+    {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+      withCredentials: true,
+    }
+  );
+  return result.data;
+};

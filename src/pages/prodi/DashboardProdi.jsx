@@ -55,8 +55,8 @@ export default function DashboardProdi() {
     }
 
     fetchUser();
-    getListTahun();
     fetch();
+    getListTahun();
   }, [navigate]);
 
   const renderCustomBarLabel = ({ x, y, width, value }) => {
