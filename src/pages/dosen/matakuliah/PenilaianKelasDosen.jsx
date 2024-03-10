@@ -352,6 +352,19 @@ export default function PenilaianKelasDosen() {
     }
   };
 
+  const handleChange = (input) => {
+    const updatedData = input.map((subArr) => {
+      return subArr.map((item) => {
+        if (item.value !== '' && Number.isNaN(Number(item.value))) {
+          item.value = '';
+          alertFailed('harus berupa angka');
+        }
+        return item;
+      });
+    });
+    setData(updatedData);
+  };
+
   const listNav = [
     { name: 'Mata Kuliah', link: '/dosen/matakuliah' },
     {
@@ -485,7 +498,7 @@ export default function PenilaianKelasDosen() {
                 <Spreadsheet
                   className="font-semibold"
                   data={data}
-                  onChange={setData}
+                  onChange={handleChange}
                   columnLabels={colLabel}
                   rowLabels={rowLabel}
                 />
