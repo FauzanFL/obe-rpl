@@ -1,10 +1,11 @@
 /* eslint-disable react/prop-types */
-import { XMarkIcon } from '@heroicons/react/24/solid';
+import { EyeIcon, EyeSlashIcon, XMarkIcon } from '@heroicons/react/24/solid';
 import { updateUser } from '../../../api/user';
 import { alertFailed, alertSuccess } from '../../../utils/alert';
 import { useState } from 'react';
 
 export default function ModalEditPengguna({ close, render, data }) {
+  const [isPassShow, setIsPassShow] = useState(false);
   const [errStatus, setErrStatus] = useState({});
   const [errors, setErrors] = useState({});
   const [dataInput, setDataInput] = useState({
@@ -43,6 +44,34 @@ export default function ModalEditPengguna({ close, render, data }) {
       status = false;
     }
 
+    if (dataInput.password !== '') {
+      if (dataInput.password.length < 8) {
+        error.password = 'password minimal memiliki 8 karakter';
+        errStat.password = true;
+        status = false;
+      } else if (/[ ]/.test(dataInput.password)) {
+        error.password = 'password tidak boleh mengandung spasi';
+        errStat.password = true;
+        status = false;
+      } else if (!/[a-z]/.test(dataInput.password)) {
+        error.password = 'password minimal memiliki 1 huruf kecil';
+        errStat.password = true;
+        status = false;
+      } else if (!/[A-Z]/.test(dataInput.password)) {
+        error.password = 'password minimal memiliki 1 huruf besar';
+        errStat.password = true;
+        status = false;
+      } else if (!/[0-9]/.test(dataInput.password)) {
+        error.password = 'password minimal memiliki 1 angka';
+        errStat.password = true;
+        status = false;
+      } else if (!/[!@#$%^&*(),.?":{}|<>]/.test(dataInput.password)) {
+        error.password = 'password minimal memiliki 1 spesial karakter';
+        errStat.password = true;
+        status = false;
+      }
+    }
+
     setErrStatus(errStat);
     setErrors(error);
     return status;
@@ -61,6 +90,10 @@ export default function ModalEditPengguna({ close, render, data }) {
         alertFailed('Gagal memperbarui data');
       }
     }
+  };
+  const handleTogglePass = (e) => {
+    e.preventDefault();
+    setIsPassShow(!isPassShow);
   };
   const handleChange = (target) => {
     const helper = { ...dataInput };
@@ -158,25 +191,41 @@ export default function ModalEditPengguna({ close, render, data }) {
             )}
           </div>
           <div className="mb-2">
-            <label
-              htmlFor="password"
-              className="block mb-1 text-sm font-medium text-gray-900"
-            >
-              Password
-            </label>
-            <input
-              onChange={({ target }) => handleChange(target)}
-              name="password"
-              id="password"
-              type="password"
-              className={`bg-gray-50 border ${
-                errStatus.password ? 'border-red-500' : 'border-gray-300'
-              } text-gray-900 text-sm rounded-lg block w-full p-2.5`}
-              placeholder="Masukkan password (boleh tidak diisi)"
-            />
+            <div className="relative">
+              <label
+                htmlFor="password"
+                className="block mb-1 text-sm font-medium text-gray-900"
+              >
+                Password
+              </label>
+              <input
+                onChange={({ target }) => handleChange(target)}
+                name="password"
+                id="password"
+                type={`${isPassShow ? 'text' : 'password'}`}
+                className={`bg-gray-50 border ${
+                  errStatus.password ? 'border-red-500' : 'border-gray-300'
+                } text-gray-900 text-sm rounded-lg block w-full p-2.5`}
+                placeholder="Masukkan password (boleh tidak diisi)"
+              />
+              <button
+                onClick={handleTogglePass}
+                className="absolute right-2 top-9 w-5"
+              >
+                {isPassShow ? <EyeSlashIcon /> : <EyeIcon />}
+              </button>
+            </div>
             {errStatus.password && (
               <span className="text-red-500 text-sm">{errors.password}</span>
             )}
+            <ul className="text-xs list-disc ml-4 mt-1">
+              <li>Minimal 8 karakter</li>
+              <li>Tidak mengandung spasi</li>
+              <li>Mengandung huruf kecil</li>
+              <li>Mengandung huruf besar</li>
+              <li>Mengandung angka</li>
+              <li>Mengandung karakter spesial</li>
+            </ul>
           </div>
           <div className="flex justify-center mt-3">
             <button

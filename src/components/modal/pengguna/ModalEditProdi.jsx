@@ -29,6 +29,34 @@ export default function ModalEditProdi({ close, render, data }) {
       status = false;
     }
 
+    if (dataInput.password !== '') {
+      if (dataInput.password.length < 8) {
+        error.password = 'password minimal memiliki 8 karakter';
+        errStat.password = true;
+        status = false;
+      } else if (/[ ]/.test(dataInput.password)) {
+        error.password = 'password tidak boleh mengandung spasi';
+        errStat.password = true;
+        status = false;
+      } else if (!/[a-z]/.test(dataInput.password)) {
+        error.password = 'password minimal memiliki 1 huruf kecil';
+        errStat.password = true;
+        status = false;
+      } else if (!/[A-Z]/.test(dataInput.password)) {
+        error.password = 'password minimal memiliki 1 huruf besar';
+        errStat.password = true;
+        status = false;
+      } else if (!/[0-9]/.test(dataInput.password)) {
+        error.password = 'password minimal memiliki 1 angka';
+        errStat.password = true;
+        status = false;
+      } else if (!/[!@#$%^&*(),.?":{}|<>]/.test(dataInput.password)) {
+        error.password = 'password minimal memiliki 1 spesial karakter';
+        errStat.password = true;
+        status = false;
+      }
+    }
+
     setErrStatus(errStat);
     setErrors(error);
     return status;
@@ -114,6 +142,14 @@ export default function ModalEditProdi({ close, render, data }) {
             {errStatus.password && (
               <span className="text-red-500 text-sm">{errors.password}</span>
             )}
+            <ul className="text-xs list-disc ml-4 mt-1">
+              <li>Minimal 8 karakter</li>
+              <li>Tidak mengandung spasi</li>
+              <li>Mengandung huruf kecil</li>
+              <li>Mengandung huruf besar</li>
+              <li>Mengandung angka</li>
+              <li>Mengandung karakter spesial</li>
+            </ul>
           </div>
           <div className="flex justify-center mt-3">
             <button
