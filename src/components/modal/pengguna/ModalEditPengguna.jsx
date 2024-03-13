@@ -135,7 +135,7 @@ export default function ModalEditPengguna({ close, render, data }) {
               type="text"
               className={`bg-gray-50 border ${
                 errStatus.nama ? 'border-red-500' : 'border-gray-300'
-              } text-gray-900 text-sm rounded-lg block w-full p-2.5`}
+              } text-gray-900 text-sm rounded-lg block w-full p-2.5 pr-8`}
               placeholder="Masukkan nama"
               defaultValue={data.nama}
               required

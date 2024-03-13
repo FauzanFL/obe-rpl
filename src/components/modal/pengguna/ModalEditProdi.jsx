@@ -1,10 +1,11 @@
 /* eslint-disable react/prop-types */
-import { XMarkIcon } from '@heroicons/react/24/solid';
+import { EyeIcon, EyeSlashIcon, XMarkIcon } from '@heroicons/react/24/solid';
 import { updateUser } from '../../../api/user';
 import { alertFailed, alertSuccess } from '../../../utils/alert';
 import { useState } from 'react';
 
 export default function ModalEditProdi({ close, render, data }) {
+  const [isPassShow, setIsPassShow] = useState(false);
   const [errStatus, setErrStatus] = useState({});
   const [errors, setErrors] = useState({});
   const [dataInput, setDataInput] = useState({
@@ -60,6 +61,10 @@ export default function ModalEditProdi({ close, render, data }) {
     setErrStatus(errStat);
     setErrors(error);
     return status;
+  };
+  const handleTogglePass = (e) => {
+    e.preventDefault();
+    setIsPassShow(!isPassShow);
   };
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -122,23 +127,31 @@ export default function ModalEditProdi({ close, render, data }) {
             )}
           </div>
           <div className="mb-2">
-            <label
-              htmlFor="password"
-              className="block mb-1 text-sm font-medium text-gray-900"
-            >
-              Password
-            </label>
-            <input
-              onChange={({ target }) => handleChange(target)}
-              name="password"
-              id="password"
-              type="password"
-              className={`bg-gray-50 border ${
-                errStatus.password ? 'border-red-500' : 'border-gray-300'
-              } text-gray-900 text-sm rounded-lg block w-full p-2.5`}
-              placeholder="Masukkan password"
-              required
-            />
+            <div className="relative">
+              <label
+                htmlFor="password"
+                className="block mb-1 text-sm font-medium text-gray-900"
+              >
+                Password
+              </label>
+              <input
+                onChange={({ target }) => handleChange(target)}
+                name="password"
+                id="password"
+                type={`${isPassShow ? 'text' : 'password'}`}
+                className={`bg-gray-50 border ${
+                  errStatus.password ? 'border-red-500' : 'border-gray-300'
+                } text-gray-900 text-sm rounded-lg block w-full p-2.5 pr-8`}
+                placeholder="Masukkan password"
+                required
+              />
+              <button
+                onClick={handleTogglePass}
+                className="absolute right-2 top-9 w-5"
+              >
+                {isPassShow ? <EyeSlashIcon /> : <EyeIcon />}
+              </button>
+            </div>
             {errStatus.password && (
               <span className="text-red-500 text-sm">{errors.password}</span>
             )}

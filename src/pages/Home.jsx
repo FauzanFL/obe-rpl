@@ -10,6 +10,7 @@ import { useNavigate } from 'react-router-dom';
 import GetCookie from '../hooks/GetCookie';
 import { alertFailed, alertSuccess } from '../utils/alert';
 import Loader from '../components/Loader';
+import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/solid';
 
 export default function Home() {
   const navigate = useNavigate();
@@ -18,6 +19,7 @@ export default function Home() {
   const [errStatus, setErrStatus] = useState({});
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
+  const [isPassShow, setIsPassShow] = useState(false);
 
   const roleHandler = useCallback((role) => {
     if (role == 'prodi') {
@@ -97,6 +99,11 @@ export default function Home() {
     }
   };
 
+  const handleTogglePass = (e) => {
+    e.preventDefault();
+    setIsPassShow(!isPassShow);
+  };
+
   const handleChange = (e) => {
     const errStat = {};
     if (e.target.name === 'email') {
@@ -151,23 +158,31 @@ export default function Home() {
                       )}
                     </div>
                     <div className="mb-2">
-                      <label
-                        htmlFor="password"
-                        className="block mb-1 text-sm font-medium text-gray-900"
-                      >
-                        Password
-                      </label>
-                      <input
-                        onChange={(e) => handleChange(e)}
-                        name="password"
-                        type="password"
-                        className={`bg-gray-50 border ${
-                          errStatus.password
-                            ? 'border-red-500'
-                            : 'border-gray-300'
-                        } text-gray-900 text-sm rounded-lg block w-full p-2.5`}
-                        required
-                      />
+                      <div className="relative">
+                        <label
+                          htmlFor="password"
+                          className="block mb-1 text-sm font-medium text-gray-900"
+                        >
+                          Password
+                        </label>
+                        <input
+                          onChange={(e) => handleChange(e)}
+                          name="password"
+                          type={`${isPassShow ? 'text' : 'password'}`}
+                          className={`bg-gray-50 border ${
+                            errStatus.password
+                              ? 'border-red-500'
+                              : 'border-gray-300'
+                          } text-gray-900 text-sm rounded-lg block w-full p-2.5 pr-8`}
+                          required
+                        />
+                        <button
+                          onClick={handleTogglePass}
+                          className="absolute right-2 top-9 w-5"
+                        >
+                          {isPassShow ? <EyeSlashIcon /> : <EyeIcon />}
+                        </button>
+                      </div>
                       {errStatus.password && (
                         <span className="text-red-500 text-sm">
                           {errors.password}
