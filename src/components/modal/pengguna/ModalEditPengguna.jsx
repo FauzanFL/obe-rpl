@@ -209,6 +209,7 @@ export default function ModalEditPengguna({ close, render, data }) {
                 placeholder="Masukkan password (boleh tidak diisi)"
               />
               <button
+                type="button"
                 onClick={handleTogglePass}
                 className="absolute right-2 top-9 w-5"
               >

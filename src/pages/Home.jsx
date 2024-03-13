@@ -177,6 +177,7 @@ export default function Home() {
                           required
                         />
                         <button
+                          type="button"
                           onClick={handleTogglePass}
                           className="absolute right-2 top-9 w-5"
                         >
