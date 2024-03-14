@@ -3,6 +3,7 @@ import {
   AcademicCapIcon,
   BookOpenIcon,
   BriefcaseIcon,
+  CalendarDaysIcon,
   ChevronDownIcon,
   ClipboardDocumentIcon,
   DocumentCheckIcon,
@@ -141,6 +142,45 @@ export default function NavListProdi({ open, page }) {
           <UsersIcon className="w-7" />
           <span className={`${!open && 'hidden'} origin-left duration-200`}>
             Pengguna
+          </span>
+        </Link>
+      </li>
+      <li
+        className={`font-bold cursor-pointer my-1 p-2 px-4 rounded-md ${
+          page === 'kelas' ? 'bg-indigo-200' : 'bg-indigo-400'
+        } hover:bg-indigo-200`}
+      >
+        <Link to={'/prodi/kelas'} className="flex items-center gap-x-4">
+          <BriefcaseIcon className="w-7" />
+          <span className={`${!open && 'hidden'} origin-left duration-200`}>
+            Kelas
+          </span>
+        </Link>
+      </li>
+      <li
+        className={`font-bold cursor-pointer my-1 p-2 px-4 rounded-md ${
+          page === 'tahun ajar' ? 'bg-indigo-200' : 'bg-indigo-400'
+        } hover:bg-indigo-200`}
+      >
+        <Link to={'/prodi/tahunAjar'} className="flex items-center gap-x-4">
+          <CalendarDaysIcon className="w-7" />
+          <span className={`${!open && 'hidden'} origin-left duration-200`}>
+            Tahun Ajaran
+          </span>
+        </Link>
+      </li>
+      <li
+        className={`font-bold cursor-pointer my-1 p-2 px-4 rounded-md ${
+          page === 'index' ? 'bg-indigo-200' : 'bg-indigo-400'
+        } hover:bg-indigo-200`}
+      >
+        <Link
+          to={'/prodi/indexPenilaian'}
+          className="flex items-center gap-x-4"
+        >
+          <BookOpenIcon className="w-7" />
+          <span className={`${!open && 'hidden'} origin-left duration-200`}>
+            Index Penilaian
           </span>
         </Link>
       </li>

@@ -1,5 +1,5 @@
 import { createBrowserRouter } from 'react-router-dom';
-import Home from '../pages/home';
+import Home from '../pages/Home';
 import MataKuliah from '../pages/prodi/MataKuliah';
 import Kurikulum from '../pages/prodi/Kurikulum';
 import Pengguna from '../pages/prodi/Pengguna';
@@ -17,6 +17,9 @@ import Rps from '../pages/dosen/Rps';
 import RpsDetail from '../pages/dosen/RpsDetail';
 import PenilaianKelasDosen from '../pages/dosen/matakuliah/PenilaianKelasDosen';
 import PenilaianKelas from '../pages/prodi/matakuliah/PenilaianKelas';
+import Kelas from '../pages/prodi/Kelas';
+import TahunAjaran from '../pages/prodi/TahunAjaran';
+import IndexPenilaian from '../pages/prodi/IndexPenilaian';
 
 const router = createBrowserRouter([
   {
@@ -46,6 +49,18 @@ const router = createBrowserRouter([
   {
     path: '/prodi/penilaian',
     element: <Penilaian />,
+  },
+  {
+    path: '/prodi/kelas',
+    element: <Kelas />,
+  },
+  {
+    path: '/prodi/tahunAjaran',
+    element: <TahunAjaran />,
+  },
+  {
+    path: '/prodi/indexPenilaian',
+    element: <IndexPenilaian />,
   },
   {
     path: '/prodi/penilaian/matakuliah/:mkId',

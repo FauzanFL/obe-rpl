@@ -1,25 +1,20 @@
 /* eslint-disable react/prop-types */
 import { XMarkIcon } from '@heroicons/react/24/solid';
-import { updatePlo } from '../../../api/plo';
-import { alertFailed, alertSuccess } from '../../../utils/alert';
 import { useState } from 'react';
+import { alertFailed, alertSuccess } from '../../../utils/alert';
+import { createKelas } from '../../../api/kelas';
 
-export default function ModalEditPlo({ close, render, data }) {
+export default function ModalTambahKelas({ close, render }) {
   const [errStatus, setErrStatus] = useState({});
   const [errors, setErrors] = useState({});
   const [dataInput, setDataInput] = useState({
-    nama: data.nama,
-    deskripsi: data.deskripsi,
-    obe_id: data.obe_id,
+    kode_kelas: '',
   });
 
   const handleChange = (target) => {
     const helper = { ...dataInput };
-    if (target.name === 'nama') {
+    if (target.name === 'kode_kelas') {
       helper.nama = target.value;
-      setDataInput(helper);
-    } else if (target.name === 'deskripsi') {
-      helper.deskripsi = target.value;
       setDataInput(helper);
     }
   };
@@ -29,15 +24,9 @@ export default function ModalEditPlo({ close, render, data }) {
     const errStat = {};
     let status = true;
 
-    if (dataInput.nama === '') {
-      error.nama = 'nama tidak boleh kosong';
-      errStat.nama = true;
-      status = false;
-    }
-
-    if (dataInput.deskripsi === '') {
-      error.deskripsi = 'deskripsi tidak boleh kosong';
-      errStat.deskripsi = true;
+    if (dataInput.kode_kelas === '') {
+      error.kode_kelas = 'kode kelas tidak boleh kosong';
+      errStat.kode_kelas = true;
       status = false;
     }
 
@@ -50,14 +39,14 @@ export default function ModalEditPlo({ close, render, data }) {
     event.preventDefault();
     if (validation()) {
       try {
-        const res = await updatePlo(dataInput, data.id);
+        const res = await createKelas(dataInput);
         if (res) {
-          alertSuccess('Berhasil memperbarui data');
+          alertSuccess('Berhasil menambah data');
           render();
           close();
         }
       } catch (e) {
-        alertFailed('Gagal memperbarui data');
+        alertFailed('Gagal menambah data');
       }
     }
   };
@@ -71,54 +60,29 @@ export default function ModalEditPlo({ close, render, data }) {
           <XMarkIcon className="w-8" />
         </div>
         <h5 className="my-2 text-xl font-medium leading-tight text-neutral-800 dark:text-neutral-50">
-          Edit PLO
+          Tambah Kelas
         </h5>
         <form action="" onSubmit={handleSubmit} className="overflow-auto">
           <div className="mb-2">
             <label
-              htmlFor="nama"
+              htmlFor="kode_kelas"
               className="block mb-1 text-sm font-medium text-gray-900"
             >
-              Nama
+              Kode Kelas
             </label>
             <input
               onChange={({ target }) => handleChange(target)}
-              name="nama"
-              id="nama"
+              name="kode_kelas"
+              id="kode_kelas"
               type="text"
               className={`bg-gray-50 border ${
-                errStatus.nama ? 'border-red-500' : 'border-gray-300'
+                errStatus.kode_kelas ? 'border-red-500' : 'border-gray-300'
               } text-gray-900 text-sm rounded-lg block w-full p-2.5`}
-              placeholder="Masukkan nama perancangan"
-              defaultValue={data.nama}
+              placeholder="Masukkan kode kelas"
               required
             />
-            {errStatus.nama && (
-              <span className="text-red-500 text-sm">{errors.nama}</span>
-            )}
-          </div>
-          <div className="mb-2">
-            <label
-              htmlFor="deskripsi"
-              className="block mb-1 text-sm font-medium text-gray-900"
-            >
-              Deskripsi
-            </label>
-            <textarea
-              name="deskripsi"
-              id="deskripsi"
-              onChange={({ target }) => handleChange(target)}
-              cols="30"
-              rows="10"
-              className={`bg-gray-50 border ${
-                errStatus.deskripsi ? 'border-red-500' : 'border-gray-300'
-              } text-gray-900 text-sm rounded-lg block w-full p-2.5`}
-              placeholder="Masukkan deskripsi plo"
-              defaultValue={data.deskripsi}
-              required
-            ></textarea>
-            {errStatus.deskripsi && (
-              <span className="text-red-500 text-sm">{errors.deskripsi}</span>
+            {errStatus.kode_kelas && (
+              <span className="text-red-500 text-sm">{errors.kode_kelas}</span>
             )}
           </div>
           <div className="flex justify-center mt-3">
@@ -126,7 +90,7 @@ export default function ModalEditPlo({ close, render, data }) {
               type="submit"
               className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
             >
-              Update
+              Buat
             </button>
           </div>
         </form>
