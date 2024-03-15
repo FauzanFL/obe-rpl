@@ -41,6 +41,57 @@ export default function TahunAjaran() {
     displayedItems = listTahunAjar.slice(startIndex, endIndex);
   }
 
+  const arrMonth = [
+    {
+      id: 1,
+      name: 'Januari',
+    },
+    {
+      id: 2,
+      name: 'Februari',
+    },
+    {
+      id: 3,
+      name: 'Maret',
+    },
+    {
+      id: 4,
+      name: 'April',
+    },
+    {
+      id: 5,
+      name: 'Mei',
+    },
+    {
+      id: 6,
+      name: 'Juni',
+    },
+    {
+      id: 7,
+      name: 'Juli',
+    },
+    {
+      id: 8,
+      name: 'Agustus',
+    },
+    {
+      id: 9,
+      name: 'September',
+    },
+    {
+      id: 10,
+      name: 'Oktober',
+    },
+    {
+      id: 11,
+      name: 'November',
+    },
+    {
+      id: 12,
+      name: 'Desember',
+    },
+  ];
+
   useEffect(() => {
     setIsLoading(true);
     async function fetchUser() {
@@ -155,12 +206,17 @@ export default function TahunAjaran() {
     }
   };
 
+  const formatMonth = (month) => {
+    const monthName = arrMonth.find((item) => item.id === month);
+    return monthName.name;
+  };
+
   const listNav = [{ name: 'Kelas', link: '/prodi/kelas' }];
   return (
     <>
       <div className="flex">
         <div className="">
-          <Sidebar typeUser={'prodi'} page={'kelas'} />
+          <Sidebar typeUser={'prodi'} page={'tahun ajaran'} />
         </div>
         <div className="flex-1 h-screen overflow-auto">
           <Header typeUser={'prodi'} />
@@ -168,9 +224,9 @@ export default function TahunAjaran() {
             <Breadcrumb listNav={listNav} />
           </div>
           <main className="p-7 text-wrap">
-            <h2 className="text-semibold text-3xl">Kelas</h2>
+            <h2 className="text-semibold text-3xl">Tahun Ajaran</h2>
             <div className="block mt-3 p-5 bg-white border border-gray-200 rounded-lg shadow">
-              <h3 className="text-semibold text-2xl">Daftar Kelas</h3>
+              <h3 className="text-semibold text-2xl">Daftar Tahun Ajaran</h3>
               <div className="flex justify-between items-center">
                 <div className="py-2">
                   <label htmlFor="simple-search" className="sr-only">
@@ -258,8 +314,12 @@ export default function TahunAjaran() {
                         >
                           <td className="px-6 py-4">{item.tahun}</td>
                           <td className="px-6 py-4">{item.semester}</td>
-                          <td className="px-6 py-4">{item.bulan_mulai}</td>
-                          <td className="px-6 py-4">{item.bulan_selesai}</td>
+                          <td className="px-6 py-4">
+                            {formatMonth(item.bulan_mulai)}
+                          </td>
+                          <td className="px-6 py-4">
+                            {formatMonth(item.bulan_selesai)}
+                          </td>
                           <td className="flex px-6 py-4">
                             <button
                               type="button"

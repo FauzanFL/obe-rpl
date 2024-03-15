@@ -147,7 +147,7 @@ export default function NavListProdi({ open, page }) {
       </li>
       <li
         className={`font-bold cursor-pointer my-1 p-2 px-4 rounded-md ${
-          page === 'kelas' ? 'bg-indigo-200' : 'bg-indigo-400'
+          page === 'kelas' ? 'bg-indigo-200' : 'bg-indigo-300'
         } hover:bg-indigo-200`}
       >
         <Link to={'/prodi/kelas'} className="flex items-center gap-x-4">
@@ -159,10 +159,10 @@ export default function NavListProdi({ open, page }) {
       </li>
       <li
         className={`font-bold cursor-pointer my-1 p-2 px-4 rounded-md ${
-          page === 'tahun ajar' ? 'bg-indigo-200' : 'bg-indigo-400'
+          page === 'tahun ajaran' ? 'bg-indigo-200' : 'bg-indigo-300'
         } hover:bg-indigo-200`}
       >
-        <Link to={'/prodi/tahunAjar'} className="flex items-center gap-x-4">
+        <Link to={'/prodi/tahunAjaran'} className="flex items-center gap-x-4">
           <CalendarDaysIcon className="w-7" />
           <span className={`${!open && 'hidden'} origin-left duration-200`}>
             Tahun Ajaran
@@ -171,7 +171,7 @@ export default function NavListProdi({ open, page }) {
       </li>
       <li
         className={`font-bold cursor-pointer my-1 p-2 px-4 rounded-md ${
-          page === 'index' ? 'bg-indigo-200' : 'bg-indigo-400'
+          page === 'index' ? 'bg-indigo-200' : 'bg-indigo-300'
         } hover:bg-indigo-200`}
       >
         <Link
