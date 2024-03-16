@@ -6,21 +6,22 @@ import Sidebar from '../../../components/Sidebar';
 import { useEffect, useState } from 'react';
 import {
   deletePlotting,
-  getPlotting,
-  searchPlotting,
+  getPlottingByTahun,
+  searchPlottingByTahun,
 } from '../../../api/plotting';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { getUserRole } from '../../../api/user';
-import { getActivePerancangan } from '../../../api/perancanganObe';
 import ModalTambahPlotting from '../../../components/modal/plotting/ModalTambahPlotting';
 import { alertDelete, alertFailed, alertSuccess } from '../../../utils/alert';
 import Loader from '../../../components/Loader';
+import { getTahunAjaran, getTahunAjaranNow } from '../../../api/tahunAjaran';
 
 export default function PlottingDosen() {
   const navigate = useNavigate();
   const location = useLocation();
   const [listPlotting, setListPlotting] = useState([]);
-  const [activeObe, setActiveObe] = useState({});
+  const [listTahunAjaran, setListTahunAjaran] = useState([]);
+  const [tahunSelected, setTahunSelected] = useState({});
   const [isTambahOpen, setIsTambahOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const listNav = [{ name: 'Plotting Dosen', link: '/prodi/plotting' }];
@@ -49,24 +50,27 @@ export default function PlottingDosen() {
         navigate('/');
       }
     }
-    async function fetchActiveObe() {
+
+    async function fetch() {
       try {
-        const res = await getActivePerancangan();
+        const tahun = await getTahunAjaranNow();
+        setTahunSelected(tahun);
+        const res = await getPlottingByTahun(tahun.id);
         if (res) {
-          setActiveObe(res);
+          setListPlotting(res);
         }
+        setIsLoading(false);
       } catch (e) {
         console.error(e);
       }
     }
 
-    async function fetch() {
+    async function fetchTahun() {
       try {
-        const res = await getPlotting();
+        const res = await getTahunAjaran();
         if (res) {
-          setListPlotting(res);
+          setListTahunAjaran(res);
         }
-        setIsLoading(false);
       } catch (e) {
         console.error(e);
       }
@@ -89,12 +93,12 @@ export default function PlottingDosen() {
     fetchUser();
     fetchPage();
     fetch();
-    fetchActiveObe();
+    fetchTahun();
   }, [navigate, location]);
 
   const render = async () => {
     try {
-      const res = await getPlotting();
+      const res = await getPlottingByTahun(tahunSelected.id);
       if (res) {
         setListPlotting(res);
       }
@@ -106,7 +110,7 @@ export default function PlottingDosen() {
   const handleSearch = async (key) => {
     if (key.length > 1) {
       try {
-        const res = await searchPlotting(key);
+        const res = await searchPlottingByTahun(tahunSelected.id, key);
         if (res) {
           setListPlotting(res);
         }
@@ -153,6 +157,22 @@ export default function PlottingDosen() {
     urlParams.set('page', totalPages);
     navigate(`?${urlParams.toString()}`);
   };
+
+  const handleChooseTahun = async (tahunId) => {
+    setIsLoading(true);
+    const tahun = listTahunAjaran.find((item) => item.id === parseInt(tahunId));
+    setTahunSelected(tahun);
+    try {
+      const res = await getPlottingByTahun(tahunId);
+      if (res) {
+        console.log(res);
+        setListPlotting(res);
+      }
+      setIsLoading(false);
+    } catch (e) {
+      console.error(e);
+    }
+  };
   return (
     <>
       <div className="flex">
@@ -168,6 +188,25 @@ export default function PlottingDosen() {
             <h2 className="text-semibold text-3xl">Plotting Dosen</h2>
             <div className="block mt-3 p-5 bg-white border border-gray-200 rounded-lg shadow">
               <h3 className="text-semibold text-2xl">Daftar Plotting Dosen</h3>
+              <select
+                name="tahun"
+                id="tahun"
+                className="bg-gray-50 border border-gray-300 mt-2
+               text-gray-900 text-sm rounded-lg block w-40 p-2.5"
+                onChange={({ target }) => handleChooseTahun(target.value)}
+              >
+                {listTahunAjaran.map((item, i) => {
+                  return (
+                    <option
+                      key={i}
+                      value={item.id}
+                      // selected={item.id == tahunSelected.id}
+                    >
+                      {`${item.tahun} ${item.semester}`}
+                    </option>
+                  );
+                })}
+              </select>
               <div className="flex justify-between items-center">
                 <div className="py-2">
                   <label htmlFor="simple-search" className="sr-only">
@@ -283,7 +322,7 @@ export default function PlottingDosen() {
         <ModalTambahPlotting
           close={() => setIsTambahOpen(false)}
           render={render}
-          activeObe={activeObe}
+          tahun={tahunSelected}
         />
       )}
       {isLoading && <Loader />}

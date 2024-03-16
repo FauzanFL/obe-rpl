@@ -6,7 +6,9 @@ import {
   CalendarDaysIcon,
   ChevronDownIcon,
   ClipboardDocumentIcon,
+  ClipboardDocumentListIcon,
   DocumentCheckIcon,
+  HomeModernIcon,
   PresentationChartLineIcon,
   UsersIcon,
 } from '@heroicons/react/24/outline';
@@ -15,7 +17,9 @@ import { Link } from 'react-router-dom';
 
 export default function NavListProdi({ open, page }) {
   const [kOpen, setKOpen] = useState(
-    page === 'kurikulum' || page === 'plo' ? true : false
+    page === 'kurikulum' || page === 'plo' || page == 'jenis assessment'
+      ? true
+      : false
   );
   const [mkOpen, setMkOpen] = useState(
     page === 'penilaian' || page === 'plotting' || page === 'matakuliah'
@@ -75,6 +79,21 @@ export default function NavListProdi({ open, page }) {
             <ClipboardDocumentIcon className="w-7" />
             <span className={`${!open && 'hidden'} origin-left duration-200`}>
               PLO
+            </span>
+          </Link>
+        </li>
+        <li
+          className={`font-medium cursor-pointer my-1 p-2 px-4 rounded-md ${
+            page === 'jenis assessment' ? 'bg-indigo-200' : 'bg-indigo-400'
+          } hover:bg-indigo-200`}
+        >
+          <Link
+            to={'/prodi/jenisAssessment'}
+            className="flex items-center gap-x-4"
+          >
+            <ClipboardDocumentListIcon className="w-7" />
+            <span className={`${!open && 'hidden'} origin-left duration-200`}>
+              Jenis Assessment
             </span>
           </Link>
         </li>
@@ -151,7 +170,7 @@ export default function NavListProdi({ open, page }) {
         } hover:bg-indigo-200`}
       >
         <Link to={'/prodi/kelas'} className="flex items-center gap-x-4">
-          <BriefcaseIcon className="w-7" />
+          <HomeModernIcon className="w-7" />
           <span className={`${!open && 'hidden'} origin-left duration-200`}>
             Kelas
           </span>

@@ -1,29 +1,29 @@
 import { useEffect, useState } from 'react';
-import Breadcrumb from '../../components/Breadcrumb';
-import Header from '../../components/Header';
-import Sidebar from '../../components/Sidebar';
-import { getUserRole } from '../../api/user';
-import Loader from '../../components/Loader';
 import {
   PencilSquareIcon,
   PlusCircleIcon,
   TrashIcon,
 } from '@heroicons/react/24/solid';
-import { alertDelete, alertFailed, alertSuccess } from '../../utils/alert';
-import {
-  deleteIndexPenilaian,
-  getIndexPenilaian,
-} from '../../api/indexPenilaian';
 import { useNavigate } from 'react-router-dom';
-import ModalTambahIndexPenilaian from '../../components/modal/indexPenilaian/ModalTambahIndexPenilaian';
-import ModalEditIndexPenilaian from '../../components/modal/indexPenilaian/ModalEditIndexPenilaian';
+import {
+  deleteJenisAssessment,
+  getJenisAssessment,
+} from '../../../api/jenisAssessment';
+import ModalTambahJenisAssessment from '../../../components/modal/jenisAssessment/ModalTambahJenisAssessment';
+import ModalEditJenisAssessment from '../../../components/modal/jenisAssessment/ModalEditJenisAssessment';
+import { getUserRole } from '../../../api/user';
+import Sidebar from '../../../components/Sidebar';
+import Header from '../../../components/Header';
+import Breadcrumb from '../../../components/Breadcrumb';
+import { alertDelete, alertFailed, alertSuccess } from '../../../utils/alert';
+import Loader from '../../../components/Loader';
 
-export default function IndexPenilaian() {
+export default function JenisAssessment() {
   const navigate = useNavigate();
   const [isTambahOpen, setIsTambahOpen] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
-  const [selectedIndexPenilaian, setSelectedIndexPenilaian] = useState({});
-  const [listIndexPenilaian, setListIndexPenilaian] = useState([]);
+  const [selectedJenisAssessment, setSelectedJenisAssessment] = useState({});
+  const [listJenisAssessment, setListJenisAssessment] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
@@ -41,9 +41,9 @@ export default function IndexPenilaian() {
 
     async function fetch() {
       try {
-        const res = await getIndexPenilaian();
+        const res = await getJenisAssessment();
         if (res) {
-          setListIndexPenilaian(res);
+          setListJenisAssessment(res);
         }
         setIsLoading(false);
       } catch (e) {
@@ -57,9 +57,9 @@ export default function IndexPenilaian() {
 
   const render = async () => {
     try {
-      const res = await getIndexPenilaian();
+      const res = await getJenisAssessment();
       if (res) {
-        setListIndexPenilaian(res);
+        setListJenisAssessment(res);
       }
       setIsLoading(false);
     } catch (e) {
@@ -72,7 +72,7 @@ export default function IndexPenilaian() {
     <>
       <div className="flex">
         <div className="">
-          <Sidebar typeUser={'prodi'} page={'index penilaian'} />
+          <Sidebar typeUser={'prodi'} page={'jenis assessment'} />
         </div>
         <div className="flex-1 h-screen overflow-auto">
           <Header typeUser={'prodi'} />
@@ -80,9 +80,11 @@ export default function IndexPenilaian() {
             <Breadcrumb listNav={listNav} />
           </div>
           <main className="p-7 text-wrap">
-            <h2 className="text-semibold text-3xl">Index Penilaian</h2>
+            <h2 className="text-semibold text-3xl">Jenis Assessment</h2>
             <div className="block mt-3 p-5 bg-white border border-gray-200 rounded-lg shadow">
-              <h3 className="text-semibold text-2xl">Daftar Index</h3>
+              <h3 className="text-semibold text-2xl">
+                Daftar Jenis Assessment
+              </h3>
               <div className="flex justify-end items-center">
                 <button
                   type="button"
@@ -98,13 +100,7 @@ export default function IndexPenilaian() {
                   <thead className="text-xs text-gray-700 uppercase bg-gray-50">
                     <tr>
                       <th scope="col" className="px-6 py-3">
-                        Grade
-                      </th>
-                      <th scope="col" className="px-6 py-3">
-                        Batas Awal
-                      </th>
-                      <th scope="col" className="px-6 py-3">
-                        Batas Akhir
+                        Nama
                       </th>
                       <th scope="col" className="px-6 py-3">
                         Aksi
@@ -112,15 +108,15 @@ export default function IndexPenilaian() {
                     </tr>
                   </thead>
                   <tbody>
-                    {listIndexPenilaian !== null &&
-                      listIndexPenilaian.map((item, i) => {
+                    {listJenisAssessment !== null &&
+                      listJenisAssessment.map((item, i) => {
                         const handleEdit = () => {
-                          setSelectedIndexPenilaian(item);
+                          setSelectedJenisAssessment(item);
                           setIsEditOpen(true);
                         };
                         const handleDelete = async () => {
                           try {
-                            const res = await deleteIndexPenilaian(item.id);
+                            const res = await deleteJenisAssessment(item.id);
                             if (res) {
                               alertSuccess('Berhasil menghapus data');
                               render();
@@ -134,9 +130,7 @@ export default function IndexPenilaian() {
                             key={i}
                             className="odd:bg-white even:bg-gray-50 border-b"
                           >
-                            <td className="px-6 py-4">{item.grade}</td>
-                            <td className="px-6 py-4">{item.batas_awal}</td>
-                            <td className="px-6 py-4">{item.batas_akhir}</td>
+                            <td className="px-6 py-4">{item.nama}</td>
                             <td className="flex px-6 py-4">
                               <button
                                 type="button"
@@ -164,16 +158,16 @@ export default function IndexPenilaian() {
         </div>
       </div>
       {isTambahOpen && (
-        <ModalTambahIndexPenilaian
+        <ModalTambahJenisAssessment
           close={() => setIsTambahOpen(false)}
           render={render}
         />
       )}
       {isEditOpen && (
-        <ModalEditIndexPenilaian
+        <ModalEditJenisAssessment
           close={() => setIsEditOpen(false)}
           render={render}
-          data={selectedIndexPenilaian}
+          data={selectedJenisAssessment}
         />
       )}
       {isLoading && <Loader />}

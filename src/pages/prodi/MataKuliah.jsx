@@ -10,26 +10,27 @@ import Sidebar from '../../components/Sidebar';
 import { useEffect, useState } from 'react';
 import {
   deleteMataKuliah,
-  getMataKuliahByObeId,
-  searchMataKuliahByObeId,
+  getMataKuliahActiveByTahunId,
+  searchMataKuliahActiveByTahunId,
 } from '../../api/matakuliah';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { getUserRole } from '../../api/user';
-import { getActivePerancangan } from '../../api/perancanganObe';
 import ModalTambahMk from '../../components/modal/matakuliah/ModalTambahMk';
 import ModalEditMk from '../../components/modal/matakuliah/ModalEditMk';
 import { alertDelete, alertFailed, alertSuccess } from '../../utils/alert';
 import Loader from '../../components/Loader';
+import { getTahunAjaran, getTahunAjaranNow } from '../../api/tahunAjaran';
 
 export default function MataKuliah() {
   const navigate = useNavigate();
   const location = useLocation();
   const [listMk, setListMk] = useState([]);
-  const [activeObe, setActiveObe] = useState({});
+  const [listTahunAjaran, setListTahunAjaran] = useState([]);
   const [isTambahOpen, setIsTambahOpen] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [selectedMk, setSelectedMk] = useState({});
   const [isLoading, setIsLoading] = useState(false);
+  const [tahunSelected, setTahunSelected] = useState({});
   const listNav = [{ name: 'Mata Kuliah', link: '/prodi/matakuliah' }];
 
   const itemsPerPage = 5;
@@ -57,10 +58,12 @@ export default function MataKuliah() {
       }
     }
 
-    async function fetchActiveObe() {
+    async function fetchTahun() {
       try {
-        const res = await getActivePerancangan();
-        setActiveObe(res);
+        const res = await getTahunAjaran();
+        if (res) {
+          setListTahunAjaran(res);
+        }
       } catch (e) {
         console.error(e);
       }
@@ -68,8 +71,9 @@ export default function MataKuliah() {
 
     async function fetch() {
       try {
-        const obe = await getActivePerancangan();
-        const res = await getMataKuliahByObeId(obe.id);
+        const tahun = await getTahunAjaranNow();
+        setTahunSelected(tahun);
+        const res = await getMataKuliahActiveByTahunId(tahun.id);
         if (res) {
           setListMk(res);
         }
@@ -94,15 +98,14 @@ export default function MataKuliah() {
     }
 
     fetchUser();
-    fetchActiveObe();
     fetchPage();
     fetch();
+    fetchTahun();
   }, [navigate, location]);
 
   const render = async () => {
     try {
-      const obe = await getActivePerancangan();
-      const res = await getMataKuliahByObeId(obe.id);
+      const res = await getMataKuliahActiveByTahunId(tahunSelected.id);
       if (res) {
         setListMk(res);
       }
@@ -114,8 +117,10 @@ export default function MataKuliah() {
   const handleSearch = async (key) => {
     if (key.length > 1) {
       try {
-        const obe = await getActivePerancangan();
-        const res = await searchMataKuliahByObeId(obe.id, key);
+        const res = await searchMataKuliahActiveByTahunId(
+          tahunSelected.id,
+          key
+        );
         if (res) {
           setListMk(res);
         }
@@ -163,6 +168,21 @@ export default function MataKuliah() {
     navigate(`?${urlParams.toString()}`);
   };
 
+  const handleChooseTahun = async (tahunId) => {
+    setIsLoading(true);
+    const tahun = listTahunAjaran.find((item) => item.id === parseInt(tahunId));
+    try {
+      const res = await getMataKuliahActiveByTahunId(tahunId);
+      if (res) {
+        setTahunSelected(tahun);
+        setListMk(res);
+      }
+      setIsLoading(false);
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
   return (
     <>
       <div className="flex">
@@ -178,6 +198,22 @@ export default function MataKuliah() {
             <h2 className="text-semibold text-3xl">Mata Kuliah</h2>
             <div className="block mt-3 p-5 bg-white border border-gray-200 rounded-lg shadow">
               <h3 className="text-semibold text-2xl">Daftar Mata Kuliah</h3>
+              <select
+                name="tahun"
+                id="tahun"
+                className="bg-gray-50 border border-gray-300 mt-2
+               text-gray-900 text-sm rounded-lg block w-40 p-2.5"
+                defaultValue={tahunSelected.id}
+                onChange={({ target }) => handleChooseTahun(target.value)}
+              >
+                {listTahunAjaran.map((item, i) => {
+                  return (
+                    <option key={i} value={item.id}>
+                      {`${item.tahun} ${item.semester}`}
+                    </option>
+                  );
+                })}
+              </select>
               <div className="flex justify-between items-center">
                 <div className="py-2">
                   <label htmlFor="simple-search" className="sr-only">
@@ -316,15 +352,15 @@ export default function MataKuliah() {
         <ModalTambahMk
           close={() => setIsTambahOpen(false)}
           render={render}
-          activeObe={activeObe}
+          listTahunAjaran={listTahunAjaran}
         />
       )}
       {isEditOpen && (
         <ModalEditMk
           close={() => setIsEditOpen(false)}
           render={render}
-          activeObe={activeObe}
           data={selectedMk}
+          listTahunAjaran={listTahunAjaran}
         />
       )}
       {isLoading && <Loader />}

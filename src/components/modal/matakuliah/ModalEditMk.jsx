@@ -4,7 +4,7 @@ import { updateMataKuliah } from '../../../api/matakuliah';
 import { alertFailed, alertSuccess } from '../../../utils/alert';
 import { useState } from 'react';
 
-export default function ModalEditMk({ close, render, activeObe, data }) {
+export default function ModalEditMk({ close, render, listTahunAjaran, data }) {
   const [errStatus, setErrStatus] = useState({});
   const [errors, setErrors] = useState({});
   const [dataInput, setDataInput] = useState({
@@ -14,7 +14,7 @@ export default function ModalEditMk({ close, render, activeObe, data }) {
     sks: data.sks,
     semester: data.semester,
     prasyarat: data.prasyarat,
-    obe_id: activeObe.id,
+    tahun_ajaran_id: data.tahun_ajaran_id,
   });
 
   const validation = () => {
@@ -58,6 +58,12 @@ export default function ModalEditMk({ close, render, activeObe, data }) {
       status = false;
     }
 
+    if (dataInput.tahun_ajaran_id === 0) {
+      error.tahun_ajaran = 'tahun ajaran tidak boleh kosong';
+      errStat.tahun_ajaran = true;
+      status = false;
+    }
+
     setErrStatus(errStat);
     setErrors(error);
     return status;
@@ -92,6 +98,8 @@ export default function ModalEditMk({ close, render, activeObe, data }) {
       helper.semester = parseInt(target.value);
     } else if (target.name === 'prasyarat') {
       helper.prasyarat = target.value;
+    } else if (target.name === 'tahun_ajaran') {
+      helper.tahun_ajaran_id = parseInt(target.value);
     }
     setDataInput(helper);
   };
@@ -250,6 +258,40 @@ export default function ModalEditMk({ close, render, activeObe, data }) {
             ></textarea>
             {errStatus.prasyarat && (
               <span className="text-red-500 text-sm">{errors.prasyarat}</span>
+            )}
+          </div>
+          <div className="mb-2">
+            <label
+              htmlFor="tahun_ajaran"
+              className="block mb-1 text-sm font-medium text-gray-900"
+            >
+              Tahun Ajaran
+            </label>
+            <select
+              name="tahun_ajaran"
+              id="tahun_ajaran"
+              onChange={({ target }) => handleChange(target)}
+              className={`bg-gray-50 border ${
+                errStatus.tahun_ajaran ? 'border-red-500' : 'border-gray-300'
+              } text-gray-900 text-sm rounded-lg block w-full p-2.5`}
+              defaultValue={data.tahun_ajaran_id}
+              required
+            >
+              <option value="0" disabled>
+                Pilih Tahun Ajaran
+              </option>
+              {listTahunAjaran.map((item, i) => {
+                return (
+                  <option key={i} value={item.id}>
+                    {`${item.tahun} ${item.semester}`}
+                  </option>
+                );
+              })}
+            </select>
+            {errStatus.tahun_ajaran && (
+              <span className="text-red-500 text-sm">
+                {errors.tahun_ajaran}
+              </span>
             )}
           </div>
           <div className="flex justify-center mt-3">

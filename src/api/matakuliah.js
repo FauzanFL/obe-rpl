@@ -20,9 +20,9 @@ export const getMataKuliahById = async (id) => {
   return result.data;
 };
 
-export const getMataKuliahByObeId = async (obeId) => {
+export const getMataKuliahActiveByTahunId = async (tahunId) => {
   const result = await axios.get(
-    `${import.meta.env.VITE_API_URL}/mata_kuliah/obe/${obeId}`,
+    `${import.meta.env.VITE_API_URL}/mata_kuliah/tahun/${tahunId}`,
     {
       withCredentials: true,
     }
@@ -30,11 +30,21 @@ export const getMataKuliahByObeId = async (obeId) => {
   return result.data;
 };
 
-export const searchMataKuliahByObeId = async (obeId, key) => {
+export const getMataKuliahByObeId = async (tahunId) => {
+  const result = await axios.get(
+    `${import.meta.env.VITE_API_URL}/mata_kuliah/tahun/${tahunId}`,
+    {
+      withCredentials: true,
+    }
+  );
+  return result.data;
+};
+
+export const searchMataKuliahActiveByTahunId = async (tahunId, key) => {
   const result = await axios.get(
     `${
       import.meta.env.VITE_API_URL
-    }/mata_kuliah/obe/${obeId}/search?keyword=${key}`,
+    }/mata_kuliah/tahun/${tahunId}/search?keyword=${key}`,
     {
       withCredentials: true,
     }

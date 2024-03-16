@@ -1,13 +1,13 @@
 /* eslint-disable react/prop-types */
 import { XMarkIcon } from '@heroicons/react/24/solid';
 import { useEffect, useState } from 'react';
-import { getMataKuliahByObeId } from '../../../api/matakuliah';
+import { getMataKuliahActiveByTahunId } from '../../../api/matakuliah';
 import { getDosen } from '../../../api/dosen';
 import { getKelas } from '../../../api/kelas';
 import { createPlotting } from '../../../api/plotting';
 import { alertFailed, alertSuccess } from '../../../utils/alert';
 
-export default function ModalTambahPlotting({ close, render, activeObe }) {
+export default function ModalTambahPlotting({ close, render, tahun }) {
   const [listMk, setListMk] = useState([]);
   const [listDosen, setListDosen] = useState([]);
   const [listKelas, setListKelas] = useState([]);
@@ -16,7 +16,7 @@ export default function ModalTambahPlotting({ close, render, activeObe }) {
   useEffect(() => {
     async function fetchMk() {
       try {
-        const res = await getMataKuliahByObeId(activeObe.id);
+        const res = await getMataKuliahActiveByTahunId(tahun.id);
         if (res) {
           setListMk(res);
         }
@@ -48,7 +48,7 @@ export default function ModalTambahPlotting({ close, render, activeObe }) {
     fetchMk();
     fetchDosen();
     fetchKelas();
-  }, [activeObe]);
+  }, [tahun]);
 
   const handleChange = (target) => {
     if (target.name === 'mk') {

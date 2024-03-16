@@ -5,19 +5,21 @@ import Pagination from '../../../components/Pagination';
 import Sidebar from '../../../components/Sidebar';
 import { useEffect, useState } from 'react';
 import {
-  getMataKuliahByObeId,
-  searchMataKuliahByObeId,
+  getMataKuliahActiveByTahunId,
+  searchMataKuliahActiveByTahunId,
 } from '../../../api/matakuliah';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { getUserRole } from '../../../api/user';
-import { getActivePerancangan } from '../../../api/perancanganObe';
 import Loader from '../../../components/Loader';
+import { getTahunAjaran, getTahunAjaranNow } from '../../../api/tahunAjaran';
 
 export default function Penilaian() {
   const navigate = useNavigate();
   const location = useLocation();
   const [listMk, setListMk] = useState([]);
+  const [listTahunAjaran, setListTahunAjaran] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [tahunSelected, setTahunSelected] = useState({});
   const listNav = [{ name: 'Penilaian', link: '/prodi/penilaian' }];
 
   const itemsPerPage = 5;
@@ -47,12 +49,24 @@ export default function Penilaian() {
 
     async function fetch() {
       try {
-        const obe = await getActivePerancangan();
-        const res = await getMataKuliahByObeId(obe.id);
+        const tahun = await getTahunAjaranNow();
+        setTahunSelected(tahun);
+        const res = await getMataKuliahActiveByTahunId(tahun.id);
         if (res) {
           setListMk(res);
         }
         setIsLoading(false);
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    async function fetchTahun() {
+      try {
+        const res = await getTahunAjaran();
+        if (res) {
+          setListTahunAjaran(res);
+        }
       } catch (e) {
         console.error(e);
       }
@@ -75,13 +89,16 @@ export default function Penilaian() {
     fetchUser();
     fetchPage();
     fetch();
+    fetchTahun();
   }, [navigate, location]);
 
   const handleSearch = async (key) => {
     if (key.length > 1) {
       try {
-        const obe = await getActivePerancangan();
-        const res = await searchMataKuliahByObeId(obe.id, key);
+        const res = await searchMataKuliahActiveByTahunId(
+          tahunSelected.id,
+          key
+        );
         if (res) {
           setListMk(res);
         }
@@ -90,8 +107,7 @@ export default function Penilaian() {
       }
     } else if (key.length === 0) {
       try {
-        const obe = await getActivePerancangan();
-        const res = await getMataKuliahByObeId(obe.id);
+        const res = await getMataKuliahActiveByTahunId(tahunSelected.id);
         if (res) {
           setListMk(res);
         }
@@ -137,6 +153,21 @@ export default function Penilaian() {
     navigate(`?${urlParams.toString()}`);
   };
 
+  const handleChooseTahun = async (tahunId) => {
+    setIsLoading(true);
+    const tahun = listTahunAjaran.find((item) => item.id === parseInt(tahunId));
+    setTahunSelected(tahun);
+    try {
+      const res = await getMataKuliahActiveByTahunId(tahunId);
+      if (res) {
+        setListMk(res);
+      }
+      setIsLoading(false);
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
   return (
     <>
       <div className="flex">
@@ -152,7 +183,7 @@ export default function Penilaian() {
             <h2 className="text-semibold text-3xl">Penilaian</h2>
             <div className="block mt-3 p-5 bg-white border border-gray-200 rounded-lg shadow">
               <h3 className="text-semibold text-2xl">Daftar Mata Kuliah</h3>
-              <div className="py-2">
+              <div className="py-2 flex justify-between">
                 <label htmlFor="simple-search" className="sr-only">
                   Search
                 </label>
@@ -183,6 +214,25 @@ export default function Penilaian() {
                     required
                   />
                 </div>
+                <select
+                  name="tahun"
+                  id="tahun"
+                  className="bg-gray-50 border border-gray-300
+               text-gray-900 text-sm rounded-lg block w-40 p-2.5"
+                  onChange={({ target }) => handleChooseTahun(target.value)}
+                >
+                  {listTahunAjaran.map((item, i) => {
+                    return (
+                      <option
+                        key={i}
+                        value={item.id}
+                        // selected={item.id == tahunSelected.id}
+                      >
+                        {`${item.tahun} ${item.semester}`}
+                      </option>
+                    );
+                  })}
+                </select>
               </div>
               <div className="relative overflow-x-auto shadow-sm sm:rounded-lg">
                 <table className="w-full text-left rtl:text-right">

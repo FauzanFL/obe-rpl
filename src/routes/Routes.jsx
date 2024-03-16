@@ -20,6 +20,7 @@ import PenilaianKelas from '../pages/prodi/matakuliah/PenilaianKelas';
 import Kelas from '../pages/prodi/Kelas';
 import TahunAjaran from '../pages/prodi/TahunAjaran';
 import IndexPenilaian from '../pages/prodi/IndexPenilaian';
+import JenisAssessment from '../pages/prodi/kurikulum/JenisAssessment';
 
 const router = createBrowserRouter([
   {
@@ -57,6 +58,10 @@ const router = createBrowserRouter([
   {
     path: '/prodi/tahunAjaran',
     element: <TahunAjaran />,
+  },
+  {
+    path: '/prodi/jenisAssessment',
+    element: <JenisAssessment />,
   },
   {
     path: '/prodi/indexPenilaian',

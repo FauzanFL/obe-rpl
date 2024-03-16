@@ -1,8 +1,8 @@
 import axios from 'axios';
 
-export const getPlotting = async () => {
+export const getPlottingByTahun = async (tahunId) => {
   const result = await axios.get(
-    `${import.meta.env.VITE_API_URL}/plotting_dosen_mk/`,
+    `${import.meta.env.VITE_API_URL}/plotting_dosen_mk/tahun/${tahunId}`,
     {
       withCredentials: true,
     }
@@ -34,9 +34,11 @@ export const getKelasByMkId = async (mkId) => {
   return result.data;
 };
 
-export const searchPlotting = async (key) => {
+export const searchPlottingByTahun = async (tahunId, key) => {
   const result = await axios.get(
-    `${import.meta.env.VITE_API_URL}/plotting_dosen_mk/search?keyword=${key}`,
+    `${
+      import.meta.env.VITE_API_URL
+    }/plotting_dosen_mk/tahun/${tahunId}/search?keyword=${key}`,
     {
       withCredentials: true,
     }
