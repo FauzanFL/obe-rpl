@@ -112,49 +112,50 @@ export default function IndexPenilaian() {
                     </tr>
                   </thead>
                   <tbody>
-                    {listIndexPenilaian.map((item, i) => {
-                      const handleEdit = () => {
-                        setSelectedIndexPenilaian(item);
-                        setIsEditOpen(true);
-                      };
-                      const handleDelete = async () => {
-                        try {
-                          const res = await deleteIndexPenilaian(item.id);
-                          if (res) {
-                            alertSuccess('Berhasil menghapus data');
-                            render();
+                    {listIndexPenilaian.length >= 0 &&
+                      listIndexPenilaian.map((item, i) => {
+                        const handleEdit = () => {
+                          setSelectedIndexPenilaian(item);
+                          setIsEditOpen(true);
+                        };
+                        const handleDelete = async () => {
+                          try {
+                            const res = await deleteIndexPenilaian(item.id);
+                            if (res) {
+                              alertSuccess('Berhasil menghapus data');
+                              render();
+                            }
+                          } catch (e) {
+                            alertFailed('Gagal menghapus data');
                           }
-                        } catch (e) {
-                          alertFailed('Gagal menghapus data');
-                        }
-                      };
-                      return (
-                        <tr
-                          key={i}
-                          className="odd:bg-white even:bg-gray-50 border-b"
-                        >
-                          <td className="px-6 py-4">{item.grade}</td>
-                          <td className="px-6 py-4">{item.batas_awal}</td>
-                          <td className="px-6 py-4">{item.batas_akhir}</td>
-                          <td className="flex px-6 py-4">
-                            <button
-                              type="button"
-                              onClick={handleEdit}
-                              className="flex justify-center items-center focus:outline-none text-white bg-orange-600 hover:bg-orange-700 focus:ring-4 focus:ring-orange-300 font-medium rounded-lg text-sm px-3 py-1.5 me-2 mb-2"
-                            >
-                              <PencilSquareIcon className="w-5" />
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => alertDelete(handleDelete)}
-                              className="flex justify-center items-center focus:outline-none text-white bg-red-600 hover:bg-red-700 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-3 py-1.5 me-2 mb-2"
-                            >
-                              <TrashIcon className="w-5" />
-                            </button>
-                          </td>
-                        </tr>
-                      );
-                    })}
+                        };
+                        return (
+                          <tr
+                            key={i}
+                            className="odd:bg-white even:bg-gray-50 border-b"
+                          >
+                            <td className="px-6 py-4">{item.grade}</td>
+                            <td className="px-6 py-4">{item.batas_awal}</td>
+                            <td className="px-6 py-4">{item.batas_akhir}</td>
+                            <td className="flex px-6 py-4">
+                              <button
+                                type="button"
+                                onClick={handleEdit}
+                                className="flex justify-center items-center focus:outline-none text-white bg-orange-600 hover:bg-orange-700 focus:ring-4 focus:ring-orange-300 font-medium rounded-lg text-sm px-3 py-1.5 me-2 mb-2"
+                              >
+                                <PencilSquareIcon className="w-5" />
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => alertDelete(handleDelete)}
+                                className="flex justify-center items-center focus:outline-none text-white bg-red-600 hover:bg-red-700 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-3 py-1.5 me-2 mb-2"
+                              >
+                                <TrashIcon className="w-5" />
+                              </button>
+                            </td>
+                          </tr>
+                        );
+                      })}
                   </tbody>
                 </table>
               </div>

@@ -14,7 +14,7 @@ export default function ModalEditKelas({ close, render, data }) {
   const handleChange = (target) => {
     const helper = { ...dataInput };
     if (target.name === 'kode_kelas') {
-      helper.kode_kelas = target.value;
+      helper.kode_kelas = target.value.toUpperCase();
       setDataInput(helper);
     }
   };

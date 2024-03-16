@@ -225,7 +225,9 @@ export default function LembarAssessment() {
             <Breadcrumb listNav={listNav} />
           </div>
           <main className="p-7 text-wrap">
-            <h2 className="text-semibold text-3xl">{clo.nama}</h2>
+            <h2 className="text-semibold text-3xl">{`${clo.nama} (${formatBobot(
+              clo.bobot
+            )})`}</h2>
             <div className="block mt-3 p-5 bg-white border border-gray-200 rounded-lg shadow">
               <h3 className="text-semibold text-2xl">
                 Daftar Lembar Assessment

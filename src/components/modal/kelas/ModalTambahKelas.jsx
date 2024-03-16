@@ -14,7 +14,7 @@ export default function ModalTambahKelas({ close, render }) {
   const handleChange = (target) => {
     const helper = { ...dataInput };
     if (target.name === 'kode_kelas') {
-      helper.nama = target.value;
+      helper.kode_kelas = target.value;
       setDataInput(helper);
     }
   };
