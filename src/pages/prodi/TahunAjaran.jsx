@@ -211,12 +211,12 @@ export default function TahunAjaran() {
     return monthName.name;
   };
 
-  const listNav = [{ name: 'Kelas', link: '/prodi/kelas' }];
+  const listNav = [{ name: 'Tahun Ajaran', link: '/prodi/tahun-ajaran' }];
   return (
     <>
       <div className="flex">
         <div className="">
-          <Sidebar typeUser={'prodi'} page={'tahun ajaran'} />
+          <Sidebar typeUser={'prodi'} page={'tahun-ajaran'} />
         </div>
         <div className="flex-1 h-screen overflow-auto">
           <Header typeUser={'prodi'} />

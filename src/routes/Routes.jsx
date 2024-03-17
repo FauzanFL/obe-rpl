@@ -56,15 +56,15 @@ const router = createBrowserRouter([
     element: <Kelas />,
   },
   {
-    path: '/prodi/tahunAjaran',
+    path: '/prodi/tahun-ajaran',
     element: <TahunAjaran />,
   },
   {
-    path: '/prodi/jenisAssessment',
+    path: '/prodi/jenis-assessment',
     element: <JenisAssessment />,
   },
   {
-    path: '/prodi/indexPenilaian',
+    path: '/prodi/index-penilaian',
     element: <IndexPenilaian />,
   },
   {

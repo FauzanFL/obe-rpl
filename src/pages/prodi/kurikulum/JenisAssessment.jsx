@@ -67,12 +67,14 @@ export default function JenisAssessment() {
     }
   };
 
-  const listNav = [{ name: 'Kelas', link: '/prodi/kelas' }];
+  const listNav = [
+    { name: 'Jenis Assessment', link: '/prodi/jenis-assessment' },
+  ];
   return (
     <>
       <div className="flex">
         <div className="">
-          <Sidebar typeUser={'prodi'} page={'jenis assessment'} />
+          <Sidebar typeUser={'prodi'} page={'jenis-assessment'} />
         </div>
         <div className="flex-1 h-screen overflow-auto">
           <Header typeUser={'prodi'} />

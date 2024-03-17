@@ -67,12 +67,12 @@ export default function IndexPenilaian() {
     }
   };
 
-  const listNav = [{ name: 'Kelas', link: '/prodi/kelas' }];
+  const listNav = [{ name: 'Index Penilaian', link: '/prodi/index-penilaian' }];
   return (
     <>
       <div className="flex">
         <div className="">
-          <Sidebar typeUser={'prodi'} page={'index penilaian'} />
+          <Sidebar typeUser={'prodi'} page={'index-penilaian'} />
         </div>
         <div className="flex-1 h-screen overflow-auto">
           <Header typeUser={'prodi'} />
