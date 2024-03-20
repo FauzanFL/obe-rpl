@@ -7,11 +7,11 @@ export const getPenilaian = async () => {
   return result.data;
 };
 
-export const getDataPenilaian = async (mkId, kelasId, tahunId) => {
+export const getDataPenilaian = async (mkId, kelasId) => {
   const result = await axios.get(
     `${
       import.meta.env.VITE_API_URL
-    }/penilaian/data/matakuliah/${mkId}/kelas/${kelasId}/tahun/${tahunId}`,
+    }/penilaian/data/matakuliah/${mkId}/kelas/${kelasId}`,
     {
       withCredentials: true,
     }
