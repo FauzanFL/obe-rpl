@@ -28,7 +28,8 @@ import {
 import { getTahunAjaranNow } from '../../../api/tahunAjaran';
 // import { createBeritaAcaraBatch } from '../../../api/beritaAcara';
 import { CheckCircleIcon } from '@heroicons/react/24/solid';
-import { alertFailed, alertSuccess } from '../../../utils/alert';
+import { alertFailed, alertFinalization, alertSuccess } from '../../../utils/alert';
+import { createBeritaAcara } from '../../../api/beritaAcara';
 
 interface Matakuliah {
   id: number;
@@ -91,6 +92,22 @@ interface DataPenilaian {
   penilaian: Penilaian;
 }
 
+interface Dosen {
+  id: number;
+  kode_dosen: string;
+  nama: string;
+  user_id: number;
+}
+
+interface BeritaAcara {
+  id: number;
+  mata_kuliah: Matakuliah;
+  dosen: Dosen;
+  kelas: Kelas;
+  nilai: NilaiMahasiswa[];
+  penilaian_id: number;
+}
+
 export default function PenilaianKelasDosen() {
   const [dataPenilaian, setDataPenilaian] = useState<DataPenilaian>({
     clo_assessment: [],
@@ -131,7 +148,6 @@ export default function PenilaianKelasDosen() {
   const [isFinal, setIsFinal] = useState(false);
   const params = useParams();
   const navigate = useNavigate();
-  let sumDataNilai = useRef(0);
 
   useEffect(() => {
     setIsLoading(true);
@@ -194,6 +210,30 @@ export default function PenilaianKelasDosen() {
     fetch();
   }, [navigate, params]);
 
+  const render = async () => {
+    setIsLoading(true)
+    try {
+      const resData = await getDataPenilaian(
+        params.mkId,
+        params.kelasId,
+      );
+      if (resData) {
+        setDataPenilaian(resData);
+        const penilaianTemp: Penilaian = resData.penilaian
+        penilaianTemp.mk_id = Number(params.mkId)
+        penilaianTemp.kelas_id = Number(params.kelasId)
+        setPenilaian(penilaianTemp)
+        if (resData.penilaian.status === 'final') {
+          setIsFinal(true);
+        }
+        setIsLoading(false);
+      }
+    } catch (e) {
+      console.error(e);
+      setIsLoading(false)
+    }
+}
+
   const handleSimpan = async (e) => {
     e.preventDefault()
     if (penilaian.id != 0) {
@@ -236,6 +276,29 @@ export default function PenilaianKelasDosen() {
         alertFailed("error")
       }
     }
+  }
+
+  const handleFinal = async (e) => {
+    const beritaAcara: BeritaAcara = {
+      id: 0,
+      mata_kuliah: mk,
+      dosen: { id: 0, kode_dosen: '', nama: '', user_id: 0 },
+      kelas: kelas,
+      nilai: dataPenilaian.penilaian.nilai,
+      penilaian_id: dataPenilaian.penilaian.id,
+    }
+    alertFinalization(async () => {
+      try {
+        const res = await createBeritaAcara(beritaAcara)
+        if (res) {
+          alertSuccess('Data berhasil difinalisasi')
+          render()
+        }
+      } catch (e) {
+        console.error(e);
+        alertFailed("Data gagal difinalisasi")
+      }
+    })
   }
 
   const listNav = [
@@ -599,6 +662,7 @@ export default function PenilaianKelasDosen() {
                 </div>
               )}
               <div className="mt-2 flex justify-between">
+                <div className="flex justify-center">
                 <button
                   type="button"
                   onClick={handleSimpan}
@@ -606,10 +670,18 @@ export default function PenilaianKelasDosen() {
                 >
                   Simpan
                 </button>
+                <button
+                  type="button"
+                  // onClick={handleCetak}
+                  className="flex justify-center items-center focus:outline-none h-fit text-white bg-green-600 hover:bg-green-700 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-3 py-1.5 me-2 mb-2"
+                >
+                  Download
+                </button>
+                </div>
                 <div className="flex flex-col justify-center items-center">
                   <button
                     type="button"
-                    // onClick={handleFinal}
+                    onClick={handleFinal}
                     className={`flex justify-center items-center ${
                          isFinal
                         ? 'bg-green-600 pointer-events-none'

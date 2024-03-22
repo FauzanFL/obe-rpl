@@ -13,6 +13,9 @@ import Loader from '../../../components/Loader';
 import { getKelasByMkId } from '../../../api/plotting';
 import { getDataPenilaian } from '../../../api/penilaian';
 import { getTahunAjaranNow } from '../../../api/tahunAjaran';
+import { CheckCircleIcon } from '@heroicons/react/24/solid';
+import { deleteBeritaAcara, getBeritaAcaraByPenilaian } from '../../../api/beritaAcara';
+import { alertFailed, alertSuccess } from '../../../utils/alert';
 
 interface Matakuliah {
   id: number;
@@ -87,7 +90,10 @@ export default function PenilaianKelas() {
     },
   });
   const [listKelas, setListKelas] = useState<Kelas[]>([]);
-  const [kelas, setKelas] = useState('');
+  const [kelas, setKelas] = useState<Kelas>({
+    id: 0,
+    kode_kelas: '',
+  });
   const [mk, setMk] = useState<Matakuliah>({
     id: 0,
     kode_mk: '',
@@ -107,16 +113,13 @@ export default function PenilaianKelas() {
     mk_id: 0,
     kelas_id: 0,
   })
-  // const [data, setData] = useState([]);
   const navigate = useNavigate();
   const params = useParams();
-  // const tahunAjar = useRef({});
+  const [isFinal, setIsFinal] = useState(false);
 
   function isFloat(num) {
     return num % 1 !== 0 && num % 1 > 0;
   }
-
-  // const settingData = useCallback((dataToSet) => {
   //   const mahasiswaNilai = dataToSet.mahasiswa_nilai;
   //   const cloAssessment = dataToSet.clo_assessment;
   //   let listAssessments = [];
@@ -232,7 +235,7 @@ export default function PenilaianKelas() {
         const res = await getKelasByMkId(params.mkId);
         if (res) {
           setListKelas(res);
-          setKelas(res[0].kode_kelas);
+          setKelas(res[0]);
           try {
             const resData = await getDataPenilaian(
               params.mkId,
@@ -241,8 +244,9 @@ export default function PenilaianKelas() {
             if (resData) {
               setDataPenilaian(resData);
               setPenilaian(resData.penilaian);
-              // const listNilai = settingData(resData);
-              // setData(listNilai);
+              if (resData.penilaian.status === 'final') {
+                setIsFinal(true);
+              }
               setIsLoading(false);
             }
           } catch (e) {
@@ -259,31 +263,44 @@ export default function PenilaianKelas() {
     fetchKelas();
   }, [navigate, params]);
 
-  // const mahasiswaNilai = dataPenilaian.mahasiswa_nilai;
-  // const cloAssessment = dataPenilaian.clo_assessment;
-  // let colLabel = [];
-  // let rowLabel = [];
-  // if (mahasiswaNilai !== undefined && mahasiswaNilai.length !== 0) {
-  //   rowLabel = mahasiswaNilai.map((item) => item.nama);
-  // }
-  // if (cloAssessment !== undefined && cloAssessment.length !== 0) {
-  //   let clo = [];
-  //   cloAssessment.forEach((item) => {
-  //     let assessments = [];
-  //     const assessment = item.assessment;
-  //     if (assessment !== undefined && assessment.length !== 0) {
-  //       assessments = assessment.map(
-  //         (item) => `${item.nama}\n(${item.bobot * 100 + '%'})`
-  //       );
-  //     }
-  //     if (assessments.length !== 0) {
-  //       colLabel.push(...assessments);
-  //     }
-  //     clo.push(`${item.nama}\n(${item.bobot * 100 + '%'})`);
-  //   });
-  //   colLabel.push(...clo);
-  //   colLabel.push('NA');
-  // }
+  const render = async () => {
+    try {
+      const resData = await getDataPenilaian(mk.id,kelas.id);
+      if (resData) {
+        setDataPenilaian(resData);
+        setPenilaian(resData.penilaian);
+        if (resData.penilaian.status === 'final') {
+          setIsFinal(true);
+        } else {
+          setIsFinal(false)
+        }
+        setIsLoading(false);
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  const handleResetFinalisasi = async () => {
+    try {
+      const res = await getBeritaAcaraByPenilaian(penilaian.id);
+      if (res) {
+        try {
+          const response = await deleteBeritaAcara(res.id);
+          console.log(response);
+          if (response) {
+            render()
+            alertSuccess('Berhasil reset finalisasi')
+          }
+        } catch (e) {
+          console.error(e);
+          alertFailed('Gagal reset finalisasi')
+        }
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  }
 
   const listNav = [
     { name: 'Penilaian', link: '/prodi/penilaian' },
@@ -405,6 +422,7 @@ export default function PenilaianKelas() {
   }
 
   const rows = getRows(penilaian);
+
   return (
     <>
       <div className="flex">
@@ -423,7 +441,7 @@ export default function PenilaianKelas() {
                 {listKelas.map((item, i) => {
                   const handleKelasChange = async () => {
                     setIsLoading(true);
-                    setKelas(item.kode_kelas);
+                    setKelas(item);
                     try {
                       const resData = await getDataPenilaian(
                         params.mkId,
@@ -432,8 +450,11 @@ export default function PenilaianKelas() {
                       if (resData) {
                         setDataPenilaian(resData);
                         setPenilaian(resData.penilaian)
-                        // const listNilai = settingData(resData);
-                        // setData(listNilai);
+                        if (resData.penilaian.status === 'final') {
+                          setIsFinal(true);
+                        } else {
+                          setIsFinal(false);
+                        }
                         setIsLoading(false);
                       }
                     } catch (e) {
@@ -445,7 +466,7 @@ export default function PenilaianKelas() {
                       key={i}
                       onClick={handleKelasChange}
                       className={`px-3 py-1 ${
-                        kelas === item.kode_kelas
+                        kelas.kode_kelas === item.kode_kelas
                           ? 'bg-slate-50 text-gray-400 pointer-events-none'
                           : 'bg-slate-100 hover:bg-slate-50 hover:text-gray-400'
                       }`}
@@ -454,6 +475,34 @@ export default function PenilaianKelas() {
                     </button>
                   );
                 })}
+              </div>
+              <div className="mt-2 flex justify-between">
+                <button
+                  type="button"
+                  // onClick={handleCetak}
+                  className="flex justify-center items-center focus:outline-none h-fit text-white bg-green-600 hover:bg-green-700 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-3 py-1.5 me-2 mb-2"
+                >
+                  Cetak
+                </button>
+                <div className="flex flex-col justify-center items-center">
+                {isFinal && (
+                  <>
+                  <button
+                    type="button"
+                    onClick={handleResetFinalisasi}
+                    className={`flex justify-center items-center bg-red-600 hover:bg-red-700  focus:ring-red-300 focus:ring-4 focus:outline-none h-fit text-white  font-medium rounded-lg text-sm px-3 py-1.5 me-2 mb-2`}
+                  >
+                    Batalkan Finalisasi
+                  </button>
+                    <div className="flex text-green-500">
+                      <CheckCircleIcon className="h-5 w-5" />
+                      <span className="text-sm font-semibold">
+                        Terfinalisasi
+                      </span>
+                    </div>
+                  </>
+                  )}
+                </div>
               </div>
               <div className="overflow-auto">
               <ReactGrid rows={rows} columns={columns} stickyTopRows={1} enableRangeSelection />
