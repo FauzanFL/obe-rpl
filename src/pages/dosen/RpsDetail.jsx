@@ -7,9 +7,8 @@ import { getRpsMataKuliah } from '../../api/matakuliah';
 import { getUserRole } from '../../api/user';
 import { PrinterIcon } from '@heroicons/react/24/solid';
 import { useReactToPrint } from 'react-to-print';
-// import MyPdf from '../../utils/MyPdf';
-import MyPdf2 from '../../utils/MyPdf2';
 import Loader from '../../components/Loader';
+import RpsPdf2 from '../../utils/RpsPdf2';
 
 export default function RpsDetail() {
   const navigate = useNavigate();
@@ -78,7 +77,7 @@ export default function RpsDetail() {
           <main className="p-7 text-wrap">
             <div className="">
               <div className="hidden">
-                <MyPdf2
+                <RpsPdf2
                   ref={pdfRef}
                   rps={rps}
                   listClo={listClo}

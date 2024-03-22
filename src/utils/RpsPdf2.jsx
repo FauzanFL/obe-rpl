@@ -2,7 +2,7 @@
 /* eslint-disable react/display-name */
 import React from 'react';
 
-export const MyPdf2 = React.forwardRef(
+export const RpsPdf2 = React.forwardRef(
   ({ rps, listClo, listPlo, dosenPengampu }, ref) => {
     return (
       <>
@@ -136,4 +136,4 @@ export const MyPdf2 = React.forwardRef(
   }
 );
 
-export default MyPdf2;
+export default RpsPdf2;
