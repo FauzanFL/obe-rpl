@@ -6,13 +6,12 @@ import { useState, useEffect, useRef } from 'react';
 import { getUserRole } from '../../api/user';
 import Loader from '../../components/Loader';
 import { getDataPenilaianCloPloByMk } from '../../api/penilaian';
-import { getDosenMataKuliah } from '../../api/dosen';
+import { getDosenMataKuliahByTahun } from '../../api/dosen';
 import { Bar, BarChart, Legend, XAxis, YAxis, Tooltip } from 'recharts';
 import { getTahunAjaranNow } from '../../api/tahunAjaran';
 
 export default function DashboardDosen() {
   const [isLoading, setIsLoading] = useState(false);
-  const [tahunAjar, setTahunAjar] = useState({});
   const [listMk, setListMk] = useState([]);
   const [listClo, setListClo] = useState([]);
   const [listPlo, setListPlo] = useState([]);
@@ -34,30 +33,22 @@ export default function DashboardDosen() {
 
     async function fetch() {
       try {
-        const res = await getDosenMataKuliah();
-        if (res) {
-          setListMk(res);
-          mkFirst.current = res[0];
-          try {
-            const data = await getTahunAjaranNow();
-            setTahunAjar(data);
-            try {
-              const resData = await getDataPenilaianCloPloByMk(
-                res[0].id,
-                data.id
-              );
-              if (resData) {
-                setListClo(resData.clo);
-                setListPlo(resData.plo);
-              }
-            } catch (e) {
-              console.error(e);
+        const tahun = await getTahunAjaranNow();
+        try {
+          const res = await getDosenMataKuliahByTahun(tahun.id);
+          if (res) {
+            setListMk(res);
+            mkFirst.current = res[0];
+            const resData = await getDataPenilaianCloPloByMk(res[0].id);
+            if (resData) {
+              setListClo(resData.clo);
+              setListPlo(resData.plo);
             }
-          } catch (e) {
-            console.error(e);
           }
+          setIsLoading(false);
+        } catch (e) {
+          console.error(e);
         }
-        setIsLoading(false);
       } catch (e) {
         console.error(e);
       }
@@ -70,11 +61,9 @@ export default function DashboardDosen() {
   const handleChooseMk = async (mkId) => {
     setIsLoading(true);
     try {
-      const resData = await getDataPenilaianCloPloByMk(mkId, tahunAjar.id);
-      if (resData) {
-        setListClo(resData.clo);
-        setListPlo(resData.plo);
-      }
+      const resData = await getDataPenilaianCloPloByMk(mkId);
+      setListClo(resData.clo);
+      setListPlo(resData.plo);
       setIsLoading(false);
     } catch (e) {
       console.error(e);

@@ -2,7 +2,6 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { ReactGrid, Column, Row } from '@silevis/reactgrid';
 import '@silevis/reactgrid/styles.css';
 import React from 'react';
-import Spreadsheet from 'react-spreadsheet';
 import Sidebar from '../../../components/Sidebar';
 import Header from '../../../components/Header';
 import Breadcrumb from '../../../components/Breadcrumb';
@@ -12,10 +11,11 @@ import { getMataKuliahById } from '../../../api/matakuliah';
 import Loader from '../../../components/Loader';
 import { getKelasByMkId } from '../../../api/plotting';
 import { getDataPenilaian } from '../../../api/penilaian';
-import { getTahunAjaranNow } from '../../../api/tahunAjaran';
 import { CheckCircleIcon } from '@heroicons/react/24/solid';
 import { deleteBeritaAcara, getBeritaAcaraByPenilaian } from '../../../api/beritaAcara';
 import { alertFailed, alertSuccess } from '../../../utils/alert';
+import { useReactToPrint } from 'react-to-print';
+import BeritaAcaraPdf from '../../../utils/BeritaAcaraPdf';
 
 interface Matakuliah {
   id: number;
@@ -78,6 +78,22 @@ interface DataPenilaian {
   penilaian: Penilaian;
 }
 
+interface Dosen {
+  id: number;
+  kode_dosen: string;
+  nama: string;
+  user_id: number;
+}
+
+interface BeritaAcara {
+  id: number;
+  mata_kuliah: Matakuliah;
+  dosen: Dosen;
+  kelas: Kelas;
+  nilai: NilaiMahasiswa[];
+  penilaian_id: number;
+}
+
 export default function PenilaianKelas() {
   const [dataPenilaian, setDataPenilaian] = useState<DataPenilaian>({
     clo_assessment: [],
@@ -113,100 +129,33 @@ export default function PenilaianKelas() {
     mk_id: 0,
     kelas_id: 0,
   })
+  const [beritaAcara, setBeritaAcara] = useState<BeritaAcara>({
+    id: 0,
+    mata_kuliah: mk,
+    dosen: {
+      id: 0,
+      kode_dosen: '',
+      nama: '',
+      user_id: 0,
+    },
+    kelas: kelas,
+    nilai: penilaian.nilai,
+    penilaian_id: penilaian.id,
+  });
   const navigate = useNavigate();
   const params = useParams();
   const [isFinal, setIsFinal] = useState(false);
 
+  const pdfRef = useRef<HTMLDivElement>(null);
+
+  const handlePrint = useReactToPrint({
+    content: () => pdfRef.current || null,
+    documentTitle: `BA NA ${mk.kode_mk} ${kelas.kode_kelas}`,
+  });
+
   function isFloat(num) {
     return num % 1 !== 0 && num % 1 > 0;
   }
-  //   const mahasiswaNilai = dataToSet.mahasiswa_nilai;
-  //   const cloAssessment = dataToSet.clo_assessment;
-  //   let listAssessments = [];
-  //   if (cloAssessment !== undefined && cloAssessment.length !== 0) {
-  //     cloAssessment.forEach((item) => {
-  //       let assessments = [];
-  //       const assessment = item.assessment;
-  //       if (assessment !== undefined && assessment.length !== 0) {
-  //         assessments = assessment.map((item) => item);
-  //       }
-  //       if (assessments.length !== 0) {
-  //         listAssessments.push(...assessments);
-  //       }
-  //     });
-  //   }
-  //   let listNilai = [];
-  //   if (mahasiswaNilai !== undefined && mahasiswaNilai.length !== 0) {
-  //     mahasiswaNilai.forEach((item1) => {
-  //       let nilai = [];
-  //       listAssessments.forEach((assessment) => {
-  //         if (item1.penilaian.length !== 0) {
-  //           const n = item1.penilaian.find(
-  //             (item2) => assessment.id === item2.assessment_id
-  //           );
-  //           if (n) {
-  //             nilai.push({
-  //               id: n.id,
-  //               value: n.nilai,
-  //               mhs_id: item1.id,
-  //               assessment_id: assessment.id,
-  //               clo_id: assessment.clo_id,
-  //               bobot: assessment.bobot,
-  //               tahun_ajaran_id: n.tahun_ajaran_id,
-  //               readOnly: true,
-  //             });
-  //           } else {
-  //             nilai.push({
-  //               value: '',
-  //               mhs_id: item1.id,
-  //               assessment_id: assessment.id,
-  //               clo_id: assessment.clo_id,
-  //               bobot: assessment.bobot,
-  //             });
-  //           }
-  //         } else {
-  //           nilai.push({
-  //             value: '',
-  //             mhs_id: item1.id,
-  //             bobot: assessment.bobot,
-  //             clo_id: assessment.clo_id,
-  //             assessment_id: assessment.id,
-  //           });
-  //         }
-  //       });
-  //       const clo = cloAssessment.map((value) => {
-  //         let cloNilai = 0;
-  //         nilai.forEach((n) => {
-  //           if (n.clo_id == value.id) {
-  //             const nilaiFloat = n.value * n.bobot;
-  //             cloNilai += nilaiFloat;
-  //           }
-  //         });
-  //         if (isFloat(cloNilai)) {
-  //           cloNilai = cloNilai.toFixed(2);
-  //         }
-  //         return {
-  //           value: cloNilai,
-  //           mhs_id: item1.id,
-  //           bobot: value.bobot,
-  //           clo_id: value.id,
-  //           readOnly: true,
-  //         };
-  //       });
-  //       const na = clo.reduce((acc, current) => {
-  //         return acc + parseFloat(current.value);
-  //       }, 0);
-  //       nilai.push(...clo);
-  //       nilai.push({
-  //         value: na,
-  //         mhs_id: item1.id,
-  //         readOnly: true,
-  //       });
-  //       listNilai.push(nilai);
-  //     });
-  //   }
-  //   return listNilai;
-  // }, []);
 
   useEffect(() => {
     setIsLoading(true);
@@ -247,6 +196,10 @@ export default function PenilaianKelas() {
               if (resData.penilaian.status === 'final') {
                 setIsFinal(true);
               }
+              const res = await getBeritaAcaraByPenilaian(resData.penilaian.id);
+              if (res) {
+                setBeritaAcara(res)
+              }
               setIsLoading(false);
             }
           } catch (e) {
@@ -274,6 +227,10 @@ export default function PenilaianKelas() {
         } else {
           setIsFinal(false)
         }
+        const res = await getBeritaAcaraByPenilaian(resData.penilaian.id);
+        if (res) {
+          setBeritaAcara(res)
+        }
         setIsLoading(false);
       }
     } catch (e) {
@@ -287,7 +244,6 @@ export default function PenilaianKelas() {
       if (res) {
         try {
           const response = await deleteBeritaAcara(res.id);
-          console.log(response);
           if (response) {
             render()
             alertSuccess('Berhasil reset finalisasi')
@@ -358,67 +314,52 @@ export default function PenilaianKelas() {
       text: column.columnId.toString(),
     })),
   };
-
-  const numOfRow: number = 10;
   
   const getRows = (penilaian: Penilaian): Row[] => {
-    if (penilaian.nilai.length === 0) {
-      const emptyRow: Row[] = [
-        headerRow,
-        ...Array.from({ length: numOfRow }, (_, i) => i).map((i) => ({
-          rowId: i,
-          cells: columns.map((item) => {
-            if (item.columnId == 'nim' || item.columnId == 'nama') {
-              return { type: "text" as "text", text: "", id: 1, nonEditable: true, }
-            } else {
-              return { type: "number" as "number", value: NaN, nanToZero: true, nonEditable: true, }
-            }
-          }),
-        })),
-      ];
-      return emptyRow;
-    } else {
-      let na: number = 0;
-      const rows: Row[] = [
-        headerRow,
-        ...penilaian.nilai.map<Row>((nilai: NilaiMahasiswa, idx) => ({
-          rowId: nilai.nim,
-          cells: [
-            { type: "text", text: nilai.nim, nonEditable: true, },
-            { type: "text", text: nilai.nama, nonEditable: true, },
-            ...nilai.nilai_assessment.map((nilaiAssessment: NilaiAssessment) => ({
-              type: "number" as "number",
-              assessment_id: nilaiAssessment.assessment_id,
-              value: nilaiAssessment.nilai,
-              nonEditable: true,
-            })),
-            ...cloAssessment.map((clo) => {
-              let cloNilai = 0;
-              let cloNilaiArr: number[] = []
-              nilai.nilai_assessment.forEach((nilaiAssessment) => {
-                const assessment = clo.assessments.find(
-                  (assessment) => assessment.id === nilaiAssessment.assessment_id
-                );
-                if (assessment) {
-                  cloNilai += nilaiAssessment.nilai * assessment.bobot;
-                  cloNilaiArr.push(nilaiAssessment.nilai)
-                }
-              });
-              na += cloNilai
-              const avgClo = cloNilaiArr.reduce((a, b) => a + b, 0) / cloNilaiArr.length
-              return {
+    
+    const rows: Row[] = [
+      headerRow,
+      ...penilaian.nilai.map<Row>((nilai: NilaiMahasiswa, idx) => {
+          let na: number = 0;
+
+          return {
+            rowId: nilai.nim,
+            cells: [
+              { type: "text", text: nilai.nim, nonEditable: true, },
+              { type: "text", text: nilai.nama, nonEditable: true, },
+              ...nilai.nilai_assessment.map((nilaiAssessment: NilaiAssessment) => ({
                 type: "number" as "number",
-                clo_id: clo.id,
-                value: avgClo,
+                assessment_id: nilaiAssessment.assessment_id,
+                value: nilaiAssessment.nilai,
                 nonEditable: true,
-              };
-            }),
-            { type: "number" as "number", value: na, nonEditable: true, },
-          ]
-        })),
+              })),
+              ...cloAssessment.map((clo) => {
+                let cloNilai = 0;
+                let cloNilaiArr: number[] = []
+                nilai.nilai_assessment.forEach((nilaiAssessment) => {
+                  const assessment = clo.assessments.find(
+                    (assessment) => assessment.id === nilaiAssessment.assessment_id
+                  );
+                  if (assessment) {
+                    cloNilai += nilaiAssessment.nilai * assessment.bobot;
+                    cloNilaiArr.push(nilaiAssessment.nilai)
+                  }
+                });
+                na += cloNilai
+                const avgClo = cloNilaiArr.reduce((a, b) => a + b, 0) / cloNilaiArr.length
+                return {
+                  type: "number" as "number",
+                  clo_id: clo.id,
+                  value: avgClo,
+                  nonEditable: true,
+                };
+              }),
+              { type: "number" as "number", value: na, nonEditable: true, },
+            ]
+          }
+        }),
       ];
       return rows;
-    }
   }
 
   const rows = getRows(penilaian);
@@ -455,6 +396,10 @@ export default function PenilaianKelas() {
                         } else {
                           setIsFinal(false);
                         }
+                        const res = await getBeritaAcaraByPenilaian(resData.penilaian.id);
+                        if (res) {
+                          setBeritaAcara(res)
+                        }
                         setIsLoading(false);
                       }
                     } catch (e) {
@@ -476,17 +421,24 @@ export default function PenilaianKelas() {
                   );
                 })}
               </div>
+              {isFinal && (
+              <>
               <div className="mt-2 flex justify-between">
+              <div className="hidden">
+                <BeritaAcaraPdf
+                ref={pdfRef || null}
+                beritaAcara={beritaAcara}
+                cloAssessment={dataPenilaian.clo_assessment}
+                />
+              </div>
                 <button
                   type="button"
-                  // onClick={handleCetak}
+                  onClick={handlePrint}
                   className="flex justify-center items-center focus:outline-none h-fit text-white bg-green-600 hover:bg-green-700 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-3 py-1.5 me-2 mb-2"
                 >
-                  Cetak
+                  Cetak Berita Acara
                 </button>
                 <div className="flex flex-col justify-center items-center">
-                {isFinal && (
-                  <>
                   <button
                     type="button"
                     onClick={handleResetFinalisasi}
@@ -494,16 +446,16 @@ export default function PenilaianKelas() {
                   >
                     Batalkan Finalisasi
                   </button>
-                    <div className="flex text-green-500">
+                    <div className="flex text-green-500 mb-2">
                       <CheckCircleIcon className="h-5 w-5" />
                       <span className="text-sm font-semibold">
                         Terfinalisasi
                       </span>
                     </div>
-                  </>
-                  )}
                 </div>
               </div>
+              </>
+              )}
               <div className="overflow-auto">
               <ReactGrid rows={rows} columns={columns} stickyTopRows={1} enableRangeSelection />
                 {/* <Spreadsheet

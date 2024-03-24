@@ -4,14 +4,19 @@ import Breadcrumb from '../../components/Breadcrumb';
 import Pagination from '../../components/Pagination';
 import { useLocation, Link, useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
-import { getDosenMataKuliah, searchDosenMataKuliah } from '../../api/dosen';
+import {
+  getDosenMataKuliahByTahun,
+  searchDosenMataKuliahByTahun,
+} from '../../api/dosen';
 import { ClipboardDocumentCheckIcon } from '@heroicons/react/24/solid';
 import { getUserRole } from '../../api/user';
 import Loader from '../../components/Loader';
+import { getTahunAjaranNow } from '../../api/tahunAjaran';
 
 export default function MataKuliahDosen() {
   const [listMk, setListMk] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [tahunAjar, setTahunAjar] = useState({});
   const navigate = useNavigate();
   const location = useLocation();
   const listNav = [{ name: 'Mata Kuliah', link: '/dosen/matakuliah' }];
@@ -43,11 +48,17 @@ export default function MataKuliahDosen() {
 
     async function fetch() {
       try {
-        const res = await getDosenMataKuliah();
-        if (res) {
-          setListMk(res);
+        const tahun = await getTahunAjaranNow();
+        setTahunAjar(tahun);
+        try {
+          const res = await getDosenMataKuliahByTahun(tahun.id);
+          if (res) {
+            setListMk(res);
+          }
+          setIsLoading(false);
+        } catch (e) {
+          console.error(e);
         }
-        setIsLoading(false);
       } catch (e) {
         console.error(e);
       }
@@ -75,7 +86,7 @@ export default function MataKuliahDosen() {
   const handleSearch = async (key) => {
     if (key.length > 1) {
       try {
-        const res = await searchDosenMataKuliah(key);
+        const res = await searchDosenMataKuliahByTahun(tahunAjar.id, key);
         if (res) {
           setListMk(res);
         }
@@ -84,7 +95,7 @@ export default function MataKuliahDosen() {
       }
     } else if (key.length === 0) {
       try {
-        const res = await getDosenMataKuliah();
+        const res = await getDosenMataKuliahByTahun(tahunAjar.id);
         if (res) {
           setListMk(res);
         }

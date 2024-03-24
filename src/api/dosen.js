@@ -7,9 +7,9 @@ export const getDosen = async () => {
   return result.data;
 };
 
-export const getDosenMataKuliah = async () => {
+export const getDosenMataKuliahByTahun = async (tahunId) => {
   const result = await axios.get(
-    `${import.meta.env.VITE_API_URL}/dosen/mata_kuliah`,
+    `${import.meta.env.VITE_API_URL}/dosen/mata_kuliah/tahun/${tahunId}`,
     {
       withCredentials: true,
     }
@@ -17,9 +17,11 @@ export const getDosenMataKuliah = async () => {
   return result.data;
 };
 
-export const searchDosenMataKuliah = async (key) => {
+export const searchDosenMataKuliahByTahun = async (tahunId, key) => {
   const result = await axios.get(
-    `${import.meta.env.VITE_API_URL}/dosen/mata_kuliah/search?keyword=${key}`,
+    `${
+      import.meta.env.VITE_API_URL
+    }/dosen/mata_kuliah/tahun/${tahunId}/search?keyword=${key}`,
     {
       withCredentials: true,
     }

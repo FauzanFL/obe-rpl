@@ -8,9 +8,10 @@ import {
 } from '@heroicons/react/24/solid';
 import { useLocation, Link, useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
-import { getDosenMataKuliah } from '../../api/dosen';
+import { getDosenMataKuliahByTahun } from '../../api/dosen';
 import { getUserRole } from '../../api/user';
 import Loader from '../../components/Loader';
+import { getTahunAjaranNow } from '../../api/tahunAjaran';
 
 export default function Rps() {
   const [listMk, setListMk] = useState([]);
@@ -46,11 +47,16 @@ export default function Rps() {
 
     async function fetch() {
       try {
-        const res = await getDosenMataKuliah();
-        if (res) {
-          setListMk(res);
+        const tahun = await getTahunAjaranNow();
+        try {
+          const res = await getDosenMataKuliahByTahun(tahun.id);
+          if (res) {
+            setListMk(res);
+          }
+          setIsLoading(false);
+        } catch (e) {
+          console.error(e);
         }
-        setIsLoading(false);
       } catch (e) {
         console.error(e);
       }
