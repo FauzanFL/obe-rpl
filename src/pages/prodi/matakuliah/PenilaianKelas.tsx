@@ -11,11 +11,12 @@ import { getMataKuliahById } from '../../../api/matakuliah';
 import Loader from '../../../components/Loader';
 import { getKelasByMkId } from '../../../api/plotting';
 import { getDataPenilaian } from '../../../api/penilaian';
-import { CheckCircleIcon } from '@heroicons/react/24/solid';
+import { ArrowDownTrayIcon, CheckBadgeIcon, PrinterIcon } from '@heroicons/react/24/solid';
 import { deleteBeritaAcara, getBeritaAcaraByPenilaian } from '../../../api/beritaAcara';
 import { alertFailed, alertSuccess } from '../../../utils/alert';
 import { useReactToPrint } from 'react-to-print';
 import BeritaAcaraPdf from '../../../utils/BeritaAcaraPdf';
+import exceljs from 'exceljs';
 
 interface Matakuliah {
   id: number;
@@ -196,9 +197,13 @@ export default function PenilaianKelas() {
               if (resData.penilaian.status === 'final') {
                 setIsFinal(true);
               }
-              const res = await getBeritaAcaraByPenilaian(resData.penilaian.id);
-              if (res) {
-                setBeritaAcara(res)
+              try {
+                const res = await getBeritaAcaraByPenilaian(resData.penilaian.id);
+                if (res) {
+                  setBeritaAcara(res)
+                }
+              } catch (e) {
+                setIsLoading(false);
               }
               setIsLoading(false);
             }
@@ -227,9 +232,13 @@ export default function PenilaianKelas() {
         } else {
           setIsFinal(false)
         }
-        const res = await getBeritaAcaraByPenilaian(resData.penilaian.id);
-        if (res) {
-          setBeritaAcara(res)
+        try {
+          const res = await getBeritaAcaraByPenilaian(resData.penilaian.id);
+          if (res) {
+            setBeritaAcara(res)
+          }
+        } catch (e) {
+          setIsLoading(false);
         }
         setIsLoading(false);
       }
@@ -256,6 +265,102 @@ export default function PenilaianKelas() {
     } catch (e) {
       console.error(e);
     }
+  }
+
+  const formatFloat = (value: number): number => {
+    const num = value.toString().split('.');
+    if (num[1] && num[1].length > 2) {
+      return parseFloat(value.toFixed(2));
+    } else {
+      return value;
+    }
+  }
+
+  const getData = (): any[][] => {
+    const data: any[][] = [];
+
+    // Add header row
+    const headerRow = columns.map((column) => column.columnId.toString());
+    data.push(headerRow);
+
+    // Add data rows
+    penilaian.nilai.forEach((nilai) => {
+      const rowData = [nilai.nim, nilai.nama]
+      const rowAssessment = nilai.nilai_assessment.map((item) => {
+        return item.nilai;
+      });
+      let na = 0;
+      const rowClo = cloAssessment.map((clo) => {
+        let cloNilai = 0;
+        let count = 0
+        nilai.nilai_assessment.forEach((nilaiAssessment) => {
+          const assessment = clo.assessments.find(
+            (assessment) => assessment.id === nilaiAssessment.assessment_id
+          );
+          if (assessment) {
+            cloNilai += nilaiAssessment.nilai;
+            count++
+          }
+        }
+        );
+        cloNilai = cloNilai / count;
+        na += cloNilai;
+        return formatFloat(cloNilai);
+      }
+      );
+      const nilaiTotal = na / cloAssessment.length;
+      
+      data.push([...rowData, ...rowAssessment, ...rowClo, formatFloat(nilaiTotal)]);
+    });
+
+    return data;
+  }
+
+  const handleDownload = () => {
+    const workbook = new exceljs.Workbook();
+    const worksheet = workbook.addWorksheet(`Penilaian ${mk.kode_mk} ${kelas.kode_kelas}`);
+
+    const data = getData();
+    worksheet.addRows(data);
+
+    worksheet.columns.forEach((column) => {
+      column.width = column.header ? (column.header.length < 12 ? 12 : column.header.length + 4) : 12;
+      column.border = {
+        top: { style: 'thin' },
+        left: { style: 'thin' },
+        bottom: { style: 'thin' },
+        right: { style: 'thin' },
+      };
+    })
+    
+    // Apply styling to the header row
+    worksheet.getRow(1).height = 20;
+    worksheet.getRow(1).eachCell((cell) => {
+      cell.border = {
+      top: { style: 'thin' },
+      left: { style: 'thin' },
+      bottom: { style: 'thin' },
+      right: { style: 'thin' },
+      };
+      
+      cell.font = { bold: true };
+      cell.alignment = { horizontal: 'center' };
+      cell.fill = {
+      type: 'pattern',
+      pattern: 'solid',
+      fgColor: { argb: 'CCCCCC' },
+      };
+    });
+
+    workbook.xlsx.writeBuffer().then((buffer) => {
+      const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `Penilaian ${mk.kode_mk} ${kelas.kode_kelas}.xlsx`;
+      a.click();
+    }
+    );
   }
 
   const listNav = [
@@ -335,26 +440,25 @@ export default function PenilaianKelas() {
               })),
               ...cloAssessment.map((clo) => {
                 let cloNilai = 0;
-                let cloNilaiArr: number[] = []
+                let count = 0;
                 nilai.nilai_assessment.forEach((nilaiAssessment) => {
                   const assessment = clo.assessments.find(
                     (assessment) => assessment.id === nilaiAssessment.assessment_id
                   );
                   if (assessment) {
-                    cloNilai += nilaiAssessment.nilai * assessment.bobot;
-                    cloNilaiArr.push(nilaiAssessment.nilai)
+                    cloNilai += nilaiAssessment.nilai;
                   }
                 });
-                na += cloNilai
-                const avgClo = cloNilaiArr.reduce((a, b) => a + b, 0) / cloNilaiArr.length
+                const avgClo = cloNilai / count;
+                na += avgClo;
                 return {
                   type: "number" as "number",
                   clo_id: clo.id,
-                  value: avgClo,
+                  value: formatFloat(avgClo),
                   nonEditable: true,
                 };
               }),
-              { type: "number" as "number", value: na, nonEditable: true, },
+              { type: "number" as "number", value: formatFloat(na / cloAssessment.length), nonEditable: true, },
             ]
           }
         }),
@@ -396,9 +500,13 @@ export default function PenilaianKelas() {
                         } else {
                           setIsFinal(false);
                         }
-                        const res = await getBeritaAcaraByPenilaian(resData.penilaian.id);
-                        if (res) {
-                          setBeritaAcara(res)
+                        try {
+                          const res = await getBeritaAcaraByPenilaian(resData.penilaian.id);
+                          if (res) {
+                            setBeritaAcara(res)
+                          }
+                        } catch (e) {
+                          setIsLoading(false);
                         }
                         setIsLoading(false);
                       }
@@ -421,41 +529,52 @@ export default function PenilaianKelas() {
                   );
                 })}
               </div>
-              {isFinal && (
-              <>
               <div className="mt-2 flex justify-between">
-              <div className="hidden">
-                <BeritaAcaraPdf
-                ref={pdfRef || null}
-                beritaAcara={beritaAcara}
-                cloAssessment={dataPenilaian.clo_assessment}
-                />
-              </div>
-                <button
-                  type="button"
-                  onClick={handlePrint}
-                  className="flex justify-center items-center focus:outline-none h-fit text-white bg-green-600 hover:bg-green-700 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-3 py-1.5 me-2 mb-2"
-                >
-                  Cetak Berita Acara
-                </button>
-                <div className="flex flex-col justify-center items-center">
+                <div className="hidden">
+                  <BeritaAcaraPdf
+                  ref={pdfRef || null}
+                  beritaAcara={beritaAcara}
+                  cloAssessment={dataPenilaian.clo_assessment}
+                  />
+                </div>
+                <div className="flex">
                   <button
                     type="button"
-                    onClick={handleResetFinalisasi}
-                    className={`flex justify-center items-center bg-red-600 hover:bg-red-700  focus:ring-red-300 focus:ring-4 focus:outline-none h-fit text-white  font-medium rounded-lg text-sm px-3 py-1.5 me-2 mb-2`}
-                  >
-                    Batalkan Finalisasi
+                    onClick={handleDownload}
+                    className="flex justify-center items-center focus:outline-none h-fit text-white bg-green-600 hover:bg-green-700 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-3 py-1.5 me-2 mb-2"
+                    >
+                    <ArrowDownTrayIcon className='h-5 w-5 mr-1'/>
+                    Download
                   </button>
-                    <div className="flex text-green-500 mb-2">
-                      <CheckCircleIcon className="h-5 w-5" />
-                      <span className="text-sm font-semibold">
-                        Terfinalisasi
-                      </span>
-                    </div>
+                  {isFinal && (
+                    <button
+                      type="button"
+                      onClick={handlePrint}
+                      className="flex justify-center items-center focus:outline-none h-fit text-white bg-green-600 hover:bg-green-700 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-3 py-1.5 me-2 mb-2"
+                    >
+                      <PrinterIcon className='h-5 w-5 mr-1'/>
+                      Cetak Berita Acara
+                    </button>
+                  )}
                 </div>
+                {isFinal && (
+                  <div className="flex flex-col justify-center items-center">
+                    <button
+                      type="button"
+                      onClick={handleResetFinalisasi}
+                      className={`flex justify-center items-center bg-red-600 hover:bg-red-700  focus:ring-red-300 focus:ring-4 focus:outline-none h-fit text-white  font-medium rounded-lg text-sm px-3 py-1.5 me-2 mb-2`}
+                    >
+                      Batalkan Finalisasi
+                    </button>
+                      <div className="flex text-green-500 mb-2">
+                        <CheckBadgeIcon className="h-5 w-5" />
+                        <span className="text-sm font-semibold">
+                          Terfinalisasi
+                        </span>
+                      </div>
+                  </div>
+                )}
               </div>
-              </>
-              )}
               <div className="overflow-auto">
               <ReactGrid rows={rows} columns={columns} stickyTopRows={1} enableRangeSelection />
                 {/* <Spreadsheet

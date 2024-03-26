@@ -1,5 +1,5 @@
-import { useState, useEffect, useRef } from 'react';
-import { ReactGrid, Column, Row, CellChange, Cell, TextCell, NumberCell } from '@silevis/reactgrid';
+import { useState, useEffect} from 'react';
+import { ReactGrid, Column, Row, CellChange, TextCell, NumberCell } from '@silevis/reactgrid';
 import '@silevis/reactgrid/styles.css';
 import React from 'react';
 import Breadcrumb from '../../../components/Breadcrumb';
@@ -8,28 +8,17 @@ import Sidebar from '../../../components/Sidebar';
 import { useNavigate, useParams } from 'react-router-dom';
 import { getUserRole } from '../../../api/user';
 import Loader from '../../../components/Loader';
-// import Spreadsheet from 'react-spreadsheet';
 import { getMataKuliahById } from '../../../api/matakuliah';
 import { getKelasById } from '../../../api/kelas';
 import {
   createPenilaian,
   deletePenilaian,
-  // createPenilaian,
-  // deletePenilaian,
   getDataPenilaian, updatePenilaian,
-  // updatePenilaian,
 } from '../../../api/penilaian';
-// import {
-//   alertFailed,
-//   alertFinalization,
-//   alertInfo,
-//   alertSuccess,
-// } from '../../../utils/alert';
-import { getTahunAjaranNow } from '../../../api/tahunAjaran';
-// import { createBeritaAcaraBatch } from '../../../api/beritaAcara';
-import { CheckCircleIcon } from '@heroicons/react/24/solid';
-import { alertFailed, alertFinalization, alertSuccess } from '../../../utils/alert';
+import { ArrowDownTrayIcon, CheckBadgeIcon, CheckCircleIcon } from '@heroicons/react/24/solid';
+import { alertFailed, alertFinalization, alertInfo, alertSuccess } from '../../../utils/alert';
 import { createBeritaAcara } from '../../../api/beritaAcara';
+import exceljs from 'exceljs';
 
 interface Matakuliah {
   id: number;
@@ -137,7 +126,6 @@ export default function PenilaianKelasDosen() {
     id: 0,
     kode_kelas: '',
   });
-  // const [data, setData] = useState([]);
   const [penilaian, setPenilaian] = useState<Penilaian>({
     id: 0,
     nilai: [],
@@ -232,7 +220,103 @@ export default function PenilaianKelasDosen() {
       console.error(e);
       setIsLoading(false)
     }
-}
+  }
+
+  const formatFloat = (value: number): number => {
+    const num = value.toString().split('.');
+    if (num[1] && num[1].length > 2) {
+      return parseFloat(value.toFixed(2));
+    } else {
+      return value;
+    }
+  }
+
+  const getData = (): any[][] => {
+    const data: any[][] = [];
+
+    // Add header row
+    const headerRow = columns.map((column) => column.columnId.toString());
+    data.push(headerRow);
+
+    // Add data rows
+    penilaian.nilai.forEach((nilai) => {
+      const rowData = [nilai.nim, nilai.nama]
+      const rowAssessment = nilai.nilai_assessment.map((item) => {
+        return item.nilai;
+      });
+      let na = 0;
+      const rowClo = cloAssessment.map((clo) => {
+        let cloNilai = 0;
+        let count = 0
+        nilai.nilai_assessment.forEach((nilaiAssessment) => {
+          const assessment = clo.assessments.find(
+            (assessment) => assessment.id === nilaiAssessment.assessment_id
+          );
+          if (assessment) {
+            cloNilai += nilaiAssessment.nilai;
+            count++
+          }
+        }
+        );
+        cloNilai = cloNilai / count;
+        na += cloNilai;
+        return formatFloat(cloNilai);
+      }
+      );
+      const nilaiTotal = na / cloAssessment.length;
+      
+      data.push([...rowData, ...rowAssessment, ...rowClo, formatFloat(nilaiTotal)]);
+    });
+
+    return data;
+  }
+
+  const handleDownload = () => {
+    const workbook = new exceljs.Workbook();
+    const worksheet = workbook.addWorksheet(`Penilaian ${mk.kode_mk} ${kelas.kode_kelas}`);
+
+    const data = getData();
+    worksheet.addRows(data);
+
+    worksheet.columns.forEach((column) => {
+      column.width = column.header ? (column.header.length < 12 ? 12 : column.header.length + 4) : 12;
+      column.border = {
+        top: { style: 'thin' },
+        left: { style: 'thin' },
+        bottom: { style: 'thin' },
+        right: { style: 'thin' },
+      };
+    })
+    
+    // Apply styling to the header row
+    worksheet.getRow(1).height = 20;
+    worksheet.getRow(1).eachCell((cell) => {
+      cell.border = {
+      top: { style: 'thin' },
+      left: { style: 'thin' },
+      bottom: { style: 'thin' },
+      right: { style: 'thin' },
+      };
+      
+      cell.font = { bold: true };
+      cell.alignment = { horizontal: 'center' };
+      cell.fill = {
+      type: 'pattern',
+      pattern: 'solid',
+      fgColor: { argb: 'CCCCCC' },
+      };
+    });
+
+    workbook.xlsx.writeBuffer().then((buffer) => {
+      const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `Penilaian ${mk.kode_mk} ${kelas.kode_kelas}.xlsx`;
+      a.click();
+    }
+    );
+  }
 
   const handleSimpan = async (e) => {
     e.preventDefault()
@@ -377,7 +461,12 @@ export default function PenilaianKelasDosen() {
       if (found) {
         if (change.newCell.type === "text") {
           if (change.columnId === 'nim') {
-            found.nim = change.newCell.text
+            if (change.newCell.text !== '') {
+              found.nim = change.newCell.text
+            } else {
+              const index = newPenilaian.nilai.findIndex((item) => item.nim === change.rowId)
+              newPenilaian.nilai.splice(index, 1)
+            }
           } else if (change.columnId === 'nama') {
             found.nama = change.newCell.text
           }
@@ -406,42 +495,28 @@ export default function PenilaianKelasDosen() {
           }
         }
       } else {
-        let nim:string = ''
-        let nama:string = ''
-        let assessments:NilaiAssessment[] = []
-        if (change.newCell.type === "text") {
-          if (change.columnId === 'nim') {
-            nim = change.newCell.text
-          } else if (change.columnId === 'nama') {
-            nama = change.newCell.text
-          }
+        if (change.columnId === 'nim' && change.newCell.type === "text") {
+          let nim:string = ''
+          let nama:string = ''
+          let assessments:NilaiAssessment[] = []
+          nim = change.newCell.text
+          const listAssessments = lembarAssessments.map((assess) => {
+            return {
+              assessment_id: assess.id,
+              nilai: 0,
+            }
+          })
+          assessments.push(...listAssessments)
+          newPenilaian.nilai.push({
+            nim: nim,
+            nama: nama,
+            nilai_assessment: assessments
+          })
         } else {
-          const assessment = headers.find((item) => item.name === change.columnId)
-          if (assessment) {
-            const listAssessments = lembarAssessments.map((assess) => {
-              if (assess.id === assessment.id && change.type == 'number') {
-                return {
-                  assessment_id: assessment.id,
-                  nilai: change.newCell.value
-                }
-              } else {
-                return {
-                  assessment_id: assess.id,
-                  nilai: NaN
-                }
-              }
-            })
-            assessments.push(...listAssessments)
-          }
+          alertInfo("Isi NIM terlebih dahulu")
         }
-        newPenilaian.nilai.push({
-          nim: nim,
-          nama: nama,
-          nilai_assessment: assessments
-        })
       }
     });
-    console.log(newPenilaian);
     
     return newPenilaian;
   };
@@ -495,22 +570,22 @@ export default function PenilaianKelasDosen() {
             ),
             ...cloAssessment.map((clo) => {
               let cloNilai = 0;
-              let cloNilaiArr: number[] = []
+              let count = 0;
               nilai.nilai_assessment.forEach((nilaiAssessment) => {
                 const assessment = clo.assessments.find(
                   (assessment) => assessment.id === nilaiAssessment.assessment_id
                 );
                 if (assessment) {
-                  cloNilai += nilaiAssessment.nilai * assessment.bobot;
-                  cloNilaiArr.push(nilaiAssessment.nilai)
+                  cloNilai += nilaiAssessment.nilai;
+                  count++
                 }
               });
-              na += cloNilai
-              const avgClo = cloNilaiArr.reduce((a, b) => a + b, 0) / cloNilaiArr.length
+              const avgClo = cloNilai / count;
+              na += avgClo;
               return {
                 type: "number" as "number",
                 clo_id: clo.id,
-                value: avgClo,
+                value: formatFloat(avgClo),
                 nonEditable: true,
                 nanToZero: true,
                 style: {
@@ -518,7 +593,7 @@ export default function PenilaianKelasDosen() {
                 }
               };
             }),
-            { type: "number" as "number", value: na, nonEditable: true, style: {
+            { type: "number" as "number", value: formatFloat(na / cloAssessment.length), nonEditable: true, style: {
               background: '#d1d1d1' 
             } },
           ]
@@ -530,7 +605,7 @@ export default function PenilaianKelasDosen() {
           rowId: i,
           cells: columns.map((item) => {
             if (item.columnId == 'nim' || item.columnId == 'nama') {
-              return { type: "text" as "text", text: "", id: 1 }
+              return { type: "text" as "text", text: "" }
               } else {
               return { type: "number" as "number", value: NaN, nanToZero: true }
               }
@@ -672,9 +747,10 @@ export default function PenilaianKelasDosen() {
                 </button>
                 <button
                   type="button"
-                  // onClick={handleCetak}
+                  onClick={handleDownload}
                   className="flex justify-center items-center focus:outline-none h-fit text-white bg-green-600 hover:bg-green-700 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-3 py-1.5 me-2 mb-2"
                 >
+                  <ArrowDownTrayIcon className='h-5 w-5 mr-1' />
                   Download
                 </button>
                 </div>
@@ -688,11 +764,12 @@ export default function PenilaianKelasDosen() {
                         : 'bg-fuchsia-600 hover:bg-fuchsia-700  focus:ring-fuchsia-300 focus:ring-4'
                     } focus:outline-none h-fit text-white  font-medium rounded-lg text-sm px-3 py-1.5 me-2 mb-2`}
                   >
+                    <CheckCircleIcon className="h-5 w-5 mr-1" />
                     Finalisasi
                   </button>
                   {isFinal && (
-                    <div className="flex text-green-500">
-                      <CheckCircleIcon className="h-5 w-5" />
+                    <div className="flex text-green-500 mb-2">
+                      <CheckBadgeIcon className="h-5 w-5" />
                       <span className="text-sm font-semibold">
                         Terfinalisasi
                       </span>
@@ -702,13 +779,6 @@ export default function PenilaianKelasDosen() {
               </div>
               <div className="overflow-auto">
                 <ReactGrid rows={rows} columns={columns} onCellsChanged={handleChanges} stickyTopRows={1} enableRangeSelection />
-                {/* <Spreadsheet
-                  className="font-semibold"
-                  data={data}
-                  onChange={handleChange}
-                  columnLabels={colLabel}
-                  rowLabels={rowLabel}
-                /> */}
               </div>
             </div>
           </main>

@@ -93,12 +93,8 @@ export const BeritaAcaraPdf = React.forwardRef<HTMLDivElement, BeritaAcaraPdfPro
 
   useEffect(() => {
     async function fetchTahun() {
-      try {
-        const response = await getTahunAjaranById(beritaAcara.mata_kuliah.tahun_ajaran_id);
-        setTahunAjaran(response);
-      } catch (e) {
-
-      }
+      const response = await getTahunAjaranById(beritaAcara.mata_kuliah.tahun_ajaran_id);
+      setTahunAjaran(response);
     }
 
     async function fetchIndex() {
