@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { ReactGrid, Column, Row } from '@silevis/reactgrid';
 import '@silevis/reactgrid/styles.css';
 import React from 'react';
@@ -447,6 +447,7 @@ export default function PenilaianKelas() {
                   );
                   if (assessment) {
                     cloNilai += nilaiAssessment.nilai;
+                    count++
                   }
                 });
                 const avgClo = cloNilai / count;
@@ -577,12 +578,6 @@ export default function PenilaianKelas() {
               </div>
               <div className="overflow-auto">
               <ReactGrid rows={rows} columns={columns} stickyTopRows={1} enableRangeSelection />
-                {/* <Spreadsheet
-                  className="font-semibold"
-                  data={data}
-                  columnLabels={colLabel}
-                  rowLabels={rowLabel}
-                /> */}
               </div>
             </div>
           </main>
