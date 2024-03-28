@@ -102,10 +102,10 @@ export default function PenilaianDosen() {
                           className="odd:bg-white even:bg-gray-50 border-b"
                         >
                           <td className="px-6 py-4">{item.kode_kelas}</td>
-                          <td className="px-6 py-4">
+                          <td className="px-6 py-4 flex">
                             <Link
                               to={`/dosen/matakuliah/${mk.id}/penilaian/kelas/${item.id}`}
-                              className="flex justify-center items-center focus:outline-none max-w-60 text-white bg-indigo-500 hover:bg-indigo-600 focus:ring-4 focus:ring-indigo-300 font-medium rounded-lg text-sm px-3 py-1.5 me-2 mb-2"
+                              className="flex justify-center items-center min-w-52 focus:outline-none max-w-60 text-white bg-indigo-500 hover:bg-indigo-600 focus:ring-4 focus:ring-indigo-300 font-medium rounded-lg text-sm px-3 py-1.5 me-2 mb-2"
                             >
                               <ClipboardDocumentIcon className="w-5 mr-1" />
                               Nilai

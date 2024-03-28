@@ -88,7 +88,7 @@ export default function NavListProdi({ open, page }) {
           } hover:bg-indigo-200`}
         >
           <Link
-            to={'/prodi/jenisAssessment'}
+            to={'/prodi/jenis-assessment'}
             className="flex items-center gap-x-4"
           >
             <ClipboardDocumentListIcon className="w-7" />

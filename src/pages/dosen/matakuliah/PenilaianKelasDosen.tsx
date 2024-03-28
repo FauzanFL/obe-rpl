@@ -500,18 +500,24 @@ export default function PenilaianKelasDosen() {
           let nama:string = ''
           let assessments:NilaiAssessment[] = []
           nim = change.newCell.text
-          const listAssessments = lembarAssessments.map((assess) => {
-            return {
-              assessment_id: assess.id,
-              nilai: 0,
-            }
-          })
-          assessments.push(...listAssessments)
-          newPenilaian.nilai.push({
-            nim: nim,
-            nama: nama,
-            nilai_assessment: assessments
-          })
+          const nimExists = newPenilaian.nilai.some(item => item.nim === nim);
+          if (!nimExists) {
+            const listAssessments = lembarAssessments.map((assess) => {
+              return {
+                assessment_id: assess.id,
+                nilai: 0,
+              }
+            })
+            assessments.push(...listAssessments)
+            newPenilaian.nilai.push({
+              nim: nim,
+              nama: nama,
+              nilai_assessment: assessments
+            })
+          } else {
+            alertInfo("NIM sudah ada");
+          }
+
         } else {
           alertInfo("Isi NIM terlebih dahulu")
         }

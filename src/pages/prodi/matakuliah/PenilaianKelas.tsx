@@ -11,7 +11,7 @@ import { getMataKuliahById } from '../../../api/matakuliah';
 import Loader from '../../../components/Loader';
 import { getKelasByMkId } from '../../../api/plotting';
 import { getDataPenilaian } from '../../../api/penilaian';
-import { ArrowDownTrayIcon, CheckBadgeIcon, PrinterIcon } from '@heroicons/react/24/solid';
+import { ArrowDownTrayIcon, CheckBadgeIcon, PrinterIcon, XCircleIcon } from '@heroicons/react/24/solid';
 import { deleteBeritaAcara, getBeritaAcaraByPenilaian } from '../../../api/beritaAcara';
 import { alertFailed, alertSuccess } from '../../../utils/alert';
 import { useReactToPrint } from 'react-to-print';
@@ -565,6 +565,7 @@ export default function PenilaianKelas() {
                       onClick={handleResetFinalisasi}
                       className={`flex justify-center items-center bg-red-600 hover:bg-red-700  focus:ring-red-300 focus:ring-4 focus:outline-none h-fit text-white  font-medium rounded-lg text-sm px-3 py-1.5 me-2 mb-2`}
                     >
+                      <XCircleIcon className='h-5 w-5 mr-1'/>
                       Batalkan Finalisasi
                     </button>
                       <div className="flex text-green-500 mb-2">
