@@ -193,6 +193,7 @@ export default function PlottingDosen() {
                 id="tahun"
                 className="bg-gray-50 border border-gray-300 mt-2
                text-gray-900 text-sm rounded-lg block w-40 p-2.5"
+                defaultValue={tahunSelected.id}
                 onChange={({ target }) => handleChooseTahun(target.value)}
               >
                 {listTahunAjaran.map((item, i) => {
@@ -200,7 +201,7 @@ export default function PlottingDosen() {
                     <option
                       key={i}
                       value={item.id}
-                      // selected={item.id == tahunSelected.id}
+                      selected={item.id == tahunSelected.id}
                     >
                       {`${item.tahun} ${item.semester}`}
                     </option>
