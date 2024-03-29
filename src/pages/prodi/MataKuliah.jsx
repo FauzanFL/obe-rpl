@@ -208,7 +208,11 @@ export default function MataKuliah() {
               >
                 {listTahunAjaran.map((item, i) => {
                   return (
-                    <option key={i} value={item.id}>
+                    <option
+                      key={i}
+                      value={item.id}
+                      selected={tahunSelected.id == item.id ? true : false}
+                    >
                       {`${item.tahun} ${item.semester}`}
                     </option>
                   );

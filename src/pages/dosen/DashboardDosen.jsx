@@ -105,7 +105,11 @@ export default function DashboardDosen() {
             >
               {listMk.map((item, i) => {
                 return (
-                  <option key={i} value={item.id}>
+                  <option
+                    key={i}
+                    value={item.id}
+                    selected={mkFirst.current.id == item.id ? true : false}
+                  >
                     {item.nama}
                   </option>
                 );
