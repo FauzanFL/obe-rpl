@@ -19,6 +19,7 @@ import { ArrowDownTrayIcon, CheckBadgeIcon, CheckCircleIcon } from '@heroicons/r
 import { alertFailed, alertFinalization, alertInfo, alertSuccess } from '../../../utils/alert';
 import { createBeritaAcara } from '../../../api/beritaAcara';
 import exceljs from 'exceljs';
+import { getIndexPenilaian } from '../../../api/indexPenilaian';
 
 interface Matakuliah {
   id: number;
@@ -134,6 +135,7 @@ export default function PenilaianKelasDosen() {
     kelas_id: 0,
   });
   const [isFinal, setIsFinal] = useState(false);
+  const [listIndex, setListIndex] = useState<any[]>([]);
   const params = useParams();
   const navigate = useNavigate();
 
@@ -192,9 +194,15 @@ export default function PenilaianKelasDosen() {
         }
     }
 
+    async function fetchIndex() {
+      const res = await getIndexPenilaian();
+      setListIndex(res)
+    }
+
     fetchUser();
     fetchMk();
     fetchKelas();
+    fetchIndex();
     fetch();
   }, [navigate, params]);
 
@@ -433,10 +441,20 @@ export default function PenilaianKelasDosen() {
       width: 150,
     }
 
-    headers.push({ id: 0, name: 'nim', type: "nim"}, { id: 0, name: 'nama', type: "nama"}, ...assessmentHeaders, ...cloHeaders, { id: 0, name: "NA", type: "NA" })
+    const grade : Column = {
+      columnId: "Grade",
+      width: 50,
+    }
+
+    headers.push({ id: 0, name: 'nim', type: "nim"}, { id: 0, name: 'nama', type: "nama"}, ...assessmentHeaders, ...cloHeaders, { id: 0, name: "NA", type: "NA"}, { id: 0, name: "Grade", type: "Grade"})
     
-    return [...columns, ...assessmentColumns, ...cloColumns, col];
+    return [...columns, ...assessmentColumns, ...cloColumns, col, grade];
   };
+
+  const getIndexNilai = (nilai: number): string => {
+    const index = listIndex.find((i) => nilai >= i.batas_awal && nilai <= i.batas_akhir);
+    return index ? index.grade : '';
+  }
   
   const columns = getColumns()
 
@@ -601,7 +619,10 @@ export default function PenilaianKelasDosen() {
             }),
             { type: "number" as "number", value: formatFloat(na / cloAssessment.length), nonEditable: true, style: {
               background: '#d1d1d1' 
-            } },
+            }},
+            { type: "text", text: getIndexNilai(formatFloat(na / cloAssessment.length)), nonEditable: true, style: {
+              background: '#d1d1d1' 
+            }},
           ]
         }
       }),
@@ -610,7 +631,7 @@ export default function PenilaianKelasDosen() {
         rows.push(...Array.from({ length: numOfRow - penilaian.nilai.length }, (_, i) => i).map((i) => ({
           rowId: i,
           cells: columns.map((item) => {
-            if (item.columnId == 'nim' || item.columnId == 'nama') {
+            if (item.columnId == 'nim' || item.columnId == 'nama' || item.columnId == 'Grade') {
               return { type: "text" as "text", text: "" }
               } else {
               return { type: "number" as "number", value: NaN, nanToZero: true }

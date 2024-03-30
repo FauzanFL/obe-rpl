@@ -7,7 +7,6 @@ const SetCookie = (cookiename, usrin) => {
     secure: true,
     sameSite: 'Lax',
     path: '/',
-    domain: '.obe-rpl.site',
   });
 };
 

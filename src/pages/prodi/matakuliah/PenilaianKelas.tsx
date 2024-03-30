@@ -17,6 +17,7 @@ import { alertFailed, alertSuccess } from '../../../utils/alert';
 import { useReactToPrint } from 'react-to-print';
 import BeritaAcaraPdf from '../../../utils/BeritaAcaraPdf';
 import exceljs from 'exceljs';
+import { getIndexPenilaian } from '../../../api/indexPenilaian';
 
 interface Matakuliah {
   id: number;
@@ -146,6 +147,7 @@ export default function PenilaianKelas() {
   const navigate = useNavigate();
   const params = useParams();
   const [isFinal, setIsFinal] = useState(false);
+  const [listIndex, setListIndex] = useState<any[]>([]);
 
   const pdfRef = useRef<HTMLDivElement>(null);
 
@@ -216,8 +218,14 @@ export default function PenilaianKelas() {
       }
     }
 
+    async function fetchIndex() {
+      const res = await getIndexPenilaian();
+      setListIndex(res)
+    }
+
     fetchUser();
     fetchMk();
+    fetchIndex();
     fetchKelas();
   }, [navigate, params]);
 
@@ -404,10 +412,14 @@ export default function PenilaianKelas() {
       columnId: "NA",
       width: 150,
     }
+    const grade : Column = {
+      columnId: "Grade",
+      width: 50,
+    }
 
-    headers.push({ id: 0, type: "nim"}, { id: 0, type: "nama"}, ...assessmentHeaders, ...cloHeaders, { id: 0, type: "NA" })
+    headers.push({ id: 0, type: "nim"}, { id: 0, type: "nama"}, ...assessmentHeaders, ...cloHeaders, { id: 0, type: "NA" }, { id: 0, type: "Grade" })
     
-    return [...columns, ...assessmentColumns, ...cloColumns, col];
+    return [...columns, ...assessmentColumns, ...cloColumns, col, grade];
   };
   
   const columns = getColumns()
@@ -460,11 +472,17 @@ export default function PenilaianKelas() {
                 };
               }),
               { type: "number" as "number", value: formatFloat(na / cloAssessment.length), nonEditable: true, },
+              { type: "text", text: getIndexNilai(formatFloat(na / cloAssessment.length)), nonEditable: true, },
             ]
           }
         }),
       ];
       return rows;
+  }
+
+  const getIndexNilai = (nilai: number): string => {
+    const index = listIndex.find((i) => nilai >= i.batas_awal && nilai <= i.batas_akhir);
+    return index ? index.grade : '';
   }
 
   const rows = getRows(penilaian);
