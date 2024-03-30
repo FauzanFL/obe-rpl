@@ -7,6 +7,7 @@ const SetCookie = (cookiename, usrin) => {
     secure: true,
     sameSite: 'Lax',
     path: '/',
+    domain: `.${import.meta.env.VITE_DOMAIN}`,
   });
 };
 

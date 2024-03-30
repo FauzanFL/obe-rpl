@@ -100,7 +100,7 @@ export default function NavListProdi({ open, page }) {
       </ul>
       <li
         onClick={() => setMkOpen(!mkOpen)}
-        className="font-bold flex items-center gap-x-4 cursor-pointer my-1 p-2 px-4 rounded-md bg-indigo-300 hover:bg-indigo-200"
+        className="font-bold flex items-center gap-x-4 cursor-pointer mb-1 p-2 px-4 rounded-md bg-indigo-300 hover:bg-indigo-200"
       >
         <BookOpenIcon className="w-7" />
         <span className={`${!open && 'hidden'} origin-left duration-200`}>
