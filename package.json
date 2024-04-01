@@ -24,7 +24,8 @@
     "react-to-print": "^2.14.15",
     "recharts": "^2.12.1",
     "scheduler": "^0.23.0",
-    "sweetalert2": "^11.10.4"
+    "sweetalert2": "^11.10.4",
+    "uuid": "^9.0.1"
   },
   "devDependencies": {
     "@types/react": "^18.2.37",

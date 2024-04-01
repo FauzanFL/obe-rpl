@@ -20,6 +20,7 @@ import { alertFailed, alertFinalization, alertInfo, alertSuccess } from '../../.
 import { createBeritaAcara } from '../../../api/beritaAcara';
 import exceljs from 'exceljs';
 import { getIndexPenilaian } from '../../../api/indexPenilaian';
+import { v4 as uuidv4 } from 'uuid';
 
 interface Matakuliah {
   id: number;
@@ -469,18 +470,38 @@ export default function PenilaianKelasDosen() {
 
   const numOfRow: number = 70;
 
+  // const applyChangesToPenilaian = ( changes: CellChange[], prevPenilaian: Penilaian) : Penilaian => {
+  //   let newPenilaian = { ...prevPenilaian}
+  //   console.log(changes.length)
+
+  //   return newPenilaian
+  // }
+
   const applyChangesToPenilaian = (
     changes: CellChange<TextCell | NumberCell>[],
     prevPenilaian: Penilaian
   ): Penilaian => {
     let newPenilaian = { ...prevPenilaian };
+    console.log(changes.length)
     changes.forEach((change) => {
       const found = newPenilaian.nilai.find((item) => item.nim === change.rowId);
       if (found) {
         if (change.newCell.type === "text") {
           if (change.columnId === 'nim') {
             if (change.newCell.text !== '') {
-              found.nim = change.newCell.text
+              let penilaianSearch : NilaiMahasiswa[] = []
+              newPenilaian.nilai.forEach((item) => {
+                if (item.nim != change.rowId) {
+                  penilaianSearch.push(item)
+                }
+              })
+              const nim = change.newCell.text
+              const isNimExists = penilaianSearch.some((item) => item.nim === nim);
+              if (!isNimExists) {
+                found.nim = nim
+              } else {
+                alertInfo('NIM sudah ada')
+              }
             } else {
               const index = newPenilaian.nilai.findIndex((item) => item.nim === change.rowId)
               newPenilaian.nilai.splice(index, 1)
@@ -533,9 +554,8 @@ export default function PenilaianKelasDosen() {
               nilai_assessment: assessments
             })
           } else {
-            alertInfo("NIM sudah ada");
+            console.log("NIM sudah ada");
           }
-
         } else {
           alertInfo("Isi NIM terlebih dahulu")
         }
@@ -546,7 +566,7 @@ export default function PenilaianKelasDosen() {
   };
 
   const handleChanges = (changes: CellChange<any>[]) => { 
-    setPenilaian((prevPeople) => applyChangesToPenilaian(changes, prevPeople)); 
+    setPenilaian((prevPenilaian) => applyChangesToPenilaian(changes, prevPenilaian)); 
   }; 
   
   const getRows = (penilaian: Penilaian): Row[] => {
@@ -629,7 +649,7 @@ export default function PenilaianKelasDosen() {
       ];
       if (penilaian.nilai.length < numOfRow) {
         rows.push(...Array.from({ length: numOfRow - penilaian.nilai.length }, (_, i) => i).map((i) => ({
-          rowId: i,
+          rowId: uuidv4(),
           cells: columns.map((item) => {
             if (item.columnId == 'nim' || item.columnId == 'nama' || item.columnId == 'Grade') {
               return { type: "text" as "text", text: "" }
