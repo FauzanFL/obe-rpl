@@ -52,7 +52,6 @@ export default function DashboardProdi() {
           setListMk(mk);
         }
         const res = await getDataPenilaianMatakuliahByTahun(tahun.id);
-        console.log(res);
         if (res) {
           setData(res);
         }
