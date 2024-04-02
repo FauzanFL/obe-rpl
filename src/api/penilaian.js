@@ -19,6 +19,28 @@ export const getDataPenilaian = async (mkId, kelasId) => {
   return result.data;
 };
 
+export const getDataPenilaianMatakuliahByTahun = async (tahunId) => {
+  const result = await axios.get(
+    `${
+      import.meta.env.VITE_API_URL
+    }/penilaian/data/matakuliah/tahun/${tahunId}`,
+    {
+      withCredentials: true,
+    }
+  );
+  return result.data;
+};
+
+export const getDataPenilaianMatakuliahByMk = async (mkId) => {
+  const result = await axios.get(
+    `${import.meta.env.VITE_API_URL}/penilaian/data/matakuliah/${mkId}`,
+    {
+      withCredentials: true,
+    }
+  );
+  return result.data;
+};
+
 export const getDataPenilaianCloPloByMk = async (mkId) => {
   const result = await axios.get(
     `${import.meta.env.VITE_API_URL}/penilaian/data/clo_plo/matakuliah/${mkId}`,
