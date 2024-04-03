@@ -470,19 +470,11 @@ export default function PenilaianKelasDosen() {
 
   const numOfRow: number = 70;
 
-  // const applyChangesToPenilaian = ( changes: CellChange[], prevPenilaian: Penilaian) : Penilaian => {
-  //   let newPenilaian = { ...prevPenilaian}
-  //   console.log(changes.length)
-
-  //   return newPenilaian
-  // }
-
   const applyChangesToPenilaian = (
     changes: CellChange<TextCell | NumberCell>[],
     prevPenilaian: Penilaian
   ): Penilaian => {
     let newPenilaian = { ...prevPenilaian };
-    console.log(changes.length)
     changes.forEach((change) => {
       const found = newPenilaian.nilai.find((item) => item.nim === change.rowId);
       if (found) {
@@ -554,7 +546,7 @@ export default function PenilaianKelasDosen() {
               nilai_assessment: assessments
             })
           } else {
-            console.log("NIM sudah ada");
+            alertInfo("NIM sudah ada");
           }
         } else {
           alertInfo("Isi NIM terlebih dahulu")
@@ -565,7 +557,7 @@ export default function PenilaianKelasDosen() {
     return newPenilaian;
   };
 
-  const handleChanges = (changes: CellChange<any>[]) => { 
+  const handleChanges = (changes: CellChange<any>[]) => {
     setPenilaian((prevPenilaian) => applyChangesToPenilaian(changes, prevPenilaian)); 
   }; 
   
@@ -825,7 +817,7 @@ export default function PenilaianKelasDosen() {
                 </div>
               </div>
               <div className="overflow-auto">
-                <ReactGrid rows={rows} columns={columns} onCellsChanged={handleChanges} stickyTopRows={1} enableRangeSelection />
+                <ReactGrid rows={rows} columns={columns} onCellsChanged={handleChanges} moveRightOnEnter stickyTopRows={1} enableRangeSelection />
               </div>
             </div>
           </main>
