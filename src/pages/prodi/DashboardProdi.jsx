@@ -9,7 +9,11 @@ import {
   getDataPenilaianMatakuliahByMk,
   getDataPenilaianMatakuliahByTahun,
 } from '../../api/penilaian';
-import { getTahunAjaran, getTahunAjaranNow } from '../../api/tahunAjaran';
+import {
+  getTahunAjaran,
+  getTahunAjaranById,
+  getTahunAjaranNow,
+} from '../../api/tahunAjaran';
 import { getMataKuliahActiveByTahunId } from '../../api/matakuliah';
 
 export default function DashboardProdi() {
@@ -69,6 +73,10 @@ export default function DashboardProdi() {
   const handleChooseTahun = async (tahunId) => {
     setIsLoading(true);
     try {
+      const tahun = await getTahunAjaranById(tahunId);
+      if (tahun) {
+        setTahunAjar(tahun);
+      }
       const mk = await getMataKuliahActiveByTahunId(tahunId);
       if (mk) {
         setListMk(mk);
@@ -86,9 +94,16 @@ export default function DashboardProdi() {
   const handleChooseMk = async (mkId) => {
     setIsLoading(true);
     try {
-      const res = await getDataPenilaianMatakuliahByMk(mkId);
-      if (res) {
-        setData(res);
+      if (mkId === '') {
+        const res = await getDataPenilaianMatakuliahByTahun(tahunAjar.id);
+        if (res) {
+          setData(res);
+        }
+      } else {
+        const res = await getDataPenilaianMatakuliahByMk(mkId);
+        if (res) {
+          setData(res);
+        }
       }
       setIsLoading(false);
     } catch (e) {
