@@ -21,6 +21,7 @@ import Kelas from '../pages/prodi/Kelas';
 import TahunAjaran from '../pages/prodi/TahunAjaran';
 import IndexPenilaian from '../pages/prodi/IndexPenilaian';
 import JenisAssessment from '../pages/prodi/kurikulum/JenisAssessment';
+import Perancangan from '../pages/prodi/Perancangan';
 
 const router = createBrowserRouter([
   {
@@ -38,6 +39,10 @@ const router = createBrowserRouter([
   {
     path: '/prodi/kurikulum',
     element: <Kurikulum />,
+  },
+  {
+    path: '/prodi/perancangan-obe',
+    element: <Perancangan />,
   },
   {
     path: '/prodi/pengguna',

@@ -7,9 +7,11 @@ import {
   ChevronDownIcon,
   ClipboardDocumentIcon,
   ClipboardDocumentListIcon,
+  DocumentChartBarIcon,
   DocumentCheckIcon,
   HomeModernIcon,
   PresentationChartLineIcon,
+  RectangleStackIcon,
   UsersIcon,
 } from '@heroicons/react/24/outline';
 import { useState } from 'react';
@@ -17,7 +19,10 @@ import { Link } from 'react-router-dom';
 
 export default function NavListProdi({ open, page }) {
   const [kOpen, setKOpen] = useState(
-    page === 'kurikulum' || page === 'plo' || page == 'jenis-assessment'
+    page === 'kurikulum' ||
+      page === 'plo' ||
+      page == 'jenis-assessment' ||
+      page == 'perancangan-obe'
       ? true
       : false
   );
@@ -67,6 +72,21 @@ export default function NavListProdi({ open, page }) {
             <AcademicCapIcon className="w-7" />
             <span className={`${!open && 'hidden'} origin-left duration-200`}>
               Kurikulum
+            </span>
+          </Link>
+        </li>
+        <li
+          className={`font-medium cursor-pointer my-1 p-2 px-4 rounded-md ${
+            page === 'perancangan-obe' ? 'bg-indigo-200' : 'bg-indigo-400'
+          } hover:bg-indigo-200`}
+        >
+          <Link
+            to={'/prodi/perancangan-obe'}
+            className="flex items-center gap-x-4"
+          >
+            <RectangleStackIcon className="w-7" />
+            <span className={`${!open && 'hidden'} origin-left duration-200`}>
+              Perancangan
             </span>
           </Link>
         </li>
@@ -197,7 +217,7 @@ export default function NavListProdi({ open, page }) {
           to={'/prodi/index-penilaian'}
           className="flex items-center gap-x-4"
         >
-          <BookOpenIcon className="w-7" />
+          <DocumentChartBarIcon className="w-7" />
           <span className={`${!open && 'hidden'} origin-left duration-200`}>
             Index Penilaian
           </span>
