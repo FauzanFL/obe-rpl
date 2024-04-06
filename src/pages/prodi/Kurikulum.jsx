@@ -136,7 +136,7 @@ export default function Kurikulum() {
           <main className="p-7 text-wrap">
             <h2 className="text-semibold text-3xl">Kurikulum</h2>
             <div className="block mt-3 p-5 bg-white border border-gray-200 rounded-lg shadow">
-              <h3 className="text-semibold text-2xl">Daftar Perancangan OBE</h3>
+              <h3 className="text-semibold text-2xl">Daftar Kurikulum</h3>
               <div className="flex justify-end items-center">
                 <button
                   onClick={() => setIsTambahOpen(true)}
