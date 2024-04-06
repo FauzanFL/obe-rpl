@@ -14,7 +14,11 @@ import { getUserRole } from '../../../api/user';
 import ModalTambahPlotting from '../../../components/modal/plotting/ModalTambahPlotting';
 import { alertDelete, alertFailed, alertSuccess } from '../../../utils/alert';
 import Loader from '../../../components/Loader';
-import { getTahunAjaran, getTahunAjaranNow } from '../../../api/tahunAjaran';
+import {
+  getTahunAjaran,
+  getTahunAjaranById,
+  getTahunAjaranNow,
+} from '../../../api/tahunAjaran';
 
 export default function PlottingDosen() {
   const navigate = useNavigate();
@@ -26,12 +30,21 @@ export default function PlottingDosen() {
   const [isLoading, setIsLoading] = useState(false);
   const listNav = [{ name: 'Plotting Dosen', link: '/prodi/plotting' }];
 
-  const itemsPerPage = 5;
+  const itemsPerPage = 2;
   const [currentPage, setCurrentPage] = useState(1);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
-  const totalPages =
-    listPlotting != null ? Math.ceil(listPlotting.length / itemsPerPage) : 1;
+  let totalPages;
+  if (listPlotting != null) {
+    const total = Math.ceil(listPlotting.length / itemsPerPage);
+    if (total > 0) {
+      totalPages = total;
+    } else {
+      totalPages = 1;
+    }
+  } else {
+    totalPages = 1;
+  }
 
   let displayedItems;
   if (listPlotting != null) {
@@ -52,16 +65,32 @@ export default function PlottingDosen() {
     }
 
     async function fetch() {
-      try {
-        const tahun = await getTahunAjaranNow();
-        setTahunSelected(tahun);
-        const res = await getPlottingByTahun(tahun.id);
-        if (res) {
-          setListPlotting(res);
+      const urlParams = new URLSearchParams(location.search);
+      const year = urlParams.get('year');
+      if (year === null) {
+        try {
+          const tahun = await getTahunAjaranNow();
+          setTahunSelected(tahun);
+          const res = await getPlottingByTahun(tahun.id);
+          if (res) {
+            setListPlotting(res);
+          }
+          setIsLoading(false);
+        } catch (e) {
+          console.error(e);
         }
-        setIsLoading(false);
-      } catch (e) {
-        console.error(e);
+      } else {
+        try {
+          const tahun = await getTahunAjaranById(year);
+          setTahunSelected(tahun);
+          const res = await getPlottingByTahun(year);
+          if (res) {
+            setListPlotting(res);
+          }
+          setIsLoading(false);
+        } catch (e) {
+          console.error(e);
+        }
       }
     }
 
@@ -76,7 +105,7 @@ export default function PlottingDosen() {
       }
     }
 
-    function fetchPage() {
+    async function fetchPage() {
       const urlParams = new URLSearchParams(location.search);
       const page = urlParams.get('page');
       if (page === null) {
@@ -125,6 +154,7 @@ export default function PlottingDosen() {
   const handlePageChange = (pageNumber) => {
     const urlParams = new URLSearchParams(location.search);
     urlParams.set('page', pageNumber);
+    urlParams.set('year', tahunSelected.id);
     navigate(`?${urlParams.toString()}`);
   };
 
@@ -133,6 +163,7 @@ export default function PlottingDosen() {
       const current = currentPage - 1;
       const urlParams = new URLSearchParams(location.search);
       urlParams.set('page', current);
+      urlParams.set('year', tahunSelected.id);
       navigate(`?${urlParams.toString()}`);
     }
   };
@@ -142,6 +173,7 @@ export default function PlottingDosen() {
       const current = currentPage + 1;
       const urlParams = new URLSearchParams(location.search);
       urlParams.set('page', current);
+      urlParams.set('year', tahunSelected.id);
       navigate(`?${urlParams.toString()}`);
     }
   };
@@ -149,12 +181,14 @@ export default function PlottingDosen() {
   const handleFirst = () => {
     const urlParams = new URLSearchParams(location.search);
     urlParams.set('page', 1);
+    urlParams.set('year', tahunSelected.id);
     navigate(`?${urlParams.toString()}`);
   };
 
   const handleLast = () => {
     const urlParams = new URLSearchParams(location.search);
     urlParams.set('page', totalPages);
+    urlParams.set('year', tahunSelected.id);
     navigate(`?${urlParams.toString()}`);
   };
 
@@ -162,10 +196,10 @@ export default function PlottingDosen() {
     setIsLoading(true);
     const tahun = listTahunAjaran.find((item) => item.id === parseInt(tahunId));
     setTahunSelected(tahun);
+    setCurrentPage(1);
     try {
       const res = await getPlottingByTahun(tahunId);
       if (res) {
-        console.log(res);
         setListPlotting(res);
       }
       setIsLoading(false);
