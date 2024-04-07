@@ -271,9 +271,11 @@ export default function Perancangan() {
                         try {
                           const res = await deletePerancangan(item.id);
                           if (res) {
+                            alertSuccess('Berhasil menghapus data');
                             render();
                           }
                         } catch (e) {
+                          alertFailed('Gagal menghapus data');
                           console.error(e);
                         }
                       };

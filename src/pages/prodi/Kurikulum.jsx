@@ -6,7 +6,7 @@ import Pagination from '../../components/Pagination';
 import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { getUserRole } from '../../api/user';
-import { alertDelete } from '../../utils/alert';
+import { alertDelete, alertFailed, alertSuccess } from '../../utils/alert';
 import Loader from '../../components/Loader';
 import { deleteKurikulum, getKurikulum } from '../../api/kurikulum';
 import ModalTambahKurikulum from '../../components/modal/kurikulum/ModalTambahKurikulum';
@@ -165,9 +165,11 @@ export default function Kurikulum() {
                         try {
                           const res = await deleteKurikulum(item.id);
                           if (res) {
+                            alertSuccess('Berhasil menghapus data');
                             render();
                           }
                         } catch (e) {
+                          alertFailed('Gagal menghapus data');
                           console.error(e);
                         }
                       };
