@@ -91,6 +91,14 @@ export const BeritaAcaraPdf = React.forwardRef<HTMLDivElement, BeritaAcaraPdfPro
   });
   const [listIndex, setListIndex] = useState<any[]>([]);
 
+  const getPageMargins = () => {
+    const marginTop = '1cm';
+    const marginRight = '1cm';
+    const marginBottom = '1cm';
+    const marginLeft = '1cm';
+    return `@page { margin: ${marginTop} ${marginRight} ${marginBottom} ${marginLeft} !important; }`;
+  };
+
   useEffect(() => {
     async function fetchTahun() {
       const response = await getTahunAjaranById(beritaAcara.mata_kuliah.tahun_ajaran_id);
@@ -143,7 +151,8 @@ export const BeritaAcaraPdf = React.forwardRef<HTMLDivElement, BeritaAcaraPdfPro
   
   return (
     <>
-      <div ref={ref} className="p-10">
+    <style>{getPageMargins()}</style>
+      <div ref={ref} className="">
         <div className="flex items-start border-b-2 border-black py-5">
           <img src="/logo-vertikal.png" alt="" className='mr-4' width={100} />
           <div className="leading-none">

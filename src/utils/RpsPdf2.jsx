@@ -4,9 +4,17 @@ import React from 'react';
 
 export const RpsPdf2 = React.forwardRef(
   ({ rps, listClo, listPlo, dosenPengampu }, ref) => {
+    const getPageMargins = () => {
+      const marginTop = '2cm';
+      const marginRight = '2cm';
+      const marginBottom = '2cm';
+      const marginLeft = '2cm';
+      return `@page { margin: ${marginTop} ${marginRight} ${marginBottom} ${marginLeft} !important; }`;
+    };
     return (
       <>
-        <div ref={ref} className="m-5">
+        <style>{getPageMargins()}</style>
+        <div ref={ref} className="font-serif">
           <table className="border w-full border-black border-collapse">
             <thead className="bg-gray-300 text-center font-bold">
               <tr className="border-b border-black">
