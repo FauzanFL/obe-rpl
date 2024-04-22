@@ -113,7 +113,7 @@ export default function ModalEditMk({ close, render, listTahunAjaran, data }) {
           <XMarkIcon className="w-8" />
         </div>
         <h5 className="my-2 text-xl font-medium leading-tight text-neutral-800 dark:text-neutral-50">
-          Tambah Mata Kuliah
+          Edit Mata Kuliah
         </h5>
         <form
           action=""
