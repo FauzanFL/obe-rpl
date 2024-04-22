@@ -11,7 +11,13 @@ export default function ModalTambahPlotting({ close, render, tahun }) {
   const [listMk, setListMk] = useState([]);
   const [listDosen, setListDosen] = useState([]);
   const [listKelas, setListKelas] = useState([]);
-  const dataInput = {};
+  const [errStatus, setErrStatus] = useState({});
+  const [errors, setErrors] = useState({});
+  const dataInput = {
+    mk_id: 0,
+    dosen_id: 0,
+    kelas_id: 0,
+  };
 
   useEffect(() => {
     async function fetchMk() {
@@ -60,15 +66,37 @@ export default function ModalTambahPlotting({ close, render, tahun }) {
     }
   };
 
+  const validation = () => {
+    const error = {};
+    const errStat = {};
+    let status = true;
+
+    if (dataInput.mk_id === 0) {
+      error.mk = 'mata kuliah tidak boleh kosong';
+      errStat.mk = true;
+      status = false;
+    }
+
+    if (dataInput.dosen_id === 0) {
+      error.dosen = 'dosen tidak boleh kosong';
+      errStat.dosen = true;
+      status = false;
+    }
+
+    if (dataInput.kelas_id === 0) {
+      error.kelas = 'kelas tidak boleh kosong';
+      errStat.kelas = true;
+      status = false;
+    }
+
+    setErrStatus(errStat);
+    setErrors(error);
+    return status;
+  };
+
   const handleSubmit = async (event) => {
     event.preventDefault();
-    if (dataInput.mk_id === undefined || dataInput.mk_id === 0) {
-      console.log('Mata Kuliah tidak boleh kosong');
-    } else if (dataInput.dosen_id === undefined || dataInput.dosen_id === 0) {
-      console.log('Dosen tidak boleh kosong');
-    } else if (dataInput.kelas_id === undefined || dataInput.kelas_id === 0) {
-      console.log('Kelas tidak boleh kosong');
-    } else {
+    if (!validation()) {
       try {
         const res = await createPlotting(dataInput);
         if (res) {
@@ -105,7 +133,9 @@ export default function ModalTambahPlotting({ close, render, tahun }) {
               name="mk"
               id="mk"
               onChange={({ target }) => handleChange(target)}
-              className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+              className={`bg-gray-50 border ${
+                errStatus.mk ? 'border-red-500' : 'border-gray-300'
+              } text-gray-900 text-sm rounded-lg block w-full p-2.5`}
               defaultValue={''}
             >
               <option value="" disabled>
@@ -119,6 +149,9 @@ export default function ModalTambahPlotting({ close, render, tahun }) {
                 );
               })}
             </select>
+            {errStatus.mk && (
+              <span className="text-red-500 text-sm">{errors.mk}</span>
+            )}
           </div>
           <div className="mb-2">
             <label
@@ -131,7 +164,9 @@ export default function ModalTambahPlotting({ close, render, tahun }) {
               name="dosen"
               id="dosen"
               onChange={({ target }) => handleChange(target)}
-              className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+              className={`bg-gray-50 border ${
+                errStatus.dosen ? 'border-red-500' : 'border-gray-300'
+              } text-gray-900 text-sm rounded-lg block w-full p-2.5`}
               defaultValue={''}
             >
               <option value="" disabled>
@@ -145,6 +180,9 @@ export default function ModalTambahPlotting({ close, render, tahun }) {
                 );
               })}
             </select>
+            {errStatus.dosen && (
+              <span className="text-red-500 text-sm">{errors.dosen}</span>
+            )}
           </div>
           <div className="mb-2">
             <label
@@ -157,7 +195,9 @@ export default function ModalTambahPlotting({ close, render, tahun }) {
               name="kelas"
               id="kelas"
               onChange={({ target }) => handleChange(target)}
-              className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+              className={`bg-gray-50 border ${
+                errStatus.kelas ? 'border-red-500' : 'border-gray-300'
+              } text-gray-900 text-sm rounded-lg block w-full p-2.5`}
               defaultValue={''}
             >
               <option value="" disabled>
@@ -171,6 +211,9 @@ export default function ModalTambahPlotting({ close, render, tahun }) {
                 );
               })}
             </select>
+            {errStatus.kelas && (
+              <span className="text-red-500 text-sm">{errors.kelas}</span>
+            )}
           </div>
           <div className="flex justify-center mt-3">
             <button
