@@ -91,7 +91,7 @@ export default function ModalTambahPlotting({ close, render, tahun }) {
           <XMarkIcon className="w-8" />
         </div>
         <h5 className="my-2 text-xl font-medium leading-tight text-neutral-800 dark:text-neutral-50">
-          Tambah PLO
+          Tambah Plotting
         </h5>
         <form action="" onSubmit={handleSubmit} className="overflow-auto">
           <div className="mb-2">
