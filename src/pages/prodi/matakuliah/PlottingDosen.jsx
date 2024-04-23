@@ -30,7 +30,7 @@ export default function PlottingDosen() {
   const [isLoading, setIsLoading] = useState(false);
   const listNav = [{ name: 'Plotting Dosen', link: '/prodi/plotting' }];
 
-  const itemsPerPage = 2;
+  const itemsPerPage = 5;
   const [currentPage, setCurrentPage] = useState(1);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
