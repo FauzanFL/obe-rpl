@@ -96,7 +96,7 @@ export default function ModalTambahPlotting({ close, render, tahun }) {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    if (!validation()) {
+    if (validation()) {
       try {
         const res = await createPlotting(dataInput);
         if (res) {
