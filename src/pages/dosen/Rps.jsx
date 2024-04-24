@@ -84,7 +84,6 @@ export default function Rps() {
     fetchUser();
     fetchPage();
     fetch();
-    setIsLoading(false);
   }, [navigate, location]);
 
   const handleSearch = async (key) => {
