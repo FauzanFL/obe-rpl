@@ -178,7 +178,9 @@ export default function ModalEditTahunAjaran({ close, render, data }) {
               name="semester"
               id="semester"
               onChange={({ target }) => handleChange(target)}
-              className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+              className={`bg-gray-50 border ${
+                errStatus.semester ? 'border-red-500' : 'border-gray-300'
+              } text-gray-900 text-sm rounded-lg block w-full p-2.5`}
               defaultValue={data.semester}
             >
               <option value="" disabled>
@@ -187,6 +189,9 @@ export default function ModalEditTahunAjaran({ close, render, data }) {
               <option value="Ganjil">Ganjil</option>
               <option value="Genap">Genap</option>
             </select>
+            {errStatus.semester && (
+              <span className="text-red-500 text-sm">{errors.semester}</span>
+            )}
           </div>
           <div className="mb-2">
             <label
@@ -199,7 +204,9 @@ export default function ModalEditTahunAjaran({ close, render, data }) {
               name="bulan_mulai"
               id="bulan_mulai"
               onChange={({ target }) => handleChange(target)}
-              className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+              className={`bg-gray-50 border ${
+                errStatus.bulan_mulai ? 'border-red-500' : 'border-gray-300'
+              } text-gray-900 text-sm rounded-lg block w-full p-2.5`}
               defaultValue={data.bulan_mulai}
             >
               <option value="" disabled>
@@ -211,6 +218,9 @@ export default function ModalEditTahunAjaran({ close, render, data }) {
                 </option>
               ))}
             </select>
+            {errStatus.bulan_mulai && (
+              <span className="text-red-500 text-sm">{errors.bulan_mulai}</span>
+            )}
           </div>
           <div className="mb-2">
             <label
@@ -223,7 +233,9 @@ export default function ModalEditTahunAjaran({ close, render, data }) {
               name="bulan_selesai"
               id="bulan_selesai"
               onChange={({ target }) => handleChange(target)}
-              className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+              className={`bg-gray-50 border ${
+                errStatus.bulan_selesai ? 'border-red-500' : 'border-gray-300'
+              } text-gray-900 text-sm rounded-lg block w-full p-2.5`}
               defaultValue={data.bulan_selesai}
             >
               <option value="" disabled>
@@ -235,6 +247,11 @@ export default function ModalEditTahunAjaran({ close, render, data }) {
                 </option>
               ))}
             </select>
+            {errStatus.bulan_selesai && (
+              <span className="text-red-500 text-sm">
+                {errors.bulan_selesai}
+              </span>
+            )}
           </div>
           <div className="flex justify-center mt-3">
             <button
