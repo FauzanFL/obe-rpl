@@ -44,6 +44,15 @@ export default function ModalEditIndexPenilaian({ close, render, data }) {
       status = false;
     }
 
+    if (
+      dataInput.batas_awal != undefined &&
+      dataInput.batas_akhir < dataInput.batas_awal
+    ) {
+      error.batas_akhir = 'batas akhir tidak boleh kurang dari batas awal';
+      errStat.batas_akhir = true;
+      status = false;
+    }
+
     setErrStatus(errStat);
     setErrors(error);
     return status;
