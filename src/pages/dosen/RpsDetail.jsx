@@ -56,7 +56,6 @@ export default function RpsDetail() {
     setIsLoading(true);
     fetchUser();
     fetchRps();
-    setIsLoading(false);
   }, [params, navigate]);
 
   const listNav = [
