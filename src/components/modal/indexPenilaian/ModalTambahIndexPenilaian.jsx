@@ -47,9 +47,7 @@ export default function ModalTambahIndexPenilaian({ close, render }) {
       error.batas_akhir = 'batas akhir tidak boleh kosong';
       errStat.batas_akhir = true;
       status = false;
-    }
-
-    if (
+    } else if (
       dataInput.batas_awal != undefined &&
       dataInput.batas_akhir < dataInput.batas_awal
     ) {

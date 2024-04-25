@@ -44,10 +44,18 @@ export default function ModalTambahMk({ close, render, listTahunAjaran }) {
       error.sks = 'sks tidak boleh kosong';
       errStat.sks = true;
       status = false;
+    } else if (dataInput.sks < 1) {
+      error.sks = 'sks tidak boleh kurang dari 1';
+      errStat.sks = true;
+      status = false;
     }
 
     if (dataInput.semester === 0) {
       error.semester = 'semester tidak boleh kosong';
+      errStat.semester = true;
+      status = false;
+    } else if (dataInput.semester < 1) {
+      error.semester = 'semester tidak boleh kurang dari 1';
       errStat.semester = true;
       status = false;
     }
