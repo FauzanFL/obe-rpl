@@ -89,7 +89,7 @@ export default function ModalEditPerancangan({ close, render, id }) {
           <XMarkIcon className="w-8" />
         </div>
         <h5 className="my-2 text-xl font-medium leading-tight text-neutral-800 dark:text-neutral-50">
-          Tambah Perancangan OBE
+          Edit Perancangan OBE
         </h5>
         <form action="" onSubmit={handleSubmit} className="overflow-auto">
           <div className="mb-2">
