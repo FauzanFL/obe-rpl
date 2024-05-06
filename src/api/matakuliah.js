@@ -86,7 +86,7 @@ export const updateMataKuliah = async (data, id) => {
 
 export const deleteMataKuliah = async (id) => {
   const result = await axios.delete(
-    `${import.meta.env.VITE_API_URL}/mata_kuliah/update/${id}`,
+    `${import.meta.env.VITE_API_URL}/mata_kuliah/delete/${id}`,
     {
       withCredentials: true,
     }
