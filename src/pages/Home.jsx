@@ -119,7 +119,7 @@ export default function Home() {
   return (
     <>
       <div className="flex">
-        <div className="">
+        <div className="fixed top-0 bottom-0 z-50 bg-indigo-500 md:static">
           <Sidebar typeUser={'all'} />
         </div>
         <div className="flex-1 h-screen">

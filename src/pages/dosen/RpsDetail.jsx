@@ -47,6 +47,7 @@ export default function RpsDetail() {
           setListClo(res.clo);
           setListPlo(res.plo);
           setListAssessment(res.lembar_assessment);
+          setIsLoading(false);
         }
       } catch (e) {
         console.error(e);
@@ -65,7 +66,7 @@ export default function RpsDetail() {
   return (
     <>
       <div className="flex">
-        <div className="">
+        <div className="fixed top-0 bottom-0 z-50 bg-indigo-500 md:static">
           <Sidebar typeUser={'dosen'} page={'rps'} />
         </div>
         <div className="flex-1 h-screen overflow-auto">

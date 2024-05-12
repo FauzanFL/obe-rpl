@@ -143,7 +143,7 @@ export default function MataKuliahDosen() {
   return (
     <>
       <div className="flex">
-        <div className="">
+        <div className="fixed top-0 bottom-0 z-50 bg-indigo-500 md:static">
           <Sidebar typeUser={'dosen'} page={'matakuliah'} />
         </div>
         <div className="flex-1 h-screen overflow-auto">

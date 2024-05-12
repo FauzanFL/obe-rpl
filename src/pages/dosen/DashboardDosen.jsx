@@ -85,7 +85,7 @@ export default function DashboardDosen() {
   return (
     <>
       <div className="flex">
-        <div className="">
+        <div className="fixed top-0 bottom-0 z-50 bg-indigo-500 md:static">
           <Sidebar typeUser={'dosen'} page={'dashboard'} />
         </div>
         <div className="flex-1 h-screen overflow-auto">
@@ -99,7 +99,7 @@ export default function DashboardDosen() {
               name="mk"
               id="mk"
               className="bg-gray-50 border border-gray-300 mb-1
-               text-gray-900 text-sm rounded-lg block w-96 p-2.5"
+               text-gray-900 text-sm rounded-lg block w-60 md:w-96 p-2.5"
               defaultValue={mkFirst.current.id}
               onChange={({ target }) => handleChooseMk(target.value)}
             >

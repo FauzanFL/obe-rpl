@@ -204,7 +204,7 @@ export default function Clo() {
   return (
     <>
       <div className="flex">
-        <div className="">
+        <div className="fixed top-0 bottom-0 z-50 bg-indigo-500 md:static">
           <Sidebar typeUser={'dosen'} page={'rps'} />
         </div>
         <div className="flex-1 h-screen overflow-auto">
@@ -216,7 +216,7 @@ export default function Clo() {
             <h2 className="text-semibold text-3xl">{mk.nama}</h2>
             <div className="block mt-3 p-5 bg-white border border-gray-200 rounded-lg shadow">
               <h3 className="text-semibold text-2xl">Daftar CLO</h3>
-              <div className="flex justify-between items-center">
+              <div className="flex flex-col md:flex-row items-start justify-between md:items-center">
                 <div className="py-2">
                   <label htmlFor="simple-search" className="sr-only">
                     Search

@@ -10,7 +10,9 @@ export default function NavListDosen({ open, page }) {
   return (
     <>
       <li
-        className={`font-bold cursor-pointer my-1 p-2 px-4 rounded-md ${
+        className={` ${
+          open ? 'block' : 'hidden md:block'
+        } font-bold cursor-pointer my-1 p-2 px-4 rounded-md ${
           page === 'dashboard' ? 'bg-indigo-200' : 'bg-indigo-300'
         } hover:bg-indigo-200`}
       >
@@ -22,7 +24,9 @@ export default function NavListDosen({ open, page }) {
         </Link>
       </li>
       <li
-        className={`font-bold cursor-pointer my-1 p-2 px-4 rounded-md ${
+        className={`${
+          open ? 'block' : 'hidden md:block'
+        } font-bold cursor-pointer my-1 p-2 px-4 rounded-md ${
           page === 'matakuliah' ? 'bg-indigo-200' : 'bg-indigo-300'
         } hover:bg-indigo-200`}
       >
@@ -34,7 +38,9 @@ export default function NavListDosen({ open, page }) {
         </Link>
       </li>
       <li
-        className={`font-bold cursor-pointer my-1 p-2 px-4 rounded-md ${
+        className={`${
+          open ? 'block' : 'hidden md:block'
+        } font-bold cursor-pointer my-1 p-2 px-4 rounded-md ${
           page === 'rps' ? 'bg-indigo-200' : 'bg-indigo-300'
         } hover:bg-indigo-200`}
       >

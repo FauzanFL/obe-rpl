@@ -11,7 +11,7 @@ export default function Sidebar({ typeUser, page }) {
     <>
       <aside
         className={` ${
-          open ? 'w-72' : 'w-20'
+          open ? 'md:w-72 w-60' : 'md:w-20 w-0'
         } duration-300 min-h-screen bg-indigo-500 relative shadow-inner`}
       >
         <Bars3CenterLeftIcon

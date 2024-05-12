@@ -801,7 +801,7 @@ export default function PenilaianKelasDosen() {
   return (
     <>
       <div className="flex">
-        <div className="">
+        <div className="fixed top-0 bottom-0 z-50 bg-indigo-500 md:static">
           <Sidebar typeUser={'dosen'} page={'matakuliah'} />
         </div>
         <div className="flex-1 h-screen overflow-auto">
@@ -916,8 +916,8 @@ export default function PenilaianKelasDosen() {
                   </button>
                 </div>
               )}
-              <div className="mt-2 flex justify-between">
-                <div className="flex justify-center">
+              <div className="mt-2 flex flex-col md:flex-row justify-between items-start">
+                <div className="flex flex-wrap items-start justify-start md:justify-center">
                 <button
                   type="button"
                   onClick={handleSimpan}
