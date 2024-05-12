@@ -1,4 +1,4 @@
-import { useState, useEffect} from 'react';
+import { useState, useEffect, useRef} from 'react';
 import { ReactGrid, Column, Row, CellChange, TextCell, NumberCell } from '@silevis/reactgrid';
 import '@silevis/reactgrid/styles.css';
 import React from 'react';
@@ -15,7 +15,7 @@ import {
   deletePenilaian,
   getDataPenilaian, updatePenilaian,
 } from '../../../api/penilaian';
-import { ArrowDownTrayIcon, CheckBadgeIcon, CheckCircleIcon } from '@heroicons/react/24/solid';
+import { ArrowDownTrayIcon, CheckBadgeIcon, CheckCircleIcon, DocumentArrowDownIcon } from '@heroicons/react/24/solid';
 import { alertFailed, alertFinalization, alertInfo, alertSuccess } from '../../../utils/alert';
 import { createBeritaAcara } from '../../../api/beritaAcara';
 import exceljs from 'exceljs';
@@ -139,6 +139,13 @@ export default function PenilaianKelasDosen() {
   const [listIndex, setListIndex] = useState<any[]>([]);
   const params = useParams();
   const navigate = useNavigate();
+  const [initialPenilaian, setInitialPenilaian] = useState<Penilaian>({
+    id: 0,
+    nilai: [],
+    status: '',
+    mk_id: 0,
+    kelas_id: 0,
+  });
 
   useEffect(() => {
     setIsLoading(true);
@@ -185,6 +192,7 @@ export default function PenilaianKelasDosen() {
             penilaianTemp.mk_id = Number(params.mkId)
             penilaianTemp.kelas_id = Number(params.kelasId)
             setPenilaian(penilaianTemp)
+            setInitialPenilaian(JSON.parse(JSON.stringify(penilaianTemp)));
             if (resData.penilaian.status === 'final') {
               setIsFinal(true);
             }
@@ -231,6 +239,10 @@ export default function PenilaianKelasDosen() {
     }
   }
 
+  const cloAssessment = dataPenilaian.clo_assessment;
+  let lembarAssessments: LembarAssessment[] = []
+  let headers: { id: number; name:string; type: string; }[] = []
+
   const formatFloat = (value: number): number => {
     const num = value.toString().split('.');
     if (num[1] && num[1].length > 2) {
@@ -239,6 +251,96 @@ export default function PenilaianKelasDosen() {
       return value;
     }
   }
+
+  const processJsonData = (jsonData: exceljs.RowValues[]): Penilaian => {
+    const penilaianData: Penilaian = {
+      id: penilaian.id,
+      nilai: [],
+      status: penilaian.status,
+      mk_id: penilaian.mk_id,
+      kelas_id: penilaian.kelas_id,
+    };
+  
+    const headerRow = jsonData[1];
+    const errors = {isError: false, messages: {}}
+  
+    for (let i = 2; i < jsonData.length; i++) {
+      const row = jsonData[i];
+      if (row) {
+        let nim = row[1]
+        if (typeof nim === 'number') {
+          nim = nim.toString()
+        }
+        const nama = row[2]
+        
+        const isNimExists = penilaianData.nilai.some((item) => item.nim === nim);
+        if (!isNimExists) {
+          if (/^\d+$/.test(nim)) {
+            const nilai = row.slice(3, lembarAssessments.length+3)?.map((item) => item) ?? [];
+            const nilaiAssessment : NilaiAssessment[] = []
+            lembarAssessments.forEach((item, i) => {
+              let nilaiFinal = 0
+              if (nilai[i] >= 0 && nilai[i] <= 100) {
+                nilaiFinal = parseFloat(nilai[i])
+              } else {
+                errors.isError = true
+                errors.messages['invalidNilai'] = 'Nilai tidak valid'
+              }
+              nilaiAssessment.push({
+                assessment_id: item.id,
+                nilai: nilaiFinal,
+              })
+            })
+            penilaianData.nilai.push({
+              nim,
+              nama,
+              nilai_assessment: nilaiAssessment,
+            });
+          } else {
+            errors.isError = true
+            errors.messages['invalidNim'] = 'NIM tidak valid'
+          }
+        } else {
+          errors.isError = true
+          errors.messages['exists'] = 'NIM sudah ada'
+        }
+      }
+    }
+
+    if (errors.isError) {
+      alertInfo(`Terdapat kesalahan: ${Object.values(errors.messages).join(', ')}`)
+    }
+  
+    return penilaianData;
+  };
+
+  const handleFileUpload = async (event) => {
+    const file = event.target.files[0];
+    const workbook = new exceljs.Workbook();
+    const reader = new FileReader();
+  
+    reader.onload = async (e) => {
+      setIsLoading(true);
+      const buffer = (e.target as FileReader).result as ArrayBuffer;
+      await workbook.xlsx.load(buffer);
+  
+      const worksheet = workbook.getWorksheet(kelas.kode_kelas);
+      if (worksheet) {
+        const jsonData = worksheet.getSheetValues();
+        // processJsonData(jsonData)
+        const penilaianData = processJsonData(jsonData);
+  
+        // Lakukan sesuatu dengan data JSON dari file Excel
+        console.log(penilaianData);
+        setPenilaian(penilaianData);
+        setIsLoading(false);
+      }
+    };
+  
+    reader.readAsArrayBuffer(file);
+    const fileInput = document.getElementById('importFile') as HTMLInputElement;
+    fileInput.value = ''
+  };
 
   const getData = (): any[][] => {
     const data: any[][] = [];
@@ -274,7 +376,7 @@ export default function PenilaianKelasDosen() {
       );
       const nilaiTotal = na / cloAssessment.length;
       
-      data.push([...rowData, ...rowAssessment, ...rowClo, formatFloat(nilaiTotal)]);
+      data.push([...rowData, ...rowAssessment, ...rowClo, formatFloat(nilaiTotal), getIndexNilai(formatFloat(nilaiTotal))]);
     });
 
     return data;
@@ -282,7 +384,7 @@ export default function PenilaianKelasDosen() {
 
   const handleDownload = () => {
     const workbook = new exceljs.Workbook();
-    const worksheet = workbook.addWorksheet(`Penilaian ${mk.kode_mk} ${kelas.kode_kelas}`);
+    const worksheet = workbook.addWorksheet(kelas.kode_kelas);
 
     const data = getData();
     worksheet.addRows(data);
@@ -363,12 +465,20 @@ export default function PenilaianKelasDosen() {
         const res = await createPenilaian(penilaian)
         if (res) {
           alertSuccess('Data berhasil disimpan')
+          setInitialPenilaian(penilaian)
         }
       } catch (e) {
         console.error(e);
         alertFailed("error")
       }
     }
+    setInitialPenilaian(JSON.parse(JSON.stringify(penilaian)));
+  }
+
+  const isDataReady = (): boolean => {
+    const str1 = JSON.stringify(penilaian)
+    const str2 = JSON.stringify(initialPenilaian)
+    return str1 === str2 ? true : false
   }
 
   const handleFinal = async (e) => {
@@ -380,18 +490,27 @@ export default function PenilaianKelasDosen() {
       nilai: dataPenilaian.penilaian.nilai,
       penilaian_id: dataPenilaian.penilaian.id,
     }
-    alertFinalization(async () => {
-      try {
-        const res = await createBeritaAcara(beritaAcara)
-        if (res) {
-          alertSuccess('Data berhasil difinalisasi')
-          render()
-        }
-      } catch (e) {
-        console.error(e);
-        alertFailed("Data gagal difinalisasi")
+    const check = isDataReady()
+    if (penilaian.nilai.length === 0) {
+      alertInfo('Data tidak lengkap')
+    } else {
+      if (check) {
+        alertFinalization(async () => {
+          try {
+            const res = await createBeritaAcara(beritaAcara)
+            if (res) {
+              alertSuccess('Data berhasil difinalisasi')
+              render()
+            }
+          } catch (e) {
+            console.error(e);
+            alertFailed("Data gagal difinalisasi")
+          }
+        })
+      } else {
+        alertInfo('Data belum disimpan')
       }
-    })
+    }
   }
 
   const listNav = [
@@ -405,10 +524,6 @@ export default function PenilaianKelasDosen() {
       link: `/dosen/matakuliah/${mk.id}/penilaian/kelas/${kelas.id}`,
     },
   ];
-
-  const cloAssessment = dataPenilaian.clo_assessment;
-  let lembarAssessments: LembarAssessment[] = []
-  let headers: { id: number; name:string; type: string; }[] = []
 
   const getColumns = (): Column[] => {
     const columns: Column[] = [
@@ -490,7 +605,11 @@ export default function PenilaianKelasDosen() {
               const nim = change.newCell.text
               const isNimExists = penilaianSearch.some((item) => item.nim === nim);
               if (!isNimExists) {
-                found.nim = nim
+                if (/^\d+$/.test(nim)) {
+                  found.nim = nim
+                } else {
+                  alertInfo('NIM harus berupa angka')
+                }
               } else {
                 alertInfo('NIM sudah ada')
               }
@@ -504,15 +623,29 @@ export default function PenilaianKelasDosen() {
         } else {
           const assessment = headers.find((item) => item.name === change.columnId)
           if (assessment) {
+            let invalid = false
             const foundAssessment = found.nilai_assessment.find((item) => item.assessment_id === assessment?.id);
             if (foundAssessment) {
-              foundAssessment.nilai = change.newCell.value
+              if (change.newCell.value >= 0 && change.newCell.value <= 100) {
+                foundAssessment.nilai = change.newCell.value
+              } else {
+                invalid = true
+                foundAssessment.nilai = NaN
+              }
             } else {
               const listAssessments = lembarAssessments.map((assess) => {
                 if (assess.id === assessment.id && change.type == 'number') {
-                  return {
-                    assessment_id: assessment.id,
-                    nilai: change.newCell.value
+                  if (change.newCell.value >= 0 && change.newCell.value <= 100) {
+                    return {
+                      assessment_id: assessment.id,
+                      nilai: change.newCell.value
+                    }
+                  } else {
+                    invalid = true
+                    return {
+                      assessment_id: assessment.id,
+                      nilai: NaN
+                    }
                   }
                 } else {
                   return {
@@ -521,7 +654,11 @@ export default function PenilaianKelasDosen() {
                   }
                 }
               })
-              found.nilai_assessment.push(...listAssessments)
+              if (!invalid) {
+                found.nilai_assessment.push(...listAssessments)
+              } else {
+                alertInfo("Nilai harus diantara 0-100")
+              }
             }
           }
         }
@@ -533,18 +670,22 @@ export default function PenilaianKelasDosen() {
           nim = change.newCell.text
           const nimExists = newPenilaian.nilai.some(item => item.nim === nim);
           if (!nimExists) {
-            const listAssessments = lembarAssessments.map((assess) => {
-              return {
-                assessment_id: assess.id,
-                nilai: 0,
-              }
-            })
-            assessments.push(...listAssessments)
-            newPenilaian.nilai.push({
-              nim: nim,
-              nama: nama,
-              nilai_assessment: assessments
-            })
+            // if (/^\d+$/.test(nim)) {
+              const listAssessments = lembarAssessments.map((assess) => {
+                return {
+                  assessment_id: assess.id,
+                  nilai: 0,
+                }
+              })
+              assessments.push(...listAssessments)
+              newPenilaian.nilai.push({
+                nim: nim,
+                nama: nama,
+                nilai_assessment: assessments
+              })  
+            // } else {
+            //   alertInfo('NIM harus berupa angka')
+            // }
           } else {
             alertInfo("NIM sudah ada");
           }
@@ -643,10 +784,10 @@ export default function PenilaianKelasDosen() {
         rows.push(...Array.from({ length: numOfRow - penilaian.nilai.length }, (_, i) => i).map((i) => ({
           rowId: uuidv4(),
           cells: columns.map((item) => {
-            if (item.columnId == 'nim' || item.columnId == 'nama' || item.columnId == 'Grade') {
-              return { type: "text" as "text", text: "" }
+              if (item.columnId == 'nim' || item.columnId == 'nama' || item.columnId == 'Grade') {
+                return { type: "text" as "text", text: "", nonEditable: (penilaian.status === 'final') ? true: false, }
               } else {
-              return { type: "number" as "number", value: NaN, nanToZero: true }
+                return { type: "number" as "number", value: NaN, nanToZero: true, nonEditable: (penilaian.status === 'final') ? true: false, }
               }
             }),
           })));
@@ -792,6 +933,13 @@ export default function PenilaianKelasDosen() {
                   <ArrowDownTrayIcon className='h-5 w-5 mr-1' />
                   Download
                 </button>
+                <form action="">
+                  <input id='importFile' type="file" onChange={((e) => handleFileUpload(e))} accept='.xlsx, .csv' hidden/>
+                  <label htmlFor="importFile" className="flex justify-center items-center focus:outline-none h-fit text-white bg-orange-600 hover:cursor-pointer hover:bg-orange-700 focus:ring-4 focus:ring-orange-300 font-medium rounded-lg text-sm px-3 py-1.5 me-2 mb-2">
+                  <DocumentArrowDownIcon className='h-5 w-5 mr-1' />
+                    Import
+                  </label>
+                </form>
                 </div>
                 <div className="flex flex-col justify-center items-center">
                   <button
@@ -816,7 +964,7 @@ export default function PenilaianKelasDosen() {
                   )}
                 </div>
               </div>
-              <div className="overflow-auto">
+              <div className="overflow-auto overflow-y-scroll">
                 <ReactGrid rows={rows} columns={columns} onCellsChanged={handleChanges} moveRightOnEnter stickyTopRows={1} enableRangeSelection />
               </div>
             </div>

@@ -26,7 +26,7 @@ export const alertSuccess = (msg) => {
 export const alertInfo = (msg) => {
   Swal.fire({
     title: msg,
-    timer: 1500,
+    timer: 3000,
     icon: 'info',
     showClass: {
       popup: `
