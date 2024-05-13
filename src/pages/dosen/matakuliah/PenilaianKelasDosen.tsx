@@ -590,7 +590,6 @@ export default function PenilaianKelasDosen() {
     prevPenilaian: Penilaian
   ): Penilaian => {
     let newPenilaian = { ...prevPenilaian };
-    console.log(changes)
     changes.forEach((change) => {
       const found = newPenilaian.nilai.find((item) => item.nim === change.rowId);
       if (found) {
@@ -633,6 +632,9 @@ export default function PenilaianKelasDosen() {
                 invalid = true
                 foundAssessment.nilai = NaN
               }
+              if (invalid) {
+                alertInfo("Nilai harus diantara 0-100")
+              }
             } else {
               const listAssessments = lembarAssessments.map((assess) => {
                 if (assess.id === assessment.id && change.type == 'number') {
@@ -669,27 +671,29 @@ export default function PenilaianKelasDosen() {
           let nama:string = ''
           let assessments:NilaiAssessment[] = []
           nim = change.newCell.text
-          console.log(nim, typeof nim);
-          const nimExists = newPenilaian.nilai.some(item => item.nim === nim);
-          if (!nimExists) {
-            if (/^\d+$/.test(nim)) {
-              const listAssessments = lembarAssessments.map((assess) => {
-                return {
-                  assessment_id: assess.id,
-                  nilai: 0,
-                }
-              })
-              assessments.push(...listAssessments)
-              newPenilaian.nilai.push({
-                nim: nim,
-                nama: nama,
-                nilai_assessment: assessments
-              })  
+          if (nim !== null && nim !== '') {
+            nim = nim.trim()
+            const nimExists = newPenilaian.nilai.some(item => item.nim === nim);
+            if (!nimExists) {
+              if (/^\d+$/.test(nim)) {
+                const listAssessments = lembarAssessments.map((assess) => {
+                  return {
+                    assessment_id: assess.id,
+                    nilai: 0,
+                  }
+                })
+                assessments.push(...listAssessments)
+                newPenilaian.nilai.push({
+                  nim: nim,
+                  nama: nama,
+                  nilai_assessment: assessments
+                })  
+              } else {
+                alertInfo('NIM harus berupa angka')
+              }
             } else {
-              alertInfo('NIM harus berupa angka')
+              alertInfo("NIM sudah ada");
             }
-          } else {
-            alertInfo("NIM sudah ada");
           }
         } else {
           alertInfo("Isi NIM terlebih dahulu")
