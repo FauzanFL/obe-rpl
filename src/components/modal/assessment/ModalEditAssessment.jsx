@@ -134,7 +134,7 @@ export default function ModalEditAssessment({
         >
           <XMarkIcon className="w-8" />
         </div>
-        <h5 className="my-2 text-xl font-medium leading-tight text-neutral-800 dark:text-neutral-50">
+        <h5 className="my-2 text-xl font-medium leading-tight text-neutral-800">
           Edit Lembar Assessment
         </h5>
         <form

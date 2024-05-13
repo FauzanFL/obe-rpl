@@ -79,7 +79,7 @@ export default function ModalTambahPerancangan({ close, render }) {
         >
           <XMarkIcon className="w-8" />
         </div>
-        <h5 className="my-2 text-xl font-medium leading-tight text-neutral-800 dark:text-neutral-50">
+        <h5 className="my-2 text-xl font-medium leading-tight text-neutral-800">
           Tambah Perancangan OBE
         </h5>
         <form action="" onSubmit={handleSubmit} className="overflow-auto">
