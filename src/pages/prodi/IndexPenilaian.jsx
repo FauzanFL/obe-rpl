@@ -71,7 +71,7 @@ export default function IndexPenilaian() {
   return (
     <>
       <div className="flex">
-        <div className="">
+        <div className="fixed top-0 bottom-0 z-50 bg-indigo-500 md:static">
           <Sidebar typeUser={'prodi'} page={'index-penilaian'} />
         </div>
         <div className="flex-1 h-screen overflow-auto">
@@ -83,7 +83,7 @@ export default function IndexPenilaian() {
             <h2 className="text-semibold text-3xl">Index Penilaian</h2>
             <div className="block mt-3 p-5 bg-white border border-gray-200 rounded-lg shadow">
               <h3 className="text-semibold text-2xl">Daftar Index</h3>
-              <div className="flex justify-end items-center">
+              <div className="flex justify-start md:justify-end items-center">
                 <button
                   type="button"
                   onClick={() => setIsTambahOpen(true)}

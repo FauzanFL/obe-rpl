@@ -73,7 +73,7 @@ export default function JenisAssessment() {
   return (
     <>
       <div className="flex">
-        <div className="">
+        <div className="fixed top-0 bottom-0 z-50 bg-indigo-500 md:static">
           <Sidebar typeUser={'prodi'} page={'jenis-assessment'} />
         </div>
         <div className="flex-1 h-screen overflow-auto">
@@ -87,7 +87,7 @@ export default function JenisAssessment() {
               <h3 className="text-semibold text-2xl">
                 Daftar Jenis Assessment
               </h3>
-              <div className="flex justify-end items-center">
+              <div className="flex justify-start md:justify-end items-center">
                 <button
                   type="button"
                   onClick={() => setIsTambahOpen(true)}

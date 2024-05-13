@@ -35,7 +35,9 @@ export default function NavListProdi({ open, page }) {
   return (
     <>
       <li
-        className={`font-bold cursor-pointer my-1 p-2 px-4 rounded-md ${
+        className={`${
+          open ? 'block' : 'hidden md:block'
+        } font-bold cursor-pointer my-1 p-2 px-4 rounded-md ${
           page === 'dashboard' ? 'bg-indigo-200' : 'bg-indigo-300'
         } hover:bg-indigo-200`}
       >
@@ -48,7 +50,9 @@ export default function NavListProdi({ open, page }) {
       </li>
       <li
         onClick={() => setKOpen(!kOpen)}
-        className="font-bold flex items-center gap-x-4 cursor-pointer my-1 p-2 px-4 rounded-md bg-indigo-300 hover:bg-indigo-200"
+        className={`${
+          open ? 'block' : 'hidden md:block'
+        } font-bold flex items-center gap-x-4 cursor-pointer my-1 p-2 px-4 rounded-md bg-indigo-300 hover:bg-indigo-200`}
       >
         <AcademicCapIcon className="w-7" />
         <span className={`${!open && 'hidden'} origin-left duration-200`}>
@@ -64,7 +68,9 @@ export default function NavListProdi({ open, page }) {
         className={`${!kOpen ? 'h-0' : 'h-auto'} overflow-hidden duration-500`}
       >
         <li
-          className={`font-medium cursor-pointer my-1 p-2 px-4 rounded-md ${
+          className={`${
+            open ? 'block' : 'hidden md:block'
+          } font-medium cursor-pointer my-1 p-2 px-4 rounded-md ${
             page === 'kurikulum' ? 'bg-indigo-200' : 'bg-indigo-400'
           } hover:bg-indigo-200`}
         >
@@ -76,7 +82,9 @@ export default function NavListProdi({ open, page }) {
           </Link>
         </li>
         <li
-          className={`font-medium cursor-pointer my-1 p-2 px-4 rounded-md ${
+          className={`${
+            open ? 'block' : 'hidden md:block'
+          } font-medium cursor-pointer my-1 p-2 px-4 rounded-md ${
             page === 'perancangan-obe' ? 'bg-indigo-200' : 'bg-indigo-400'
           } hover:bg-indigo-200`}
         >
@@ -91,7 +99,9 @@ export default function NavListProdi({ open, page }) {
           </Link>
         </li>
         <li
-          className={`font-medium cursor-pointer my-1 p-2 px-4 rounded-md ${
+          className={`${
+            open ? 'block' : 'hidden md:block'
+          } font-medium cursor-pointer my-1 p-2 px-4 rounded-md ${
             page === 'plo' ? 'bg-indigo-200' : 'bg-indigo-400'
           } hover:bg-indigo-200`}
         >
@@ -103,7 +113,9 @@ export default function NavListProdi({ open, page }) {
           </Link>
         </li>
         <li
-          className={`font-medium cursor-pointer my-1 p-2 px-4 rounded-md ${
+          className={`${
+            open ? 'block' : 'hidden md:block'
+          } font-medium cursor-pointer my-1 p-2 px-4 rounded-md ${
             page === 'jenis-assessment' ? 'bg-indigo-200' : 'bg-indigo-400'
           } hover:bg-indigo-200`}
         >
@@ -120,7 +132,9 @@ export default function NavListProdi({ open, page }) {
       </ul>
       <li
         onClick={() => setMkOpen(!mkOpen)}
-        className="font-bold flex items-center gap-x-4 cursor-pointer mb-1 p-2 px-4 rounded-md bg-indigo-300 hover:bg-indigo-200"
+        className={`${
+          open ? 'block' : 'hidden md:block'
+        } font-bold flex items-center gap-x-4 cursor-pointer mb-1 p-2 px-4 rounded-md bg-indigo-300 hover:bg-indigo-200`}
       >
         <BookOpenIcon className="w-7" />
         <span className={`${!open && 'hidden'} origin-left duration-200`}>
@@ -136,7 +150,9 @@ export default function NavListProdi({ open, page }) {
         className={`${!mkOpen ? 'h-0' : 'h-auto'} overflow-hidden duration-500`}
       >
         <li
-          className={`font-medium cursor-pointer my-1 p-2 px-4 rounded-md ${
+          className={`${
+            open ? 'block' : 'hidden md:block'
+          } font-medium cursor-pointer my-1 p-2 px-4 rounded-md ${
             page === 'matakuliah' ? 'bg-indigo-200' : 'bg-indigo-400'
           }  hover:bg-indigo-200`}
         >
@@ -148,7 +164,9 @@ export default function NavListProdi({ open, page }) {
           </Link>
         </li>
         <li
-          className={`font-medium cursor-pointer my-1 p-2 px-4 rounded-md ${
+          className={`${
+            open ? 'block' : 'hidden md:block'
+          } font-medium cursor-pointer my-1 p-2 px-4 rounded-md ${
             page === 'plotting' ? 'bg-indigo-200' : 'bg-indigo-400'
           }  hover:bg-indigo-200`}
         >
@@ -160,7 +178,9 @@ export default function NavListProdi({ open, page }) {
           </Link>
         </li>
         <li
-          className={`font-medium cursor-pointer my-1 p-2 px-4 rounded-md ${
+          className={`${
+            open ? 'block' : 'hidden md:block'
+          } font-medium cursor-pointer my-1 p-2 px-4 rounded-md ${
             page === 'penilaian' ? 'bg-indigo-200' : 'bg-indigo-400'
           } hover:bg-indigo-200`}
         >
@@ -173,7 +193,9 @@ export default function NavListProdi({ open, page }) {
         </li>
       </ul>
       <li
-        className={`font-bold cursor-pointer p-2 px-4 rounded-md ${
+        className={`${
+          open ? 'block' : 'hidden md:block'
+        } font-bold cursor-pointer p-2 px-4 rounded-md ${
           page === 'pengguna' ? 'bg-indigo-200' : 'bg-indigo-300'
         } hover:bg-indigo-200`}
       >
@@ -185,7 +207,9 @@ export default function NavListProdi({ open, page }) {
         </Link>
       </li>
       <li
-        className={`font-bold cursor-pointer my-1 p-2 px-4 rounded-md ${
+        className={`${
+          open ? 'block' : 'hidden md:block'
+        } font-bold cursor-pointer my-1 p-2 px-4 rounded-md ${
           page === 'kelas' ? 'bg-indigo-200' : 'bg-indigo-300'
         } hover:bg-indigo-200`}
       >
@@ -197,7 +221,9 @@ export default function NavListProdi({ open, page }) {
         </Link>
       </li>
       <li
-        className={`font-bold cursor-pointer my-1 p-2 px-4 rounded-md ${
+        className={`${
+          open ? 'block' : 'hidden md:block'
+        } font-bold cursor-pointer my-1 p-2 px-4 rounded-md ${
           page === 'tahun-ajaran' ? 'bg-indigo-200' : 'bg-indigo-300'
         } hover:bg-indigo-200`}
       >
@@ -209,7 +235,9 @@ export default function NavListProdi({ open, page }) {
         </Link>
       </li>
       <li
-        className={`font-bold cursor-pointer my-1 p-2 px-4 rounded-md ${
+        className={`${
+          open ? 'block' : 'hidden md:block'
+        } font-bold cursor-pointer my-1 p-2 px-4 rounded-md ${
           page === 'index-penilaian' ? 'bg-indigo-200' : 'bg-indigo-300'
         } hover:bg-indigo-200`}
       >

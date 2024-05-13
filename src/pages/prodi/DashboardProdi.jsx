@@ -115,7 +115,7 @@ export default function DashboardProdi() {
   return (
     <>
       <div className="flex">
-        <div className="">
+        <div className="fixed top-0 bottom-0 z-50 bg-indigo-500 md:static">
           <Sidebar typeUser={'prodi'} page={'dashboard'} />
         </div>
         <div className="flex-1 h-screen overflow-auto">
@@ -125,7 +125,7 @@ export default function DashboardProdi() {
           </div>
           <main className="p-7 text-wrap">
             <h2 className="text-semibold text-3xl mb-3">Dashboard</h2>
-            <div className="flex justify-between">
+            <div className="flex flex-wrap justify-between">
               <select
                 name="tahun"
                 id="tahun"
@@ -148,7 +148,7 @@ export default function DashboardProdi() {
               <select
                 name="mk"
                 id="mk"
-                className="bg-gray-50 border border-gray-300 mb-1 max-w-fit
+                className="bg-gray-50 border border-gray-300 mb-1 max-w-full md:max-w-fit
                text-gray-900 text-sm rounded-lg block w-96 p-2.5"
                 onChange={({ target }) => handleChooseMk(target.value)}
               >

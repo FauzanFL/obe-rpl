@@ -171,7 +171,7 @@ export default function Penilaian() {
   return (
     <>
       <div className="flex">
-        <div className="">
+        <div className="fixed top-0 bottom-0 z-50 bg-indigo-500 md:static">
           <Sidebar typeUser={'prodi'} page={'penilaian'} />
         </div>
         <div className="flex-1 h-screen overflow-auto">
@@ -183,7 +183,7 @@ export default function Penilaian() {
             <h2 className="text-semibold text-3xl">Penilaian</h2>
             <div className="block mt-3 p-5 bg-white border border-gray-200 rounded-lg shadow">
               <h3 className="text-semibold text-2xl">Daftar Mata Kuliah</h3>
-              <div className="py-2 flex justify-between">
+              <div className="py-2 flex flex-col md:flex-row items-start justify-between md:items-center">
                 <label htmlFor="simple-search" className="sr-only">
                   Search
                 </label>
@@ -217,7 +217,7 @@ export default function Penilaian() {
                 <select
                   name="tahun"
                   id="tahun"
-                  className="bg-gray-50 border border-gray-300
+                  className="bg-gray-50 border mt-1 border-gray-300
                text-gray-900 text-sm rounded-lg block w-40 p-2.5"
                   defaultValue={tahunSelected.id}
                   onChange={({ target }) => handleChooseTahun(target.value)}

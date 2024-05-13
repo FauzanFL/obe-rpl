@@ -210,7 +210,7 @@ export default function PlottingDosen() {
   return (
     <>
       <div className="flex">
-        <div className="">
+        <div className="fixed top-0 bottom-0 z-50 bg-indigo-500 md:static">
           <Sidebar typeUser={'prodi'} page={'plotting'} />
         </div>
         <div className="flex-1 h-screen overflow-auto">
@@ -242,7 +242,7 @@ export default function PlottingDosen() {
                   );
                 })}
               </select>
-              <div className="flex justify-between items-center">
+              <div className="flex flex-col md:flex-row items-start justify-between md:items-center">
                 <div className="py-2">
                   <label htmlFor="simple-search" className="sr-only">
                     Search

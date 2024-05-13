@@ -215,7 +215,7 @@ export default function TahunAjaran() {
   return (
     <>
       <div className="flex">
-        <div className="">
+        <div className="fixed top-0 bottom-0 z-50 bg-indigo-500 md:static">
           <Sidebar typeUser={'prodi'} page={'tahun-ajaran'} />
         </div>
         <div className="flex-1 h-screen overflow-auto">
@@ -227,7 +227,7 @@ export default function TahunAjaran() {
             <h2 className="text-semibold text-3xl">Tahun Ajaran</h2>
             <div className="block mt-3 p-5 bg-white border border-gray-200 rounded-lg shadow">
               <h3 className="text-semibold text-2xl">Daftar Tahun Ajaran</h3>
-              <div className="flex justify-between items-center">
+              <div className="flex flex-col md:flex-row items-start justify-between md:items-center">
                 <div className="py-2">
                   <label htmlFor="simple-search" className="sr-only">
                     Search

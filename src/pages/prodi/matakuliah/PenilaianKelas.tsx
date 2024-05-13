@@ -490,7 +490,7 @@ export default function PenilaianKelas() {
   return (
     <>
       <div className="flex">
-        <div className="">
+        <div className="fixed top-0 bottom-0 z-50 bg-indigo-500 md:static">
           <Sidebar typeUser={'prodi'} page={'penilaian'} />
         </div>
         <div className="flex-1 h-screen overflow-auto">
