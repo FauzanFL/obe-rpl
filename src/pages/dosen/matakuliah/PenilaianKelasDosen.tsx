@@ -276,7 +276,7 @@ export default function PenilaianKelasDosen() {
         const isNimExists = penilaianData.nilai.some((item) => item.nim === nim);
         if (!isNimExists) {
           if (/^\d+$/.test(nim)) {
-            const nilai = row.slice(3, lembarAssessments.length+3)?.map((item) => item) ?? [];
+            const nilai = row?.slice(3, lembarAssessments.length+3)?.map((item) => item) ?? [];
             const nilaiAssessment : NilaiAssessment[] = []
             lembarAssessments.forEach((item, i) => {
               let nilaiFinal = 0
@@ -590,6 +590,7 @@ export default function PenilaianKelasDosen() {
     prevPenilaian: Penilaian
   ): Penilaian => {
     let newPenilaian = { ...prevPenilaian };
+    console.log(changes)
     changes.forEach((change) => {
       const found = newPenilaian.nilai.find((item) => item.nim === change.rowId);
       if (found) {
@@ -668,9 +669,10 @@ export default function PenilaianKelasDosen() {
           let nama:string = ''
           let assessments:NilaiAssessment[] = []
           nim = change.newCell.text
+          console.log(nim, typeof nim);
           const nimExists = newPenilaian.nilai.some(item => item.nim === nim);
           if (!nimExists) {
-            // if (/^\d+$/.test(nim)) {
+            if (/^\d+$/.test(nim)) {
               const listAssessments = lembarAssessments.map((assess) => {
                 return {
                   assessment_id: assess.id,
@@ -683,9 +685,9 @@ export default function PenilaianKelasDosen() {
                 nama: nama,
                 nilai_assessment: assessments
               })  
-            // } else {
-            //   alertInfo('NIM harus berupa angka')
-            // }
+            } else {
+              alertInfo('NIM harus berupa angka')
+            }
           } else {
             alertInfo("NIM sudah ada");
           }
