@@ -327,11 +327,7 @@ export default function PenilaianKelasDosen() {
       const worksheet = workbook.getWorksheet(kelas.kode_kelas);
       if (worksheet) {
         const jsonData = worksheet.getSheetValues();
-        // processJsonData(jsonData)
         const penilaianData = processJsonData(jsonData);
-  
-        // Lakukan sesuatu dengan data JSON dari file Excel
-        console.log(penilaianData);
         setPenilaian(penilaianData);
         setIsLoading(false);
       }
