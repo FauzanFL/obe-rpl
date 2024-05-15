@@ -736,20 +736,26 @@ export default function PenilaianKelasDosen() {
           cells: [
             { type: "text", text: nilai.nim, nonEditable: (penilaian.status === 'final') ? true: false,  },
             { type: "text", text: nilai.nama, nonEditable: (penilaian.status === 'final') ? true: false, },
-            ...(nilai.nilai_assessment.length > 0 ? nilai.nilai_assessment.map((nilaiAssessment: NilaiAssessment) => ({
-              type: "number" as "number",
-              assessment_id: nilaiAssessment.assessment_id,
-              value: nilaiAssessment.nilai,
-              nanToZero: true,
-              nonEditable: (penilaian.status === 'final') ? true: false,
-            })) : 
-            lembarAssessments.map((assessment) => ({
-              type: "number" as "number",
-              assessment_id: assessment.id,
-              value: NaN,
-              nanToZero: true,
-              nonEditable: (penilaian.status === 'final') ? true: false,
-            }))
+            ...(lembarAssessments.length > 0 ? lembarAssessments.map((assessment) => {
+              const foundAssessment = nilai.nilai_assessment.find((item) => item.assessment_id === assessment.id);
+              if (foundAssessment) {
+                return {
+                  type: "number" as "number",
+                  assessment_id: assessment.id,
+                  value: formatFloat(foundAssessment.nilai),
+                  nonEditable: (penilaian.status === 'final') ? true: false,
+                  nanToZero: true,
+                }
+              } else {
+                return {
+                  type: "number" as "number",
+                  assessment_id: assessment.id,
+                  value: NaN,
+                  nanToZero: true,
+                  nonEditable: (penilaian.status === 'final') ? true: false,
+                }
+              }
+            }) : []
             ),
             ...cloAssessment.map((clo) => {
               let cloNilai = 0;
