@@ -532,21 +532,25 @@ export default function PenilaianKelasDosen() {
     let cloHeaders: { id: number; name:string; type: string; }[] = []
     let assessmentHeaders: { id: number; name:string; type: string; }[] = []
 
-    cloAssessment.forEach((clo) => {
-      clo.assessments.forEach((assessment) => {
-        lembarAssessments.push(assessment)
-        assessmentHeaders.push({ id: assessment.id, name:`${assessment.nama} (${assessment.bobot * 100}%)`, type: "assessment" })
-        assessmentColumns.push({
-          columnId: `${assessment.nama} (${assessment.bobot * 100}%)`,
+    if (cloAssessment) {
+      cloAssessment.forEach((clo) => {
+        if (clo.assessments) {
+          clo.assessments.forEach((assessment) => {
+            lembarAssessments.push(assessment)
+            assessmentHeaders.push({ id: assessment.id, name:`${assessment.nama} (${assessment.bobot * 100}%)`, type: "assessment" })
+            assessmentColumns.push({
+              columnId: `${assessment.nama} (${assessment.bobot * 100}%)`,
+              width: 150,
+            })
+          })
+        }
+        cloHeaders.push({ id: clo.id, name:`${clo.nama} (${clo.bobot * 100}%)`, type: "clo" })
+        cloColumns.push({
+          columnId: `${clo.nama} (${clo.bobot * 100}%)`,
           width: 150,
         })
-      })
-      cloHeaders.push({ id: clo.id, name:`${clo.nama} (${clo.bobot * 100}%)`, type: "clo" })
-      cloColumns.push({
-        columnId: `${clo.nama} (${clo.bobot * 100}%)`,
-        width: 150,
-      })
-    });
+      });
+    }
 
     const col : Column = {
       columnId: "NA",
@@ -750,16 +754,21 @@ export default function PenilaianKelasDosen() {
             ...cloAssessment.map((clo) => {
               let cloNilai = 0;
               let count = 0;
-              nilai.nilai_assessment.forEach((nilaiAssessment) => {
-                const assessment = clo.assessments.find(
-                  (assessment) => assessment.id === nilaiAssessment.assessment_id
-                );
-                if (assessment) {
-                  cloNilai += nilaiAssessment.nilai;
-                  count++
-                }
-              });
-              const avgClo = cloNilai / count;
+              if (clo.assessments) {
+                nilai.nilai_assessment.forEach((nilaiAssessment) => {
+                  const assessment = clo.assessments.find(
+                    (assessment) => assessment.id === nilaiAssessment.assessment_id
+                  );
+                  if (assessment) {
+                    cloNilai += nilaiAssessment.nilai;
+                    count++
+                  }
+                });
+              }
+              let avgClo = cloNilai / count;
+              if (isNaN(avgClo)) {
+                avgClo = 0;
+              }
               na += avgClo;
               return {
                 type: "number" as "number",
