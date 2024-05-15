@@ -318,20 +318,23 @@ export default function PenilaianKelasDosen() {
     const file = event.target.files[0];
     const workbook = new exceljs.Workbook();
     const reader = new FileReader();
-  
-    reader.onload = async (e) => {
-      setIsLoading(true);
-      const buffer = (e.target as FileReader).result as ArrayBuffer;
-      await workbook.xlsx.load(buffer);
-  
-      const worksheet = workbook.getWorksheet(kelas.kode_kelas);
-      if (worksheet) {
-        const jsonData = worksheet.getSheetValues();
-        const penilaianData = processJsonData(jsonData);
-        setPenilaian(penilaianData);
-        setIsLoading(false);
-      }
-    };
+    if (penilaian.status !== 'final') {
+      reader.onload = async (e) => {
+        setIsLoading(true);
+        const buffer = (e.target as FileReader).result as ArrayBuffer;
+        await workbook.xlsx.load(buffer);
+    
+        const worksheet = workbook.getWorksheet(kelas.kode_kelas);
+        if (worksheet) {
+          const jsonData = worksheet.getSheetValues();
+          const penilaianData = processJsonData(jsonData);
+          setPenilaian(penilaianData);
+          setIsLoading(false);
+        }
+      };
+    } else {
+      alertInfo('Data tidak dapat diubah karena sudah difinalisasi')
+    }
   
     reader.readAsArrayBuffer(file);
     const fileInput = document.getElementById('importFile') as HTMLInputElement;
